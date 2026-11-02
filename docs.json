@@ -9,29 +9,56 @@
   },
   "favicon": "/favicon.svg",
   "navigation": {
-    "pages": [
+    "groups": [
       {
-        "group": "Getting Started",
-        "pages": [
-          "index",
-          "quickstart"
-        ]
+        "group": "Start here",
+        "pages": []
+      },
+      {
+        "group": "Documents",
+        "pages": []
+      },
+      {
+        "group": "Templates reference",
+        "pages": []
+      },
+      {
+        "group": "Command Center",
+        "pages": []
+      },
+      {
+        "group": "Operations",
+        "pages": []
+      },
+      {
+        "group": "Clients",
+        "pages": []
+      },
+      {
+        "group": "Implementation",
+        "pages": []
+      },
+      {
+        "group": "Sales and HR Roadmap",
+        "pages": []
+      },
+      {
+        "group": "Intelligence",
+        "pages": []
+      },
+      {
+        "group": "Settings",
+        "pages": []
+      },
+      {
+        "group": "Admin and account",
+        "pages": []
+      },
+      {
+        "group": "Reference",
+        "pages": []
       }
-    ],
-    "global": {
-      "anchors": [
-        {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
-          "icon": "book-open-cover"
-        },
-        {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
-        }
-      ]
-    }
+    ]
   },
   "logo": {
     "light": "/logo/light.svg",
