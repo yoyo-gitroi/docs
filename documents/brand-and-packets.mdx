@@ -1,0 +1,192 @@
+---
+title: "Brand sets and packets"
+sidebarTitle: "Brand and packets"
+description: "Run a packet to create a set of documents for one client, manage packets, and view or manage the brand sets new templates are built from."
+keywords: ["packets", "run packet", "document packet", "onboarding bundle", "generate documents for client", "brand", "brand set", "letterhead", "logo", "brand assets"]
+---
+
+<Info>
+**URL:** `/documents/packets` and `/documents/brand` (mirrors: `/settings/packets`, `/settings/brand-assets`) · **Reach:** sidebar **Documents** → top tab **Packets** or **Brand** · **Roles:** Principal ✓ everything · Operator ✓ run packets and view brand sets only · **Ready when:** title **Packets** (packet cards or the empty-state line) or title **Brand & letterhead** (brand cards, "Loading..." gone).
+</Info>
+
+Packets create several documents for one client in one run. Brand sets hold the logo, colours, fonts and layout that new templates are built from.
+
+## Page map
+
+**Packets** (`/documents/packets`):
+- Title **Packets**, description "Group templates so one client gets the whole set in a single run."
+- **New packet** (Principal and Admin only). Operators see "You can run packets but not change them — editing a packet needs an admin or owner role."
+- Packet cards: a row with a chevron, the packet name, `{n} templates` and the description; **Run**; pencil icon (aria-label `Edit {name}`) and bin icon (aria-label `Delete {name}`) for Principal and Admin.
+- Under a card when open: the run panel, or the ordered template list.
+
+**Brand & letterhead** (`/documents/brand`):
+- Title **Brand & letterhead**, description "The logo, colours, lettering and layout new templates are built from."
+- Amber note: "This is the brand new templates are built from. Changing it does not restyle documents that already exist, and does not change the letterhead on the next document you generate — that still comes from the workspace brand under Settings → General. Wiring these together is pending."
+- **New brand set** (Principal and Admin only). Operators see "You can look at and preview these, but changing one needs an admin or owner role."
+- Brand cards: colour dot with logo, name, badges "Default" and "Custom" or "Platform", description, an eye icon button, preset badges.
+- Editor (after clicking a card): cards **Identity**, **Colors**, **Fonts**, **Layout Presets**, action buttons, and a **Preview** card.
+
+## Recipes
+
+### Run a packet for one client
+**Risk:** `WRITE` (`AI` only if the packet holds an official PDF form) · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** packet name; client.
+
+1. Open `/documents/packets` (or Documents top tab **Packets**).
+   - Wait for: "Loading packets…" to be replaced by packet cards.
+2. Optional: click the packet's name row (button with a chevron) to see its ordered templates ("Loading…" first). Each line shows the template title and slug.
+3. Click **Run** (button with a play icon; visual: right side of the packet's row).
+   - Wait for: a panel under the row: `Creates {n} separate documents for one client. Nothing is merged into a single file, and this result list is not kept.`
+4. Click **Select a client…** (combobox; visual: left of the panel), type in "Search clients…" and click the client.
+5. Click `Generate {n} documents` (button; disabled until a client is chosen).
+   - Wait for: the spinner on the button to stop; then a line `{created} created` (with `, {failed} failed` if any) and one row per template with **Open** or a red error ("Failed" when there is no message). Several seconds; longer with PDF forms.
+6. Record the result list now. Open each document with a middle-click or in a new tab on **Open** (link to `/documents/{id}`). Opening in the same tab loses the list.
+7. In each editor: fill or clear sample values ([Clear template sample data](/documents/document-editor#clear-template-sample-data)), then **Share** → **Download PDF (editable)**.
+
+**Done when:** `{created} created` shows and every created document has been opened or recorded.
+
+Packet documents hold template defaults plus client data. No AI prose is written (except for official PDF forms, which get one extraction pass). If you lose the list, find the documents on `/documents` (newest first; search by client slug).
+
+| If you see | Why | Do this |
+|---|---|---|
+| "Failed to generate the packet" | Run failed | Retry once; report |
+| A row with a red error | That template failed | Create that document separately ([Create a document](/documents/create-a-document)) |
+| "Failed to load packets" | Load failed | Reload |
+| "No packets yet. Create one to generate a whole set of documents at once." | No packets | A Principal must create one |
+
+### Create or edit a packet
+**Risk:** `WRITE` · **Roles:** Principal only (Operator: not available)
+
+1. Click **New packet** (button; visual: top-right) or the pencil icon on a packet (icon button, aria-label `Edit {name}`).
+   - Wait for: a form card "Create packet" or "Edit packet".
+2. Type **Packet name** (placeholder "e.g. Onboarding bundle") and **Description** (placeholder "All documents needed for new hire onboarding").
+3. Under `Select templates ({n} selected)`, search with "Search templates…" and tick the templates' checkboxes.
+4. Under **Generation order**, use "↑" (aria-label "Move up"), "↓" (aria-label "Move down") and "×" (aria-label "Remove") to order the list.
+5. Click **Create packet** (or **Save packet** when editing). **Cancel** closes the form.
+
+**Done when:** the form closes and the packet card shows the new name and `{n} templates`.
+
+| If you see | Why | Do this |
+|---|---|---|
+| "Failed to save packet" | Save failed | Check name and templates; retry |
+| "Could not load that packet to edit it" | Load failed | Reload and retry |
+
+Clear an error with the "×" (icon button, aria-label "Dismiss").
+
+### Delete a packet
+**Risk:** `DESTRUCTIVE` · **Roles:** Principal only
+
+1. Find the packet card on `/documents/packets`.
+
+<Warning>**Approval required (DESTRUCTIVE).** Stop here and get approval before clicking the bin. The packet is deleted immediately with no confirmation and no undo. Documents it already created are not affected.</Warning>
+
+2. Click the bin icon (icon button, aria-label `Delete {name}`; visual: right end of the packet's row).
+
+**Done when:** the card is gone. Failure: "Failed to delete packet".
+
+### View or preview a brand set
+**Risk:** `READ` · **Roles:** Principal, Operator
+
+1. Open `/documents/brand` (or Documents top tab **Brand**).
+   - Wait for: "Loading..." to be replaced by brand cards.
+2. Click the eye icon on a card (icon button with no label; visual: right end of the card) to render a preview under the list (frame titled "Brand asset preview").
+3. Or click the card to open the editor (read-only for Operators and for platform sets). Platform sets show "This is a platform brand set, shared across workspaces, so it cannot be changed here. Create a copy to make your own version of it."
+
+**Done when:** the preview frame shows. While rendering: "Rendering preview...". Without a preview: "Click Preview to see how documents will look with this brand asset".
+
+### Create or edit a brand set
+**Risk:** `WRITE` · **Roles:** Principal only
+
+This changes the brand used when new templates are created. It does not change existing documents or the letterhead of the next generated document (that comes from Settings → General).
+
+1. Click **New brand set** (top-right), or click a custom brand card. On a platform card, **Create a copy** opens a new set; it starts from default values, not from the platform set.
+2. **Identity** card: **Name** (placeholder "Brand name"), **Description** (placeholder "Short description"), **Logo SVG** (placeholder `<svg ...>...</svg>`; paste SVG markup).
+3. **Colors** card: eight colour pickers labelled primary, accent, text, textMuted, surface, background, border, primaryWashed.
+4. **Fonts** card: **Heading Font**, **Body Font**.
+5. **Layout Presets** card: header (Logo + Title Split, Logo Centered, Minimal), sections (Callout Box, Card, Plain Underline), signature (2-Column Grid, Stacked, Inline), footer (Split, Centered). Each card has an info button (aria-label `Info about {section}`, title "What does this control?").
+6. Click **Create brand set** (new) or **Save changes** (existing). Disabled while the name is empty.
+7. Optional: click **Refresh preview** (saved sets only). **Cancel** closes the editor.
+
+**Done when:** the editor closes or saves without a red error, and the card shows the new values.
+
+| If you see (red box) | Why | Do this |
+|---|---|---|
+| "Save failed" or a server message | Save refused | Report it |
+| "Preview failed" | Preview render failed | Save first; preview works only for saved sets |
+
+### Delete a brand set
+**Risk:** `DESTRUCTIVE` · **Roles:** Principal only (custom sets only; platform sets cannot be deleted)
+
+1. Click the custom brand card to open its editor.
+
+<Warning>**Approval required (DESTRUCTIVE).** Stop here and get approval before clicking **Delete**. The brand set is deleted immediately with no confirmation and no undo.</Warning>
+
+2. Click **Delete** (button; visual: right end of the action row, red text).
+
+**Done when:** the editor closes and the card is gone. Failure: "Delete failed" or a server message in the red box.
+
+## Settings mirrors
+
+| URL | Same as | Notes |
+|---|---|---|
+| `/settings/packets` | `/documents/packets` | Settings tab **Packets**; own h1 **Packets** and **New packet** |
+| `/settings/brand-assets` | `/documents/brand` | Settings tab **Brand Assets**; own h1 **Brand & letterhead** and **New brand set** |
+
+The Settings item and tabs are shown only to Principal and Admin. Both pages sit under the "Settings" header ("Configure tenant workspace defaults and operating controls.").
+
+<Note>Unverified: no route guard was found, so an Operator opening these URLs directly may see them; writes are still refused.</Note>
+
+## Controls reference
+
+| Visible text | Type | Locator | What it does | Risk |
+|---|---|---|---|---|
+| **New packet** | button | Principal and Admin | Opens "Create packet" | `READ` |
+| packet name row | button with chevron | shows `{n} templates` | Expands the template list | `READ` |
+| **Run** | button | packet row | Opens the run panel | `READ` |
+| (pencil) | icon button | aria-label `Edit {name}` | Opens "Edit packet" | `READ` |
+| (bin) | icon button | aria-label `Delete {name}` | Deletes the packet at once | `DESTRUCTIVE` |
+| **Select a client…** | combobox | run panel; search "Search clients…" | Run target | `READ` |
+| `Generate {n} documents` | button | run panel; disabled until a client is chosen | Creates the documents | `WRITE` |
+| **Open** | link | per result row | Opens `/documents/{id}` | `READ` |
+| **Create packet** / **Save packet** / **Cancel** | buttons | packet form | Saves or closes | `WRITE` / `READ` |
+| (error "×") | icon button | aria-label "Dismiss" | Clears the error | `READ` |
+| **New brand set** | button | Principal and Admin | Opens a blank editor | `READ` |
+| brand card | card (clickable) | name, badges | Opens the editor | `READ` |
+| (eye icon) | icon button | no label; right end of the card | Shows the preview | `READ` |
+| **Create brand set** / **Save changes** | button | editor actions | Saves the set | `WRITE` |
+| **Create a copy** | button | platform sets, Principal | Opens a new set with default values | `READ` |
+| **Refresh preview** | button | saved sets | Re-renders the preview | `READ` |
+| **Delete** | button | custom sets, Principal | Deletes at once | `DESTRUCTIVE` |
+| **Cancel** | button | editor | Closes the editor | `READ` |
+
+## Waits and signals
+
+- Packets: "Loading packets…"; expanded list "Loading…"; run spinner, then `{created} created`.
+- Brand: "Loading..."; preview "Rendering preview...".
+
+## Gotchas
+
+- Packet run results vanish when you navigate away; open results in new tabs.
+- A packet run creates separate documents; nothing is merged into one file.
+- Packet and brand-set deletes have no confirmation.
+- **Create a copy** on a platform brand set does not copy it; it starts from defaults.
+- Brand previews work only for saved sets.
+- Brand sets do not affect existing documents or the letterhead of new documents.
+- The brand-card eye button has no accessible label; find it as the icon button at the right end of the card.
+- In-app help for packets lists only `/documents/packets`; `/settings/packets` is the same page.
+
+## Related
+
+- [Create a document](/documents/create-a-document#variant-packet-run)
+- [Document editor](/documents/document-editor)
+- [Templates](/documents/templates)
+- [How templates work](/documents/how-templates-work)
+
+## Source files
+
+- `packages/web/src/app/(dashboard)/documents/packets/page.tsx`
+- `packages/web/src/components/packets/packets-manager.tsx`
+- `packages/web/src/app/(dashboard)/documents/brand/page.tsx`
+- `packages/web/src/components/brand/brand-assets-manager.tsx`
+- `packages/web/src/app/(dashboard)/settings/packets/page.tsx`
+- `packages/web/src/app/(dashboard)/settings/brand-assets/page.tsx`

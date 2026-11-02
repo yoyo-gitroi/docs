@@ -1,0 +1,142 @@
+---
+title: "Generate page (legacy)"
+sidebarTitle: "Generate page"
+description: "Use the legacy /generate page that client, roadmap, case and HR Intel buttons open: pick a template and client, fill the form, optionally run AI fill, and generate a saved document."
+keywords: ["generate document", "generate page", "client generate", "draft deliverable", "draft with context", "research and fill", "generate from case", "HR intel", "template POC"]
+---
+
+<Info>
+**URL:** `/generate` (query parameters below) · **Reach:** not in the Documents tabs; opened by buttons elsewhere (client page **Generate Document**, Roadmap **Draft**, case **Generate from case** when the assistant is off, HR Intel) · **Roles:** Principal ✓ Operator ✓ (Admin and Member too) · **Ready when:** page title **Generate Document**, the middle-column heading shows a template name (or "No template selected"), and the preview status reads "Ready".
+</Info>
+
+An older, form-first way to create a document from a code template. It does not write prose from a request the way the [document chat](/documents/create-a-document) does: it fills template defaults, the client profile and whatever you type, with optional AI fill buttons. Use it when another page sends you here; otherwise prefer the chat.
+
+## Page map
+
+- **Page header:** title **Generate Document**, description "Author, enrich, preview, and save brand-aware Ariya documents.", breadcrumb "Generate". Top-right actions: the template slug badge, **Save draft**, **Reset**, **Generate**.
+- **Left column, template picker:** search `Search {n} templates`; a select with "HR operator templates" or "All code templates" (both show the same list); a category select ("All categories" or a category); the grouped list (each item: name, "client" tag, "Platform" tag, description). "No templates match." when empty.
+- **Middle column:** h2 template name, description, badge "Needs content" or "Draft", Category, Exports, Source, Catalog; **Draft safety** box (**Save draft**, **Reset draft**, restore chips `{label} · {time}`); the HR Intel card (only from HR Intel); **Client (required)** or **Client (recommended)** select with **Research + fill**; **Document context** fields; the "Mostly template defaults" panel with **Enrich** (only when the form is mostly defaults); **Document AI** box with **Run edit**; the AI proposal card; red error text; then the template's form.
+- **Right column, Live preview:** export badges, **Copy HTML**, status "Rendering", "Ready" or "Idle", note "Generate first to export or hand off from the saved document detail. Preview actions never send externally.", and a frame titled "Document preview" (or "Preview pending").
+
+## Query parameters
+
+| Parameter | Effect |
+|---|---|
+| `template={slug}` | Selects that code template. Unknown slug: toast `Template "{slug}" wasn't found — pick one below.` and nothing selected. Absent: the first template. |
+| `client={clientSlug}` | Pre-selects the client. Absent: the first client in the list is selected automatically. |
+| `source=service-case` with `case_id={caseId}` | Loads the case context, pre-selects the case's confirmed client, feeds the AI buttons, and links the generated document to the case. |
+| `source=hr-intel` | Shows the card "HR Intel source packet" with badges and **Back to HR Intel**. |
+| `sourceId`, `sourceName`, `jurisdiction` | Badges on the HR Intel card. |
+| `related_documents={id},{id}` | Up to 10 document ids stored on the new document as earlier related documents. |
+| `request_id`, `source=hr-roadmap`, `source=request`, `source=hr-assessment` | Ignored by the page. |
+
+Where the buttons that open this page come from:
+
+| Button | Opens |
+|---|---|
+| Client page header **Generate Document**; client Documents tab **Generate** or **Generate a document** | `/generate?client={clientSlug}` |
+| Client Roadmap tab **Draft** or **Draft deliverable** | `/generate?client={clientSlug}&template={slug}&source=hr-roadmap` |
+| Client documents insights or overview "Needs you" **Draft with context** or **Draft** | `/generate?client={clientSlug}&template={slug}&case_id={caseId}&source=service-case&related_documents={ids}` |
+| Requests page | `/generate?client={clientSlug}&request_id={id}&source=request` |
+| Sales documents **Generate assessment** | `/generate?...&source=hr-assessment` |
+| Operations case **Generate from case**, assistant off | `/generate?template={slug}&source=service-case&case_id={caseId}` |
+| HR Intel | `/generate?template=ca-hr-compliance&source=hr-intel` |
+| Intelligence page | `/generate?source=hr-intel` |
+
+## Recipes
+
+### Generate a document on the generate page
+**Risk:** `WRITE` (plus `AI` if you use **Research + fill**, **Enrich** or **Run edit**) · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** template; client; facts for the form.
+
+1. Arrive from a button, or open `/generate?client={clientSlug}&template={slug}`.
+   - Wait for: the middle-column heading shows the template name and the preview status reads "Ready".
+   - If a note reads `Restored local draft from {time}.`, the form holds a previous local draft for this template and client. Click **Reset draft** (or header **Reset**) unless Clarwiz wants that draft. Toast: "Draft reset".
+2. If the template is wrong: type in `Search {n} templates` (left column) and click the template in the list. Switching template resets the form to defaults.
+3. Check the **Client (required)** or **Client (recommended)** select (visual: middle column, under the header box). It may have picked the first client on its own. If it is not the client Clarwiz named, click it and choose the right one ("Select a client" placeholder; "Loading clients" while loading).
+4. Fill the template form fields in the middle column with the facts.
+5. Optional AI help (each runs once, then shows a proposal):
+   - **Research + fill** (button next to the Client label; needs a client): fills fields from the client profile, notes and memory.
+   - **Enrich** (in the "Mostly template defaults" panel; only shown when the form is mostly defaults).
+   - **Document AI**: type an instruction (placeholder "Ask for a field edit, stronger intro, tighter tone, or added detail") and click **Run edit**.
+   - Wait for: the button's spinner to stop and a card `AI proposal, {n} fields`. Click **Apply** (toast "AI proposal applied") or **Discard**. Check the applied values: AI fill may leave placeholders for unknown facts.
+6. Optional: fill **Document context** (Audience persona, placeholder "VP People, founder, ops lead"; Funnel stage: No stage, Awareness, Consideration, Decision, Expansion; Objective, placeholder "What this document should accomplish"; Update guidance, placeholder "Refresh quarterly or when policy/pricing changes").
+7. Click **Generate** (button; visual: top-right of the page header, rightmost). It is disabled while no template is selected or a required client is missing.
+   - Wait for: "Generating" on the button, then toast `Generated "{title}"` and a redirect to `/documents/{id}`.
+8. In the editor: clear or replace sample values if the blue banner shows ([Clear template sample data](/documents/document-editor#clear-template-sample-data)), wait for "Saved", then **Share** → **Download PDF (editable)**.
+
+**Done when:** the URL is `/documents/{id}` and the PDF is downloaded.
+
+| If you see | Why | Do this |
+|---|---|---|
+| `Template "{slug}" wasn't found — pick one below.` | Unknown slug in `template=` | Search and click the template |
+| "Pick a client before generating this client-scoped template." | Client-scoped template with no client | Choose the client |
+| "At least one client is required before generating a saved document." | The workspace has no clients | Stop; a client must exist first |
+| "Failed to generate" or a server message (red, middle column) | Server refused | Retry once; then use the chat path |
+| "AI returned no patch" or "AI patch failed" | AI fill failed | Fill the form by hand |
+| Preview status stays "Idle" or shows "Preview pending" | Preview not rendered yet | Wait a few seconds; change a field to re-render |
+
+### Save or reset a local draft
+**Risk:** `READ` (browser only) · **Roles:** Principal, Operator
+
+Drafts on this page are stored in the browser only, per template and client.
+- **Save draft** (header or **Draft safety** box): toast "Draft saved locally".
+- **Reset** (header) or **Reset draft**: toast "Draft reset".
+- A restore chip `{label} · {time}` in **Draft safety** restores that local draft (toast "Draft version restored").
+- **Copy HTML** (preview header) copies the preview HTML (toast "Preview HTML copied").
+
+Nothing here creates a document; only **Generate** does.
+
+## Template POC page
+
+`/template` is a developer proof of concept. It is not a production path and is not linked from navigation. Do not use it to create documents.
+- **Ready when:** h1 **Templates (DB-only POC)**, badge `{n} from database`, "Loading from database..." replaced by category cards.
+- Controls (all `READ`): **Create Template** (opens `/settings/templates/create`); filter input "Filter by name, slug, category, or description..."; template buttons (title, slug, render-source badge, "Custom" or "Platform") that open a side preview ("Rendering from database..."; close with the unlabelled "X" button); a drag divider (title "Drag to resize").
+- No role gating.
+
+## Controls reference
+
+| Visible text | Type | Locator | What it does | Risk |
+|---|---|---|---|---|
+| `Search {n} templates` | input | left column | Filters templates | `READ` |
+| "HR operator templates" / "All code templates" | select | left column | Same list either way | `READ` |
+| "All categories" / category | select | left column | Filters by category | `READ` |
+| template item | button | left list | Selects the template, resets the form | `READ` |
+| **Client (required)** / **Client (recommended)** | select | placeholder "Select a client" | Chooses the client | `READ` |
+| **Research + fill** | button | next to the Client label; needs a client | AI fill from client data | `AI` |
+| **Enrich** | button | "Mostly template defaults" panel | AI fill of generic sections | `AI` |
+| **Run edit** | button | under the Document AI box | AI edit from your instruction | `AI` |
+| **Apply** / **Discard** | buttons | `AI proposal, {n} fields` card | Applies or drops the proposal | `READ` (form only) |
+| **Save draft** / **Reset** / **Reset draft** | buttons | header and Draft safety box | Browser-only draft | `READ` |
+| **Copy HTML** | button | preview header | Copies HTML | `READ` |
+| **Generate** / "Generating" | button | header, rightmost | Creates the saved document | `WRITE` |
+| **Back to HR Intel** | link | HR Intel card | Returns to HR Intel | `READ` |
+
+## Waits and signals
+
+- Preview: "Rendering" then "Ready" (re-renders about 0.25 s after each change).
+- AI buttons: spinner on the button, then the proposal card.
+- **Generate**: "Generating", then toast `Generated "{title}"` and the editor.
+
+## Gotchas
+
+- With no `client=` the page auto-selects the first client in the list. Always check the Client select before **Generate**.
+- Local drafts auto-restore per template and client. Reset them unless wanted.
+- **Generate** is only in the page header (top-right).
+- Only code templates are listed. Templates that exist only in the database (for example customized or workspace-authored ones) are not here; use the chat or the [Templates](/documents/templates) gallery.
+- Field labels on this page can differ from the editor and the Templates gallery for the same template.
+- `request_id` and `source=hr-roadmap`, `request`, `hr-assessment` have no effect.
+- There is no in-app help guide for this page.
+
+## Related
+
+- [Create a document](/documents/create-a-document#variant-from-a-client-profile)
+- [Document editor](/documents/document-editor)
+- [Templates](/documents/templates)
+- [Choosing a template](/documents/choosing-a-template)
+
+## Source files
+
+- `packages/web/src/app/(dashboard)/generate/page.tsx`
+- `packages/web/src/lib/document-routes.ts`
+- `packages/web/src/app/(dashboard)/template/page.tsx`

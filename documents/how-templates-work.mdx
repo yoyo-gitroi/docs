@@ -1,0 +1,272 @@
+---
+title: "How templates work"
+sidebarTitle: "How templates work"
+description: "Understand where templates live, how the Document Assistant picks and fills one, what blocks a draft, and how brand, versions, packets and exports behave."
+keywords: ["templates", "how templates work", "template kinds", "client scope", "auto-fill", "client profile", "blockers", "follow-up questions", "fork template", "lock version", "packets", "export", "PDF", "DOCX", "Google Docs", "brand"]
+---
+
+<Info>
+**URL:** `/documents/templates` (catalog), `/documents/templates/{slug}` (one template), `/settings/templates` (the same templates under Settings) · **Reach:** sidebar **Documents** → **Templates** tab · **Roles:** Principal ✓ Operator ✓ browse templates and create documents · fork, edit, lock, create or deactivate a template: Principal ✓ Operator ✗ (Admin ✓, Member ✗) · **Use this page for:** the mental model. Click paths are on the linked pages.
+</Info>
+
+A template is the form and layout a document starts from. Read this page before you hand a document request to the browser agent, so you know which facts to include, which template kind behaves how, and what will stop a draft.
+
+<Warning>
+**The database is canonical.** Templates are rows in the database, and tenants can edit, fork, rename, recategorise, deactivate and add them at runtime. The [template catalog](/documents/template-catalog) in this playbook is the **shipped baseline** from the repo seed. Before you rely on a slug, title or field label, check it in sidebar **Documents** → **Templates**.
+</Warning>
+
+## Where templates live
+
+| Where | What it holds | What it means for you |
+|---|---|---|
+| Database rows | The canonical templates: layout, fields, defaults, client prefill rules | Ariya picks the first active row in this order: client-specific override, then tenant row, then platform row. A tenant fork therefore replaces the platform template for that tenant. |
+| Locked version | Optional pin on a tenant row | When a template has a locked version, new documents use that snapshot, not the latest edit. |
+| PDF forms in code | 3 official PDFs (IRS 8655, CA DE 48, isolved implementation kit) | Same for every tenant. Never editable. See [PDF forms](/documents/catalog/pdf-forms). |
+| Code backup modules | The older code copies of 96 visible templates | They still drive the `/generate` page's list and form. That page therefore lacks the 13 database-only templates and the PDF forms, and its labels can differ from the database (for example the team-member dropdowns). See [Generate page](/documents/generate-page). |
+
+The **Documents** → **Templates** catalog merges the code list, the active database rows and the PDF forms; the database row wins when both exist. Template lookups are cached for up to one hour, but saving an edit clears the cache.
+
+## Template kinds
+
+| Kind | Examples | Who writes the content | What to do |
+|---|---|---|---|
+| Handlebars | 108 of the 109 active platform templates | The assistant's LLM fills **fields only**, from the client profile, the chat and attached evidence. The Generate action on the Templates page fills no content with the LLM. | Give every fact in the request. Use the assistant when the user wants content written. |
+| Handlebars + LLM chapters | `employee-handbook` only | The LLM always writes 8 chapters, from every entry point, including the Generate action. The cover at-will callout and the acknowledgment page are fixed text. | Expect a slow run. To rebuild a client's existing handbook, attach it first; the assistant mirrors its structure. |
+| PDF form | `report-authorization-form`, `power-of-attorney-california`, `isolved-implementation-kit-form` | One LLM extraction call fills the form fields from client facts. | Create from **Documents** → **Templates**, never from the assistant. It refuses them. |
+| Legacy authored | `billing-memo` (tenant `ariya` only); some templates a tenant created with the LLM | A plan, then LLM-written prose sections. Unknown facts become bracketed snake_case placeholders that render as fillable fields. | Look for bracketed placeholders in the draft; they mark missing facts. |
+
+## Client scope and tenant scope
+
+- Each template has a scope: `client` means the document is about a client, `tenant` means it is about your own firm. In the web catalog this is only a badge.
+- The Document Assistant needs a bound client for **every** template, whatever the scope. Name a client even for internal pieces such as flyers or business cards.
+- The Templates gallery requires you to pick a client before it creates the document. Packets also require a client.
+- The `/generate` page falls back to the **first client in the list** when the template has no client-prefill fields. Always pick the client explicitly there.
+- Slack refuses every `client`-scope template with "This client-facing template is not yet on the agentic document-builder path. Please generate it from Pilot Documents…".
+
+## Fields and sections
+
+- **Sections:** each form section is a labelled group of fields, for example **Header**, **Candidate** or **Sign & return**. The catalog pages list fields under these labels.
+- **Lists:** a repeatable list has rows you add with a button such as **+ Add condition**. Each row has its own small set of fields.
+- **Field types:** text, long text, dropdown (choice), date, number, checkbox, checkbox group, email, phone and image.
+- **Required is derived, not declared.** A field counts as required when it is still blank after the template defaults and the client prefill, and neither its label nor its section label contains "optional". The assistant reports each such field as a gap.
+- **No employee picker.** Employees, candidates and contractors are free-text fields. Type the full name and any ID in the request.
+- **Team-member dropdowns:** 8 templates have a person field that picks a user from your own team and fills that user's email: `hr-assessment`, `employee-handbook-assessment`, `energy-project-assessment`, `readiness-scorecard`, `discovery-summary`, `hr-audit-report`, `ai-readiness-audit-report`, `performance-review`. These dropdowns exist only in the database version of the form; the `/generate` form shows a plain text box.
+
+<Note>
+Unverified: 28 templates declare "protected fields" that the chat assistant must not modify (for example **Classification** on the offer letter). No code that enforces this was found, so the assistant may or may not refuse to change them.
+</Note>
+
+## What fills from the client profile
+
+When a client is set, each template copies named values from the client record into its fields. The catalog lists them per template under **From the client profile**.
+
+| Client value | Where Ariya reads it |
+|---|---|
+| company name | company name, or the name on the client record |
+| address | company address |
+| phone | company phone |
+| contact email | primary contact email, else signer email |
+| contact phone | primary contact phone, else signer phone |
+| primary contact | primary contact name |
+| signer / contact name | signer name |
+| legal name | billing legal name |
+| EIN | billing federal EIN |
+| employee count | compliance employee count |
+| DBA, industry, state, contact title, service tier, engagement start | only when the client record holds that value directly |
+
+- **Dates:** many templates set dates at creation (today, an offset from today, or the current year). Sample dates in a template's defaults are cleared first, so they never leak into a document.
+- **Defaults:** every field that is not listed as starting blank has a default from the template. For marketing pieces this is sample copy. Read the draft and replace defaults the user did not ask for.
+- **Fill the client profile first.** Facts on the client record fill every future document. Facts typed in a request fill only that document.
+
+<Note>
+Unverified per client: whether DBA, industry, state and contact title resolve depends on how each client record was filled in. If the draft shows them blank, add them to the request.
+</Note>
+
+## How the assistant picks a template
+
+The Document Assistant follows this order in every new chat:
+
+1. It restates the request.
+2. It binds a client. It binds only on exactly one confident match; otherwise it asks which client.
+3. It reads the client profile and notes which key facts are present or missing (company name, industry, jurisdiction, employee count, address, phone, primary contact, email, pay frequency, PTO model, introductory period, drug policy, disciplinary steps).
+4. It gathers evidence: attached files, meeting notes and web sources.
+5. It searches templates by **plain word overlap**: your description is split into lowercase words of 3 or more characters, and each template scores one point per word found in its slug, title, category or description. It sees the top 5. Ties go alphabetically by slug.
+6. It must confirm with the user when more than one template plausibly fits, and ask when none matches.
+7. It creates the draft with the chosen slug.
+
+What this means for a request:
+
+- **Say the full template title** as it appears in **Documents** → **Templates**: "non-disclosure agreement", not "NDA"; "incident report", not "write-up". Platform templates carry no aliases. Words shorter than 3 characters are ignored, and short words such as "nda" also match inside other words, so abbreviations rank badly.
+- Expect a confirmation question when several templates share a word: warnings, proposals, service agreements, handbook variants, incident reports, workers' comp.
+- Ask for PDF forms in the Documents UI, not the assistant.
+- Never pick `elevated-hr-roadmap`, `elevated-hr-assessment`, `elevated-hr-roadmap-progress`, `implementation-billing-memo` or `billing-memo` by hand. Their modules create them from structured data.
+
+Phrase-by-phrase routing is on [Choosing a template](/documents/choosing-a-template).
+
+## How the assistant fills a template
+
+For a Handlebars template the assistant creates the document in this order:
+
+1. Template defaults, with sample dates cleared.
+2. Client profile prefill.
+3. One LLM call that sees the field list, the client profile, the chat context and up to about 20,000 characters of source text. Its instructions include `Use ONLY facts present… Never invent names, dates, amounts, addresses or legal citations… never write a placeholder such as "<UNKNOWN>", "TBD" or "[Name]"`.
+4. Values the assistant set explicitly win over the LLM fill.
+5. Team-member emails are matched to the chosen user.
+6. The document renders.
+
+Rules that follow from this:
+
+- **Every value needs a source:** the client record, an attached file, an Operations case, or the user's own words in the chat. A field nothing supports stays blank and is reported as a gap.
+- A typed field with an unknown value stays blank. It is never filled with "TBD" or "Pending".
+- A value of the wrong type (for example text in a number field) is not written; the assistant lists it back with the expected shape. The draft is still created.
+- **Default document title:** `{Client name} - {Template title} [YYYY-MM-DD]` for `client`-scope templates, otherwise the template title.
+- **The document owns a copy of its template.** At creation the template is copied into the document. Later edits in the editor or chat (layout, style, structure, fields, HTML) change only that document, never the shared template. To change future documents, a Principal edits the template in **Settings** → **Templates**.
+
+Other kinds:
+
+- **Employee handbook:** research and company enrichment, then each of the 8 chapters as typed blocks. With an attached handbook, the chapters mirror it.
+- **PDF forms:** one extraction call over the unlocked, non-excluded fields. It never invents an EIN, account number, address, phone number, bank detail or date.
+- **Legacy authored:** plan, generate, quality check, an empty-draft guard, then render. Unknown facts become bracketed placeholders.
+
+## Generate action versus the assistant
+
+| Where the document is created | Client | LLM writes content? |
+|---|---|---|
+| **Documents** → **Templates**, Generate (see [Templates page](/documents/templates)) | Required (picked in the gallery) | Handlebars: **no**, only defaults, client prefill and the values you typed. Handbook: yes. PDF form: one extraction call. |
+| `/generate` page ([Generate page](/documents/generate-page)) | Picked, or the first client as fallback | Same as above |
+| Blank document | Optional | No |
+| Document Assistant chat ([Create a document](/documents/create-a-document)) | Required | Yes, for Handlebars, handbook and legacy templates. PDF forms are refused. |
+| Packet generate ([Brand and packets](/documents/brand-and-packets)) | Required | No, except the employee handbook |
+| Slack | Required | Pipeline; `client`-scope templates refused |
+| Operations case → document | From the case | As for the assistant or the Generate route |
+| HR Roadmap module | The client | Filled from roadmap data (`elevated-hr-*` templates) |
+| Implementation billing memo | The client | Filled from implementation intake |
+
+When the user wants the document written for them, use the assistant. The Generate action gives a form-filled skeleton plus client facts only.
+
+## Blockers and follow-up questions
+
+The assistant asks only for **true blockers**, for example the employee's name on an offer letter, and batches them into one set of questions. Everything else becomes a flagged gap in the draft. The tool messages below may be quoted or paraphrased in the assistant's reply.
+
+| If you see | Why | Do this |
+|---|---|---|
+| `No client is bound to this session yet — call resolve_client first.` | No client was named or matched | Restate the request with the client's exact name. |
+| `AMBIGUOUS` or `NO MATCH — ask the user which client this document is for.` | The client name matched several or no client records | Give the exact client name as it appears under **Clients**. |
+| The assistant will not switch to another client | Switching client mid-chat needs explicit confirmation | Confirm the switch when asked, or start a new chat. |
+| `generate_draft requires a template_id. Call resolve_template first and confirm the choice with the user.` | No template was chosen | Name the template by its full title. |
+| `Template "{id}" is not available as an editable DB template…` | The template is a PDF form, or missing | Create PDF forms from **Documents** → **Templates**. Otherwise pick another template. |
+| `Refused — these values have no valid source: …` | Values were set without a source | Give the facts in the chat as the user's own statements, or attach the document they come from. |
+| A value listed back with an expected shape | Wrong type for that field | Resend it in the right form (a number, a date). |
+| Questions appear and the turn stops ("Questions presented. STOP and wait for the user's answers…") | The assistant hit true blockers | Answer every question, then wait for the next turn. |
+| `NOT ASKED: the user attached files to this chat that you have not read: …` | The assistant tried to ask before reading attachments | Nothing; it reads the files and continues. |
+| `400 DOC_AGENT_SESSION_UNBOUND` on upload | You uploaded a file before a client was bound | Bind the client first, then upload. |
+| Readiness flags "Company name", "Client address (set on Overview tab)" or "Client jurisdiction" | The client profile lacks these | Fill them on the client's profile (jurisdiction needs a client jurisdiction record). |
+| "This is a fixed PDF form. Its layout and wording cannot be edited…" | Someone tried to edit a PDF form | Only its values can be filled. |
+| 410 "Endpoint removed — use the Enrich draft button in the editor." | An old completion endpoint was called | Use **Enrich draft** in the [document editor](/documents/document-editor). |
+
+## Brand application
+
+- **Handlebars documents** use the **tenant** brand kit: the tenant's chosen kit, else the default `ariya-hr` kit. A client's own brand does not appear on them.
+- **Legacy documents** and the **PDF footer** use brand settings in this order: defaults, then tenant brand, then client brand (unless the client is set to use tenant branding). The PDF footer shows the footer tagline or, if none, the company name, in the primary colour.
+- Each template's document intent (client notice, client form, sales material, internal admin, proposal) controls the shared tagline and footer treatment.
+- **Brand assets** on **Documents** → **Brand** (logo, colours, lettering, layout presets) are used when the LLM **creates a new template**, not when existing documents render. See [Brand and packets](/documents/brand-and-packets).
+
+<Note>
+Unverified: whether a client's own brand is meant to appear on Handlebars documents. Today it does not.
+</Note>
+
+## Template versions and forks
+
+Templates have **no draft or publish status**. An internal design document describes approved, system-generated and draft template statuses; they are not implemented.
+
+| Action | Who | Risk | Rule |
+|---|---|---|---|
+| Fork a platform template | Principal, Admin | `WRITE` | Copies the platform template into a tenant template you can edit. Refused for PDF forms and when already forked. |
+| Edit a template | Principal, Admin | `WRITE` | Platform templates are read-only: "Platform-default templates cannot be edited. Fork the template first." |
+| View history, preview or restore a version | Principal, Admin | `WRITE` (restore) | Only tenant-owned database templates keep versions. Restoring never moves the lock. |
+| Lock the version new documents use | Principal, Admin | `WRITE` | Unlocking means new documents always use the newest version. |
+| Save a named variant, for example "Offer Letter (Compact)" | Principal, Admin | `WRITE` | Needs a title and a version note; sections can be left out. |
+| Create a template from a prompt or chat | Principal, Admin | `WRITE` `AI` | The LLM drafts a spec, you preview it, then it is saved as a tenant template. |
+| Deactivate or delete a template | Principal, Admin | `DESTRUCTIVE` | Platform templates cannot be deleted; PDF forms cannot be deleted or edited. Get approval first. |
+
+**Document lifecycle** is separate: `draft` → `review` → `approved` → `delivered`. Delivering requires a linked request in review, and the approver must be a different person from the author.
+
+## Packets
+
+- A packet is a tenant-defined, named list of templates generated together for one client. **No packets are seeded**; a tenant must create them.
+- Generating a packet creates every document in parallel **without the LLM** (defaults plus client prefill), except the employee handbook, which is always LLM-written.
+- Creating, editing or deleting a packet: Principal ✓ Admin ✓ Operator ✗ Member ✗. Generating a packet for a client has no extra role check.
+- Three templates are named "packet" but are **one document** with internal pages: `new-hire-packet`, `termination-packet`, `contractor-onboarding-packet-1099`.
+
+Click path: [Brand and packets](/documents/brand-and-packets).
+
+## Export formats
+
+<Warning>
+**Approval required (EXTERNAL).** Opening a document in Google Docs writes a file to the user's Google Drive, and the HubSpot handoff writes to HubSpot. Stop and get approval before either. If Google shows a consent or sign-in screen, stop and hand off to a human.
+</Warning>
+
+| Export | What you get | Risk |
+|---|---|---|
+| PDF (default) | The rendered document with fillable form fields; a flat version is also available | `READ` |
+| PDF on one page | The whole document on one A4 page, always flat. Refused when too long, and for PDF forms: "One-page export is not available for official PDF forms. Use the regular PDF download." | `READ` |
+| PDF of a PDF-form document | The publisher's PDF filled in place, still fillable | `READ` |
+| DOCX | **Plain paragraphs only.** Styling and tables are stripped. | `READ` |
+| Google Docs | A restyled copy in the user's own Drive, folder "Ariya Documents". One Doc per document per user; a later click reopens it, and edits made there are never overwritten. | `EXTERNAL` |
+| HubSpot handoff | Sends the document to HubSpot when the tenant has it turned on | `EXTERNAL` |
+
+Google Docs errors: "Connect your Google account to open documents in Google Docs." and "Your Google connection needs permission to create Google Docs. Reconnect Google, then try again." Both mean a human must connect or reconnect Google (OAuth; hand off). A disabled Drive API or a failed export returns a server error; retry once, then report it.
+
+A template's own export list (pdf, docx, png, html, xlsx) is descriptive only. The exports above apply to every document. Click path: [Document editor](/documents/document-editor).
+
+## Gotchas
+
+- The Generate action does not write content for Handlebars templates; the assistant does.
+- The `/generate` page shows 96 templates from the code copies: no database-only templates (for example the policy templates, `hr-assessment`, `incident-report`) and no PDF forms. Its form labels can differ from **Documents** → **Templates**.
+- On `/generate`, a template with no client-prefill fields silently uses the first client unless you pick one.
+- Two templates share the title "HR Incident Report" (`hr-incident-report` and `incident-report`). Prefer `hr-incident-report`.
+- "Packet" in a template title does not mean a packet of templates.
+- DOCX export loses tables and styling. Use PDF when layout matters.
+- Handlebars documents always carry the tenant brand, never the client's.
+- A stale tenant `invoice` row once shadowed the platform invoice on one environment. If a form looks wrong, check which row **Documents** → **Templates** shows.
+- Internal design documents describe template draft/approved statuses that do not exist in the app.
+
+## Related
+
+- [Template catalog](/documents/template-catalog)
+- [Choosing a template](/documents/choosing-a-template)
+- [Create a document](/documents/create-a-document)
+- [Templates page](/documents/templates)
+- [Document editor](/documents/document-editor)
+- [Generate page](/documents/generate-page)
+- [Brand and packets](/documents/brand-and-packets)
+
+## Source files
+
+- `packages/core/src/db/schema.ts` (`document_templates`, `documents`, `brand_kits`)
+- `packages/core/src/documents/engine/template-resolver.ts`
+- `packages/core/src/documents/engine/template-schema.ts`
+- `packages/core/src/documents/engine/from-registry.ts`
+- `packages/core/src/documents/engine/create-document.ts`
+- `packages/core/src/documents/engine/generate.ts`
+- `packages/core/src/documents/engine/pipeline.ts`
+- `packages/core/src/documents/engine/pdf-form-generate.ts`
+- `packages/core/src/documents/registry-fill.ts`
+- `packages/core/src/documents/engine/team-picker-fields.ts`
+- `packages/core/src/documents/agent-prompt.ts`
+- `packages/core/src/documents/agent-tools-read.ts`
+- `packages/core/src/documents/agent-tools-write.ts`
+- `packages/core/src/documents/template-authoring.ts`
+- `packages/core/src/documents/template-versions.ts`
+- `packages/core/src/documents/template-snapshot.ts`
+- `packages/core/src/documents/pdf-form-registry.ts`
+- `packages/core/src/documents/renderer.ts`
+- `packages/core/src/documents/engine/handlebars-render.ts`
+- `packages/core/src/documents/google-docs-export.ts`
+- `packages/core/src/tools/executor.ts` (Slack refusal)
+- `packages/transport-api/src/routes/templates.ts`
+- `packages/transport-api/src/routes/documents.ts`
+- `packages/transport-api/src/routes/packets.ts`
+- `packages/shared/src/roles.ts`
+- `packages/web/src/components/documents/template-catalog-rows.ts`
+- `packages/web/src/app/(dashboard)/generate/page.tsx`

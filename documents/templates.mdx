@@ -1,0 +1,246 @@
+---
+title: "Templates"
+sidebarTitle: "Templates"
+description: "Browse and preview templates, start a document from one, and (Principal) customize, edit, version-lock, reset or create templates, including the Settings mirrors."
+keywords: ["templates", "template gallery", "find a template", "use in chat", "generate now", "customize template", "edit template", "lock version", "publish template", "reset template", "create a template", "template assistant"]
+---
+
+<Info>
+**URL:** `/documents/templates` · **Reach:** sidebar **Documents** → top tab **Templates** · **Roles:** Principal ✓ (browse, generate, create, edit) · Operator ✓ browse and generate only (no **Create a template**; template pages are view-only) · **Ready when:** title **Templates** with "`{n}` templates available for document generation." and the card grid has replaced "Loading templates…".
+</Info>
+
+Templates are what documents start from. This page covers the gallery, the template drawer, the template studio, the create wizard and the Settings copies of these pages. For what each template contains and which to pick, see [How templates work](/documents/how-templates-work), [Choosing a template](/documents/choosing-a-template) and the [Template catalog](/documents/template-catalog).
+
+## Page map
+
+- **Gallery** (`/documents/templates`): breadcrumbs "Documents › Templates"; intro "A template is what a document starts from. Open one to see how it reads, use it as it is, or change it for good."; **Create a template** (Principal and Admin only); category chips (`All {n}`, then one per category); **Find a template** search; card grid (18 per page); pagination `… of {total} templates`.
+- **Template drawer** (opens from a card, right side): title, meta line `{Category} · {scope} · Custom` (or `Platform`), description, preview, footer with **Select a client…**, **Use in chat**, **Generate now**, **Open template**, and the note "“Use in chat” describes this template to the assistant, which still picks the template it judges right. “Generate now” uses this one exactly."
+- **Template studio** (`/documents/templates/{slug}`): back link **Back to templates**, name, slug, badges, then either the read-only view (built-in) or the editor (customized).
+- **Create wizard** (`/documents/templates/create`).
+
+## Recipes
+
+### Find and preview a template
+**Risk:** `READ` · **Roles:** Principal, Operator
+
+1. Open `/documents/templates`.
+   - Wait for: the card grid ("Loading templates…" disappears).
+2. Optional: click a category chip (toggle button with `aria-pressed`; visual: row above the grid). **All** resets.
+3. Click the search box (input type search, aria-label and placeholder "Find a template"; visual: right of the chips) and type the template name or a word from it. It matches title, slug, description, category and scope.
+4. Find the card (button; visual: "Platform" or "Custom" badge, title, description, line `{Category} · {scope} · {n} fields`, plus " · PDF form · fill-in only" for official PDF forms).
+5. Click the card.
+   - Wait for: the drawer with "Rendering the template…" then a preview frame `{title} preview`. Official PDF forms show "Fixed PDF form — you can only fill in its fields" and the blank PDF ("Loading the form…").
+6. To see the slug, click **Open template** (the slug shows only on the template page). Close the drawer with Esc.
+
+**Done when:** the drawer preview shows.
+
+| If you see | Why | Do this |
+|---|---|---|
+| "No templates match that word." | No match | Try another word or **All** |
+| "No preview available for this template." | Nothing to render | Use **Open template** |
+| Two cards with the same title (for example "HR Incident Report") | Several templates share a title | Open each with **Open template** and compare slugs; use the slug Clarwiz names. See [Choosing a template](/documents/choosing-a-template). |
+
+### Start a document from a template
+**Risk:** `WRITE` (plus `AI`) · **Roles:** Principal, Operator
+
+From the drawer:
+- **Use in chat** pre-fills the request on `/documents` with `Draft a {Template title} for {Client name}: ` and hands over to the AI chat. Recipe: [Use in chat](/documents/create-a-document#variant-from-a-template-with-use-in-chat).
+- **Generate now** (needs a client in the drawer's **Select a client…**; disabled with title "Pick a client to generate straight away" until then) creates the document from this exact template and opens the editor. Recipe: [Generate now](/documents/create-a-document#variant-from-a-template-with-generate-now).
+
+Failure for **Generate now**: red text in the drawer body, "Could not generate that document." or a server message.
+
+### Open the template studio
+**Risk:** `READ` · **Roles:** Principal, Operator (Operator sees everything read-only)
+
+1. Open `/documents/templates/{slug}`, or click **Open template** in the drawer.
+   - Wait for: "Loading template…" to be replaced by **Back to templates**, the template name (h1), the slug in code style, badges (category, print size, intent, exports, "customized", "PDF form · read-only") and the description. A customized template shows "Loading your customized template…" briefly.
+2. What you see next:
+   - **Built-in template, not customized:** banner "This is a built-in template. Customising it creates a tenant copy that overrides the built-in for your documents." with **Customize this template**; left cards "Fields you can fill" (PDF forms), "Venture availability", "Client fields", `Sections {n}`, "Source: …"; right **Live preview** (caption "defaultData() · brand: Ariya HR") or "Blank form" for PDF forms.
+   - **Customized template:** the editor (see the next recipes).
+   - **Operator (or any non-editor):** "View only. Your profile can see Templates: upload, edit, version, publish but not change it." and every control disabled.
+
+| If you see | Why | Do this |
+|---|---|---|
+| "Template not found." | Wrong slug | Search the gallery |
+
+### Customize a built-in template
+**Risk:** `WRITE` · **Roles:** Principal only (Operator: not available)
+**Preconditions:** the read-only view with **Customize this template**.
+
+1. Click **Customize this template** (button, testid `customize-button`; visual: inside the built-in banner).
+   - Wait for: a spinner, then the page reloads into the editor with the fork banner `Overrides the built-in {name} — documents generated for this tenant use this copy.` (testid `fork-banner`).
+
+**Done when:** the fork banner and the version strip show.
+
+| If you see | Why | Do this |
+|---|---|---|
+| "This template cannot be customised." or another server message | Not forkable (official PDF forms are read-only) | Stop; report |
+| "That template no longer exists in the registry." | Template removed | Pick another |
+| "Your profile cannot change templates — ask a Principal or Admin to make this change." | Role lacks permission | Stop; this needs a Principal |
+
+### Edit a customized template
+**Risk:** `WRITE` · **Roles:** Principal only
+
+Edits never change documents that already exist. The four tabs each have their own save button; a saved tab shows a check icon.
+
+1. **Details** tab: **Title** (input, id `tpl-title`, placeholder "Template title"), **Description** (placeholder "What this template produces and when to use it"), **Category** (select, aria-label "Template category"; "+ New category…" shows an input "New category name"). Click **Save details** (disabled when a category is required and empty).
+2. **Sections & fields** tab: per entry, inputs with aria-labels "Section id", "Section title", "Section kind", "Section layout style", or "Field name", "Field label", "Field type". Icon buttons `Move {label} up`, `Move {label} down`, `Remove {label}`, "Remove field". Add with **Add field** or **Add section**. Click **Save sections**.
+3. **Body** tab: textarea "Template body HTML". "Unsaved — preview shows the last saved version." until you click **Save body**; then "Saved.".
+4. **CSS** tab: textarea "Template CSS". Click **Save CSS**.
+   - Wait for: the tab's check icon and the right-hand **Live preview** (caption "saved template · sample data") to re-render ("Rendering preview…").
+
+Errors show in a red box; "Layout keys dropped: …" lists layout settings that were ignored.
+
+### Change a template with the template assistant
+**Risk:** `AI` `WRITE` · **Roles:** Principal only
+
+1. In the **Template assistant** card, click a mode: **Edit**, **Add**, **Polish** or **Ask** (toggle buttons with `aria-pressed`).
+2. Optional: choose a model in **Model** (select, testid `template-model-select`).
+3. Type the change into the box (placeholder "Describe the change you want…", or "Ask a question about this template…" in Ask mode).
+4. Click **Send**.
+   - Wait for: a "Proposed changes" card with key badges and collapsible before/after views. Layout-only requests apply on their own: "Layout updated — …". "No change proposed." means nothing to apply.
+5. Click **Apply** (creates a new template version) or **Discard**.
+
+**Done when:** "Applied to the template." (or "Discarded.").
+
+| If you see | Why | Do this |
+|---|---|---|
+| "Assistant request failed" | AI call failed | Retry once |
+
+### Lock a version for new documents
+**Risk:** `WRITE` · **Roles:** Principal only
+
+There is no Publish button. By default new documents use the newest version as soon as it is saved. Locking pins one version; this is the publish equivalent.
+
+1. Read the version strip (testid `template-version-strip`): `v{n}` and either "New documents use the newest version." or `New documents use v{n} (locked)`, possibly with ` — your latest edits (v{m}) aren't used yet.`
+2. Click `Lock v{n}` in the strip to pin the current version. Or click `History ({n})` and use **Lock** on any row (aria-label `Lock v{n}`).
+3. To return to "newest version", open `History ({n})` and click **Unlock (use newest)**.
+
+**Done when:** the strip states the locked version (or "New documents use the newest version." after unlocking).
+
+### View or restore a template version
+**Risk:** `READ` (view), `WRITE` (restore) · **Roles:** Principal only (Operator can open the history read-only)
+
+1. Click `History ({n})` in the version strip.
+   - Wait for: sheet `Version history ({n})` with a lock summary, rows `v{n}` with badges "Current" and "Locked · used for new documents", a source label ("History started", "Created", "Edited", "AI edit", "Restored", with the model), and buttons **View**, **Restore**, **Lock** (aria-labels `View v{n}`, `Restore v{n}`, `Lock v{n}`).
+2. Click **View** on a row.
+   - Wait for: banner `Viewing v{n}` (testid `version-view-banner`), with "(locked — used for new documents)" when locked, and buttons **Restore**, **Lock**, **Back to current**.
+3. Click **Restore** to make it the newest version, or **Back to current**.
+
+### Reset a customized template to the built-in
+**Risk:** `DESTRUCTIVE` · **Roles:** Principal only
+
+1. In the fork banner, click **Reset to default**.
+   - Wait for: inline text "Delete this override and go back to the built-in?" with **Yes, reset** and **Cancel**.
+
+<Warning>**Approval required (DESTRUCTIVE).** Stop here and get approval before clicking **Yes, reset**. It deletes the workspace's customized copy and all its versions. Existing documents are not changed.</Warning>
+
+2. Click **Yes, reset**.
+
+**Done when:** the page shows the built-in read-only view again.
+
+### Create a new template with the wizard
+**Risk:** `AI` `WRITE` · **Roles:** Principal only (others see the back link and a view-only notice)
+**Inputs from Clarwiz:** what the template is for; optional source template, file and brand; title, slug, category.
+
+1. Open `/documents/templates/create` (or **Create a template** in the gallery). Add `?from={templateSlug}` to start from an existing template (shows `Version of: {name}`).
+   - Wait for: h1 **Create a template**, back link **Templates**, chat hint "Describe the template you want to create." and "Preview will appear after your first message".
+2. Optional: pick a brand chip under "Brand Asset" (the default has the badge "default"; **Manage brands** opens `/settings/brand-assets`).
+3. Optional: click **+ Start from existing template**, search in "Search…" under "Select source template" and click a row. The badge `Version of: {name}` appears with an "×" to remove it.
+4. Optional: click the attach icon (icon button, title "Attach a PDF or image to clone its visual design") to upload a PDF, PNG, JPEG or WebP up to 10MB.
+5. Optional: choose a **Model**.
+6. Type the request in the input (placeholder `e.g. "Create a performance improvement plan template"`) and press Enter or click the send icon (icon button, aria-label "Send").
+   - Wait for: "Generating…" to end and a reply with a `Draft v{n}` chip; the preview appears. Send follow-up changes the same way (placeholder `e.g. "Remove the relocation section and make it compact"`).
+7. Optional: in the "Drafts" strip, click a chip (aria-label `View draft v{n}`) to view it, and `Lock v{n}` to choose which draft is saved. The status reads `Save will use v{n} (latest)` or `(locked)`, followed by "Drafts are kept on this page only."
+8. In the save bar, fill **Title**, **Slug** and **Category** (select "Template category" or a new category).
+9. Click `Save v{n} as template` (disabled until Title, Slug and Category are set).
+   - Wait for: the URL changes to `/documents/templates/{slug}`.
+
+**Done when:** the new template's studio page loads.
+
+| If you see | Why | Do this |
+|---|---|---|
+| "File too large (max 10MB)" | Attachment too big | Use a smaller file |
+| "Unsupported file type. Upload a PDF or image (PNG, JPEG, WebP)." | Wrong type | Convert |
+
+**Start Over** clears the wizard. Drafts are lost on reload or when you leave the page.
+
+## Settings mirrors
+
+Principal and Admin see a Settings sidebar item with tabs **Templates**, **Brand Assets** and **Packets**. These pages share code with Documents, with differences:
+
+| URL | What it is |
+|---|---|
+| `/settings/templates` | A different list, not the gallery: h1 **Templates**, "`{n}` templates available for document generation. Open one to preview and change it, or describe a new one.", **Create template** (Principal and Admin), filter "Filter by name, slug, or description…", category cards with counts, rows (name, slug, badges "PDF form · read-only", "Custom" or "Platform") linking to `/settings/templates/{slug}`. "Loading…", "No templates match your filter.". No drawer, no **Use in chat**, no **Generate now**. |
+| `/settings/templates/{slug}` | Same studio as `/documents/templates/{slug}`; **Back to templates** returns to `/settings/templates`. |
+| `/settings/templates/create` | Same wizard; back link **Templates** → `/settings/templates`; after saving goes to `/settings/templates/{slug}`. |
+
+All Settings pages sit under the "Settings" header ("Configure tenant workspace defaults and operating controls.") and the Settings tabs.
+
+<Note>Unverified: no route guard was found for the Settings pages, so an Operator who opens these URLs directly may see them; writes are still refused for non-Principal roles.</Note>
+
+## Controls reference
+
+| Visible text | Type | Locator | What it does | Risk |
+|---|---|---|---|---|
+| **Create a template** | link button | gallery, Principal and Admin only | Opens the wizard | `READ` |
+| `All {n}` / category | toggle buttons | `aria-pressed` | Filters by category | `READ` |
+| (search) | search input | aria-label and placeholder "Find a template" | Filters cards | `READ` |
+| Template card | button | badge, title, description | Opens the drawer | `READ` |
+| **Select a client…** | combobox | drawer footer | Client for **Use in chat** / **Generate now** | `READ` |
+| **Use in chat** | button | drawer footer | Pre-fills `/documents` | `READ` |
+| **Generate now** | button | drawer footer; disabled without a client | Creates the document, opens the editor | `WRITE` (`AI` for PDF forms) |
+| **Open template** | link | drawer footer | Opens `/documents/templates/{slug}` | `READ` |
+| **Customize this template** | button | testid `customize-button` | Creates the workspace copy | `WRITE` |
+| **Reset to default** → **Yes, reset** | buttons | fork banner, testid `fork-banner` | Deletes the workspace copy | `DESTRUCTIVE` |
+| `Lock v{n}` | button | version strip, testid `template-version-strip` | Pins the version for new documents | `WRITE` |
+| `History ({n})` | button | version strip | Opens version history | `READ` |
+| **Unlock (use newest)** | button | history sheet | Removes the lock | `WRITE` |
+| **View** / **Restore** / **Lock** | buttons | history rows, aria-labels `View v{n}`, `Restore v{n}`, `Lock v{n}` | Views, restores or locks | `READ` / `WRITE` / `WRITE` |
+| **Save details** / **Save sections** / **Save body** / **Save CSS** | buttons | each tab | Saves that tab | `WRITE` |
+| **Edit** / **Add** / **Polish** / **Ask** | toggle buttons | template assistant | Assistant mode | `READ` |
+| **Send** | button | template assistant | Asks the AI | `AI` |
+| **Apply** / **Discard** | buttons | "Proposed changes" card | Applies (new version) or drops | `WRITE` / `READ` |
+| `Save v{n} as template` | button | wizard save bar | Saves the new template | `WRITE` |
+| **Start Over** | button | wizard | Clears drafts | `READ` |
+
+## Waits and signals
+
+- Gallery: "Loading templates…". Drawer: "Rendering the template…" or "Loading the form…".
+- Studio: "Loading template…", then "Loading your customized template…" for customized ones. Preview: "Rendering preview…".
+- Wizard: "Generating…" during each AI turn.
+
+## Gotchas
+
+- Several templates can share a title; the slug is only shown on the studio page.
+- The **Use in chat** pre-fill survives only in-app navigation; do not reload `/documents` before sending.
+- The drawer's client picker cannot be cleared.
+- Body and CSS previews update only after saving.
+- Template edits never change existing documents.
+- **Reset to default** deletes the workspace copy.
+- Official PDF forms cannot be edited.
+- Wizard drafts are lost on reload; Enter sends in the wizard input.
+- In-app help says the wizard button is **Save Template**; the real button is `Save v{n} as template`.
+- In-app help quotes "You need admin access to change templates — ask an owner or admin to make this change."; the real message is "Your profile cannot change templates — ask a Principal or Admin to make this change."
+
+## Related
+
+- [How templates work](/documents/how-templates-work)
+- [Choosing a template](/documents/choosing-a-template)
+- [Template catalog](/documents/template-catalog)
+- [Create a document](/documents/create-a-document)
+- [Brand and packets](/documents/brand-and-packets)
+
+## Source files
+
+- `packages/web/src/app/(dashboard)/documents/templates/page.tsx`
+- `packages/web/src/components/documents/_landing/template-gallery.tsx`
+- `packages/web/src/components/documents/_landing/template-preview-drawer.tsx`
+- `packages/web/src/components/templates/template-detail.tsx`
+- `packages/web/src/components/templates/template-read-only.tsx`
+- `packages/web/src/components/templates/template-editor.tsx`
+- `packages/web/src/components/templates/template-chat-panel.tsx`
+- `packages/web/src/components/templates/template-version-history.tsx`
+- `packages/web/src/components/templates/template-create-wizard.tsx`
+- `packages/web/src/components/templates/template-list.tsx`
+- `packages/web/src/app/(dashboard)/settings/templates/page.tsx`

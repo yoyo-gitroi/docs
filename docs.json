@@ -27,12 +27,17 @@
           "documents/create-a-document",
           "documents/documents-home",
           "documents/chat-workspace",
-          "documents/document-editor"
+          "documents/document-editor",
+          "documents/templates",
+          "documents/brand-and-packets",
+          "documents/generate-page"
         ]
       },
       {
         "group": "Templates reference",
-        "pages": []
+        "pages": [
+          "documents/how-templates-work"
+        ]
       },
       {
         "group": "Command Center",
