@@ -1,0 +1,84 @@
+---
+title: "Print and social templates"
+sidebarTitle: "Print and social"
+description: "Look up the seeded Print and Social templates: the business card and the social asset pack."
+keywords: ["business card", "social pack", "social media image", "print", "linkedin post image"]
+---
+
+<Info>
+**Reference page** · **Live source of truth:** sidebar **Documents** → **Templates** tab (`/documents/templates`), one template at `/documents/templates/{slug}` · **Roles:** Principal ✓ Operator ✓ can create documents from these templates; only a Principal (or Admin) can fork, edit, lock or deactivate a template · **Baseline:** what the repo seeds; your tenant may differ.
+</Info>
+
+The **Print** and **Social** categories hold one seeded template each, so they share this page.
+
+<Note>
+Every good request names a client because the Document Assistant will not draft until a client is bound, even for internal pieces such as flyers. Example people, amounts and dates are fictional; swap in the user's facts. Facts you leave out become flagged gaps or a follow-up question, never invented values.
+</Note>
+
+## How to read an entry
+
+- **Fields, by form section** uses the labels the template form shows. "(list; each row: …)" is a repeatable list with an add button. Types other than text are shown in brackets, for example (date) or (number); "(choice: …)" lists the dropdown options.
+- **Starts blank** fields have no default and no client value, and their label does not say "optional". The assistant reports each one as a gap, or asks when it is a true blocker such as the person's name.
+- **Blank unless the client profile has it** fields fill themselves from the client record. Put the value in the request only if the client profile lacks it.
+- All other fields start with a default from the template. The assistant only changes a default when it has a source for the new value.
+
+## Templates on this page
+
+- **Print:** [Business card](/documents/catalog/print-and-social#business-card)
+- **Social:** [Social asset pack](/documents/catalog/print-and-social#social-asset-pack)
+
+## Print
+
+### Business card
+
+**Slug:** `business-card` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none
+
+Print-grade business card (front + back) at 3.5" x 2".
+
+**Fields, by form section:**
+
+- **Person:** Name; Title
+- **Contact:** Email; Phone; Web; Office address (optional)
+- **Style:** Back style (choice: Solid brand color / Accent stripe / Brand mark, white background)
+
+**Starts blank (the assistant asks or flags these):** Phone; Web
+
+**Good request:** "Create a Business card for client ABC Dental: Rachel Kim, HR Consultant, rachel@ariyahr.com, phone 916-555-0142, web ariyahr.com, back style Accent stripe."
+
+**Note:** Prints at business-card size (3.5 by 2 inches), front and back.
+
+## Social
+
+### Social asset pack
+
+**Slug:** `social-pack` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none
+
+Same content rendered at LinkedIn, square, Twitter, and Story ratios.
+
+**Fields, by form section:**
+
+- **Content:** Eyebrow; Headline; Subtitle; Attribution
+- **Visual style:** Background (choice: Solid color block / Subtle gradient / Minimal — surface bg, accent stripe)
+- **Aspects to render:** Aspect ratios (checkboxes)
+
+**Starts blank:** nothing required. Every field has a default or is labelled optional; replace defaults the user did not ask for.
+
+**Good request:** "Create a Social asset pack for client ABC Dental: headline 'We are hiring hygienists', background Subtle gradient, aspect ratios LinkedIn and square."
+
+**Note:** The same content renders at each selected aspect ratio (LinkedIn, square, Twitter, Story). The template metadata lists PNG as its only export, but that list is descriptive; the export buttons are the same as for every document.
+
+## Related
+
+- [Template catalog overview](/documents/template-catalog)
+- [Choosing a template](/documents/choosing-a-template)
+- [How templates work](/documents/how-templates-work)
+- [Create a document](/documents/create-a-document)
+- [Templates page](/documents/templates)
+
+## Source files
+
+- `packages/core/src/documents/templates/platform/{slug}/meta.json` (seed source for field labels, defaults and client prefill)
+- `packages/core/src/db/migrations/0100_platform_templates_handlebars.sql`
+- `packages/core/src/db/migrations/0120_team_member_fields.sql`
+- `packages/core/src/documents/registry-fill.ts` (which fields count as required)
+- `packages/core/src/documents/engine/from-registry.ts` (client prefill)

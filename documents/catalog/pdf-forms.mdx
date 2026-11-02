@@ -1,0 +1,112 @@
+---
+title: "PDF form templates"
+sidebarTitle: "PDF forms"
+description: "Look up the three official PDF forms (IRS 8655 reporting agent authorization, California DE 48 power of attorney, isolved implementation kit): fields, locked lines and how to create them."
+keywords: ["PDF form", "Form 8655", "reporting agent authorization", "report authorization form", "DE 48", "CA POA", "power of attorney california", "EDD power of attorney", "implementation kit", "isolved implementation kit", "initial information form", "payroll ACH", "onboarding kit"]
+---
+
+<Info>
+**Reference page** · **Live source of truth:** sidebar **Documents** → **Templates** tab (`/documents/templates`) · **Roles:** Principal ✓ Operator ✓ can create documents from these forms; nobody can edit the forms themselves · **Baseline:** served from code, so every tenant has the same three forms.
+</Info>
+
+Three templates are the publisher's own fillable PDFs. Ariya writes your values into the PDF's form fields and keeps the original layout and wording. They are category **Business** and scope **client**.
+
+<Warning>
+**The Document Assistant cannot create these forms.** If you ask the assistant for one, it refuses with: `Template "{id}" is not available as an editable DB template. Only templates stored in the database can be used for document generation. Ask the user to select a different template, or migrate this template to the database first.` Create them from **Documents** → **Templates** instead: pick the form, pick the client, then use it. The click path is in [Templates page](/documents/templates).
+</Warning>
+
+<Note>
+Unverified: creating a PDF form from the Documents UI has not been checked in a live run. The code path exists (the Generate route makes one LLM extraction call over the form's fields), but confirm the result before you hand the document over.
+</Note>
+
+## How PDF forms behave
+
+- **Filling:** one LLM call reads the client's facts and fills the unlocked fields. It is told never to invent an EIN, account number, address, phone number, bank detail or date, so missing facts stay blank. Locked fields and fields marked AI-excluded are never shown to the model.
+- **Storage:** only the values are stored. Every export re-fills the blank PDF with them.
+- **Editing the form:** refused for everyone. The message is "This is a fixed PDF form. Its layout and wording cannot be edited, customized or changed by AI. You can only fill in its field values when you create a document from it."
+- **Download:** the PDF download is the publisher's form with your values, still fillable. The one-page export is refused with "One-page export is not available for official PDF forms. Use the regular PDF download."
+- **Look-alikes:** two older HTML versions, **Company Implementation Kit** (`implementation-kit`) and **California POA Declaration (DE 48)** (`implementation-ca-poa`), are inactive in the seed. Use the PDF forms below.
+- **Before you start:** put the client's legal name, DBA, EIN, address, phone and contacts on the client profile. That is where the extraction call gets its facts.
+
+## The three forms
+
+### Report Authorization Form
+
+**Slug:** `report-authorization-form` · **Kind:** PDF form · **Scope:** client · **Person to name:** none (the client's contact person)
+
+IRS Form 8655, Reporting Agent Authorization.
+
+**Also known as (aliases):** reporting agent authorization, report authorization, form 8655, 8655, reporting agent, raa
+
+**Fields (labels as stored in the form):**
+
+- **Taxpayer:** 1a Name of taxpayer; 1b Trade name; 2 EIN; 3 Address; 3 City/state/ZIP; 4 Seasonal employer; 5 Other identification number (optional); 6 Contact person; 7 Daytime telephone; 8 Fax
+- **Reporting agent (locked):** 9 to 14 Reporting agent name, EIN, address, city-state-ZIP, contact, phone, fax. The publisher pre-completed these lines; they cannot be filled.
+- **Authorizations:** 15 Forms 940/941/943/944/945/1042/CT-1 (returns); 16 Forms 720/940/941/943/944/945/990-PF/990-T/1041/1042/1120/CT-1 (deposits); 17 Send the reporting agent duplicate notices; 18a W-2, 18b 1099, 18c 3921-3922 calendar year beginning; 19 Authorize agent to sign state/local returns
+- **Sign Here:** Title
+
+**Facts to have ready:** taxpayer legal name, trade name, EIN, address, contact person and daytime phone on the client profile; which returns and deposits the agent handles; the calendar years for lines 18a to 18c; the signer's title.
+
+**Good request:** not through the assistant. From **Documents** → **Templates**, use **Report Authorization Form** for the client after the facts above are on the client profile.
+
+### Power of Attorney California
+
+**Slug:** `power-of-attorney-california` · **Kind:** PDF form · **Scope:** client · **Person to name:** the signer (print name and title)
+
+California EDD Power of Attorney Declaration (DE 48).
+
+**Also known as (aliases):** power of attorney california, california poa, ca poa, de 48, de48, poa declaration, edd power of attorney
+
+**Fields (labels as stored in the form):**
+
+- **Employer:** California Employer Account Number (if applicable); Taxpayer Identification Number; Federal Employer Identification Number; Owner / Corporation Name; SSN / Corporate Identification Number; Business Name / DBA; Business Mailing Address plus City/State/ZIP; Business Phone; Business Fax; Business Location (plus City/State/ZIP)
+- **Authorization:** General authorization or Specific declaration (from and to dates); Represent for reporting period; mailing-address changes; Other acts (describe); Authorized to receive confidential information
+- **Signer:** Title; Print Name; Date
+
+**Never filled by AI:** SSN / Corporate Identification Number (AI-excluded). The representative block is pre-printed. Signature and date are completed by hand.
+
+**Facts to have ready:** California employer account number, FEIN, owner or corporation name, DBA, mailing address, business location and phone; general or specific authorization (with dates if specific); the signer's name and title.
+
+**Good request:** not through the assistant. From **Documents** → **Templates**, use **Power of Attorney California** for the client after the facts above are on the client profile.
+
+### ISolved Implementation Kit Form
+
+**Slug:** `isolved-implementation-kit-form` · **Kind:** PDF form · **Scope:** client · **Person to name:** the signer (print name and title)
+
+isolved new-client implementation kit: initial information, authorized contacts, electronic funding authorization, payroll ACH and signature page.
+
+**Also known as (aliases):** isolved implementation kit, implementation kit, implementation kit form, initial information form, authorized contacts, electronic funding authorization, payroll ach, onboarding kit
+
+**Fields (labels as stored in the form):**
+
+- **Company:** Company Legal Name (IRS filing name); DBA Name; FEIN; New FEIN / Existing FEIN / Non-Profit; # of Employees; Legal mailing address (street, city, state, ZIP); Delivery address (note, street, city, state, ZIP)
+- **Taxes:** Multi-state taxes Yes/No plus which states
+- **Most Recent Pay Date Detail:** Period beginning date; Period end date; Check date; Pay frequency (Weekly / Biweekly / Semi-monthly / Monthly / Other plus detail)
+- **Systems:** General ledger Yes/No plus accounting system; Current Payroll, HR, Time & Attendance and Benefits systems
+- **Funding:** Funding contact name, phone, email; Default bank name, routing, account
+- **Service fees:** default / below / N.A.; contact, title, phone, email; bank name, phone, routing, account
+- **Payroll ACH:** default / below / N.A.; bank name, phone, routing, account
+- **Signature page:** print name; title
+
+**Never filled by AI:** signature and date, which are completed by hand. A stray "Mitch " value in **Print name** is cleared when the form loads.
+
+**Facts to have ready:** legal name, DBA, FEIN, employee count and mailing address on the client profile; most recent pay period and check dates; pay frequency; current systems; funding contact; bank details (or say they will be filled by hand); signer's name and title.
+
+**Good request:** not through the assistant. From **Documents** → **Templates**, use **ISolved Implementation Kit Form** for the client after the facts above are on the client profile.
+
+## Related
+
+- [Template catalog overview](/documents/template-catalog)
+- [How templates work](/documents/how-templates-work#template-kinds)
+- [Templates page](/documents/templates)
+- [Choosing a template](/documents/choosing-a-template)
+- [Document editor](/documents/document-editor)
+
+## Source files
+
+- `packages/core/src/documents/pdf-form-manifests/index.ts`
+- `packages/core/src/documents/pdf-form-registry.ts`
+- `packages/core/src/documents/engine/pdf-form-generate.ts`
+- `packages/core/src/documents/agent-tools-write.ts` (assistant refusal)
+- `packages/transport-api/src/routes/documents.ts` (PDF export, one-page refusal)
+- `packages/core/src/db/pdf-form-assets/` (the blank PDFs)

@@ -1,0 +1,121 @@
+---
+title: "Data templates"
+sidebarTitle: "Data"
+description: "Look up the seeded Data templates: cap table, mini financial model, risk register and variance analysis."
+keywords: ["data templates", "cap table", "financial model", "risk register", "variance report", "budget vs actual"]
+---
+
+<Info>
+**Reference page** · **Live source of truth:** sidebar **Documents** → **Templates** tab (`/documents/templates`), one template at `/documents/templates/{slug}` · **Roles:** Principal ✓ Operator ✓ can create documents from these templates; only a Principal (or Admin) can fork, edit, lock or deactivate a template · **Baseline:** what the repo seeds; your tenant may differ.
+</Info>
+
+The **Data** category holds 4 seeded table-heavy templates. Their metadata lists `xlsx` among the export formats, but the export endpoints are the same for every document (see [How templates work](/documents/how-templates-work#export-formats)).
+
+<Note>
+Every good request names a client because the Document Assistant will not draft until a client is bound, even for internal pieces such as flyers. Example people, amounts and dates are fictional; swap in the user's facts. Facts you leave out become flagged gaps or a follow-up question, never invented values.
+</Note>
+
+## How to read an entry
+
+- **Fields, by form section** uses the labels the template form shows. "(list; each row: …)" is a repeatable list with an add button. Types other than text are shown in brackets, for example (date) or (number); "(choice: …)" lists the dropdown options.
+- **Starts blank** fields have no default and no client value, and their label does not say "optional". The assistant reports each one as a gap, or asks when it is a true blocker such as the person's name.
+- **Blank unless the client profile has it** fields fill themselves from the client record. Put the value in the request only if the client profile lacks it.
+- All other fields start with a default from the template. The assistant only changes a default when it has a source for the new value.
+
+## Templates on this page
+
+- **Data and finance tables:** [Cap table snapshot](/documents/catalog/data#cap-table-snapshot), [Financial model (mini)](/documents/catalog/data#financial-model-mini), [Risk register](/documents/catalog/data#risk-register), [Variance Analysis](/documents/catalog/data#variance-analysis)
+
+## Data and finance tables
+
+### Cap table snapshot
+
+**Slug:** `cap-table-snapshot` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none
+
+Point-in-time cap table: founders, investors, option pool, fully-diluted.
+
+- **Dated automatically at creation:** As of
+
+**Fields, by form section:**
+
+- **Header:** Company; As of (date); Prepared by; Total fully-diluted shares (number)
+- **Holders** (list; each row: Holder; Class; Shares; FD %)
+- **Notes:** Notes
+
+**Starts blank (the assistant asks or flags these):** Company; Prepared by
+
+**Good request:** "Create a Cap table snapshot for Northwind Apparel: company Northwind Apparel Inc., as of 2026-10-31, prepared by Dana Cole; holders from the attached cap table export."
+
+### Financial model (mini)
+
+**Slug:** `financial-model` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none
+
+12-month branded P&L sketch — exports as Excel with brand colors.
+
+- **Dated automatically at creation:** Year
+
+**Fields, by form section:**
+
+- **Header:** Title; Subtitle; Year (number); Currency (choice: USD / EUR / GBP)
+- **Revenue lines** (list; each row: Label)
+- **Expense lines** (list; each row: Label)
+
+**Starts blank:** nothing required. Every field has a default or is labelled optional; replace defaults the user did not ask for.
+
+**Good request:** "Create a Financial model (mini) for Northwind Apparel: title 'FY2027 P&L sketch', year 2027, USD; revenue lines Wholesale and DTC; expense lines COGS, Payroll, Marketing, Rent."
+
+### Risk register
+
+**Slug:** `risk-register` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none
+
+Risk register: items, severity × likelihood, owner, mitigation, status.
+
+- **Dated automatically at creation:** As of
+
+**Fields, by form section:**
+
+- **Header:** Title; As of (date); Prepared by; Summary
+- **Risks** (list; each row: ID; Risk; Sev; Lik; Owner; Mitigation; Status; Target)
+- **Legend:** Legend
+
+**Starts blank (the assistant asks or flags these):** Prepared by
+
+**Good request:** "Create a Risk register for ABC Dental as of 2026-11-01, prepared by Rachel Kim; risks from the attached list."
+
+### Variance Analysis
+
+**Slug:** `variance-report` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none
+
+Budget vs actual variance report with line items, % variance, and narrative explanations.
+
+- **From the client profile:** company name
+- **Dated automatically at creation:** Date
+
+**Fields, by form section:**
+
+- **Header:** Company; Title; Period; Prepared by; Date (date); Currency (choice: USD / EUR / GBP); Headline (one sentence)
+- **Line items** (list; each row: Category; Label; Budget; Actual)
+- **Drivers (why we are off)** (list; each row: Driver)
+- **Actions** (list; each row: Action)
+
+**Starts blank (the assistant asks or flags these):** Prepared by
+
+**Blank unless the client profile has it:** Company
+
+**Good request:** "Create a Variance Analysis for Northwind Apparel: Q3 2026, prepared by Dana Cole; budget and actual lines from the attached export."
+
+## Related
+
+- [Template catalog overview](/documents/template-catalog)
+- [Choosing a template](/documents/choosing-a-template)
+- [How templates work](/documents/how-templates-work)
+- [Create a document](/documents/create-a-document)
+- [Templates page](/documents/templates)
+
+## Source files
+
+- `packages/core/src/documents/templates/platform/{slug}/meta.json` (seed source for field labels, defaults and client prefill)
+- `packages/core/src/db/migrations/0100_platform_templates_handlebars.sql`
+- `packages/core/src/db/migrations/0120_team_member_fields.sql`
+- `packages/core/src/documents/registry-fill.ts` (which fields count as required)
+- `packages/core/src/documents/engine/from-registry.ts` (client prefill)

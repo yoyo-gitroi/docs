@@ -43,7 +43,11 @@
             "group": "Catalog by category",
             "pages": [
               "documents/catalog/business",
-              "documents/catalog/sales"
+              "documents/catalog/sales",
+              "documents/catalog/marketing",
+              "documents/catalog/data",
+              "documents/catalog/print-and-social",
+              "documents/catalog/pdf-forms"
             ]
           }
         ]
