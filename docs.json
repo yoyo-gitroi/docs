@@ -76,12 +76,17 @@
           "clients/clients-list",
           "clients/new-client",
           "clients/client-profile",
-          "clients/client-tabs-work"
+          "clients/client-tabs-work",
+          "clients/client-tabs-people-hr",
+          "clients/client-tabs-roadmap",
+          "clients/people-and-contacts"
         ]
       },
       {
         "group": "Implementation",
-        "pages": []
+        "pages": [
+          "implementation/portfolio"
+        ]
       },
       {
         "group": "Sales and HR Roadmap",
