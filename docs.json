@@ -36,7 +36,16 @@
       {
         "group": "Templates reference",
         "pages": [
-          "documents/how-templates-work"
+          "documents/how-templates-work",
+          "documents/choosing-a-template",
+          "documents/template-catalog",
+          {
+            "group": "Catalog by category",
+            "pages": [
+              "documents/catalog/business",
+              "documents/catalog/sales"
+            ]
+          }
         ]
       },
       {

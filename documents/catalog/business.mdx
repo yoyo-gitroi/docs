@@ -1,0 +1,1898 @@
+---
+title: "Business templates"
+sidebarTitle: "Business"
+description: "Look up every seeded Business template: what it is, what fills from the client, which fields start blank and a request that will not block."
+keywords: ["business templates", "offer letter", "written warning", "incident report", "termination letter", "handbook", "NDA", "invoice", "performance review", "PTO request", "job description", "policy"]
+---
+
+<Info>
+**Reference page** · **Live source of truth:** sidebar **Documents** → **Templates** tab (`/documents/templates`), one template at `/documents/templates/{slug}` · **Roles:** Principal ✓ Operator ✓ can create documents from these templates; only a Principal (or Admin) can fork, edit, lock or deactivate a template · **Baseline:** what the repo seeds; your tenant may differ.
+</Info>
+
+The **Business** category holds 77 seeded templates: HR letters and forms, policies, client engagement documents, agreements, finance and venture documents. Two are inactive in the seed and four are created by other modules.
+
+<Note>
+Every good request names a client because the Document Assistant will not draft until a client is bound, even for internal pieces such as flyers. Example people, amounts and dates are fictional; swap in the user's facts. Facts you leave out become flagged gaps or a follow-up question, never invented values.
+</Note>
+
+## How to read an entry
+
+- **Fields, by form section** uses the labels the template form shows. "(list; each row: …)" is a repeatable list with an add button. Types other than text are shown in brackets, for example (date) or (number); "(choice: …)" lists the dropdown options.
+- **Starts blank** fields have no default and no client value, and their label does not say "optional". The assistant reports each one as a gap, or asks when it is a true blocker such as the person's name.
+- **Blank unless the client profile has it** fields fill themselves from the client record. Put the value in the request only if the client profile lacks it.
+- All other fields start with a default from the template. The assistant only changes a default when it has a source for the new value.
+
+## Templates on this page
+
+- **Hiring and onboarding:** [Job Description](/documents/catalog/business#job-description), [Offer Letter](/documents/catalog/business#offer-letter), [New Hire Welcome](/documents/catalog/business#new-hire-welcome), [New Hire Packet](/documents/catalog/business#new-hire-packet), [Employee Information](/documents/catalog/business#employee-information), [Direct Deposit Authorization](/documents/catalog/business#direct-deposit-authorization), [30-60-90 day plan](/documents/catalog/business#30-60-90-day-plan), [Equity Grant Notice](/documents/catalog/business#equity-grant-notice)
+- **Contractors:** [Contractor Agreement (1099)](/documents/catalog/business#contractor-agreement-1099), [1099 Contractor Onboarding Packet](/documents/catalog/business#1099-contractor-onboarding-packet), [Independent Contractor Commission Agreement](/documents/catalog/business#independent-contractor-commission-agreement)
+- **Performance, pay and leave:** [Performance Review](/documents/catalog/business#performance-review), [Promotion Letter](/documents/catalog/business#promotion-letter), [Pay Increase Notice](/documents/catalog/business#pay-increase-notice), [Compensation Review Framework](/documents/catalog/business#compensation-review-framework), [PTO / Leave Request](/documents/catalog/business#pto-%2F-leave-request), [Accommodation request](/documents/catalog/business#accommodation-request), [Expense Report](/documents/catalog/business#expense-report)
+- **Discipline and incidents:** [Written Warning](/documents/catalog/business#written-warning), [Corrective Action Warning](/documents/catalog/business#corrective-action-warning), [HR Incident Report](/documents/catalog/business#hr-incident-report), [HR Incident Report (incident-report)](/documents/catalog/business#hr-incident-report-incident-report), [HR Incident Report (Riverboat Delta King)](/documents/catalog/business#hr-incident-report-riverboat-delta-king)
+- **Separation:** [Termination Letter](/documents/catalog/business#termination-letter), [Termination Packet](/documents/catalog/business#termination-packet), [Resignation Acknowledgment](/documents/catalog/business#resignation-acknowledgment), [Severance summary](/documents/catalog/business#severance-summary), [Exit interview](/documents/catalog/business#exit-interview)
+- **Policies, handbooks and compliance:** [Employee Handbook](/documents/catalog/business#employee-handbook), [Employee Handbook Discovery & Assessment](/documents/catalog/business#employee-handbook-discovery-%26-assessment), [Employee Handbook Assessment](/documents/catalog/business#employee-handbook-assessment), [Employee Handbook Development Agreement](/documents/catalog/business#employee-handbook-development-agreement), [AI and Confidential Data Policy](/documents/catalog/business#ai-and-confidential-data-policy), [Remote Work and Expense Reimbursement Policy](/documents/catalog/business#remote-work-and-expense-reimbursement-policy), [Injury and Illness Prevention Program](/documents/catalog/business#injury-and-illness-prevention-program), [Workplace Violence Prevention Plan](/documents/catalog/business#workplace-violence-prevention-plan), [Wage Theft Prevention Notice](/documents/catalog/business#wage-theft-prevention-notice), [HR Compliance Checklist](/documents/catalog/business#hr-compliance-checklist), [Time Off Policy Intake](/documents/catalog/business#time-off-policy-intake), [Industry Resource Center](/documents/catalog/business#industry-resource-center), [Workers Comp Summary](/documents/catalog/business#workers-comp-summary)
+- **Client engagement and reporting:** [Client Intake Form](/documents/catalog/business#client-intake-form), [Company Information](/documents/catalog/business#company-information), [HR Assessment](/documents/catalog/business#hr-assessment), [HR Audit Report](/documents/catalog/business#hr-audit-report), [HR Roadmap](/documents/catalog/business#hr-roadmap), [AI Readiness Audit Report](/documents/catalog/business#ai-readiness-audit-report), [AI Readiness Scorecard](/documents/catalog/business#ai-readiness-scorecard), [Opportunity Register](/documents/catalog/business#opportunity-register), [Quarterly Business Review](/documents/catalog/business#quarterly-business-review), [Status Report](/documents/catalog/business#status-report), [Meeting Agenda & Minutes](/documents/catalog/business#meeting-agenda-%26-minutes), [SOP / Runbook](/documents/catalog/business#sop-%2F-runbook), [Sales to Implementation Handoff Form](/documents/catalog/business#sales-to-implementation-handoff-form), [Personal Engagement Letter](/documents/catalog/business#personal-engagement-letter)
+- **Agreements, quotes and invoices:** [Client Service Agreement](/documents/catalog/business#client-service-agreement), [Service Agreement](/documents/catalog/business#service-agreement), [Non-Disclosure Agreement](/documents/catalog/business#non-disclosure-agreement), [Pricing Quote](/documents/catalog/business#pricing-quote), [Invoice](/documents/catalog/business#invoice), [Influencer agreement](/documents/catalog/business#influencer-agreement)
+- **Investor and venture:** [Board update](/documents/catalog/business#board-update), [Deal memo (short)](/documents/catalog/business#deal-memo-short), [Investment memo](/documents/catalog/business#investment-memo), [LP onboarding packet](/documents/catalog/business#lp-onboarding-packet), [LP quarterly update](/documents/catalog/business#lp-quarterly-update), [Term sheet](/documents/catalog/business#term-sheet), [Energy project assessment](/documents/catalog/business#energy-project-assessment)
+- **Retail and wholesale operations:** [Returns policy](/documents/catalog/business#returns-policy), [Tech pack (cover sheet)](/documents/catalog/business#tech-pack-cover-sheet), [Wholesale order](/documents/catalog/business#wholesale-order)
+- **Generated by other modules:** [Elevated HR Assessment](/documents/catalog/business#elevated-hr-assessment), [Elevated HR Roadmap](/documents/catalog/business#elevated-hr-roadmap), [Elevated HR Roadmap Progress Report](/documents/catalog/business#elevated-hr-roadmap-progress-report), [iSolved Billing Memo](/documents/catalog/business#isolved-billing-memo)
+- **Inactive in the seed:** [Company Implementation Kit](/documents/catalog/business#company-implementation-kit), [California POA Declaration (DE 48)](/documents/catalog/business#california-poa-declaration-de-48)
+
+## Hiring and onboarding
+
+### Job Description
+
+**Slug:** `job-description` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none
+
+Job description with role summary, responsibilities, requirements, comp range, equal-opportunity statement.
+
+- **From the client profile:** company name
+
+**Fields, by form section:**
+
+- **Header:** Company; Job title; Department; Reports to; Location; Employment (choice: Full-time / Part-time / Contract); FLSA classification (choice: Exempt (salary) / Non-exempt (hourly)); Level
+- **Compensation (transparency):** Salary range — low (number); Salary range — high (number); Currency (choice: USD / EUR / GBP); Equity; Pay-transparency note (CA, NY, CO)
+- **Summary:** Role summary (1 paragraph)
+- **Responsibilities** (list; each row: Responsibility)
+- **Must-haves** (list; each row: Requirement)
+- **Nice-to-haves** (list; each row: Nice-to-have)
+- **Benefits & EEOC:** Benefits summary; EEOC statement
+
+**Starts blank (the assistant asks or flags these):** Pay-transparency note (CA, NY, CO)
+
+**Blank unless the client profile has it:** Company
+
+**Good request:** "Create a Job Description for ABC Dental: Dental Hygienist, Clinical department, reports to Dr. Sam Patel, Sacramento office, full-time, non-exempt, salary range 95000 to 110000 USD, pay-transparency note 'Range is the good-faith expected pay for this role'."
+
+### Offer Letter
+
+**Slug:** `offer-letter` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** Candidate
+
+California offer of employment — terms table, statutory conditions, at-will clause, dual signature block.
+
+- **From the client profile:** company name
+- **Dated automatically at creation:** Date
+
+**Fields, by form section:**
+
+- **Letter:** Company; Date (date)
+- **Candidate:** Name; Email
+- **Position:** Position title; Position summary; Department; Reports to; Start date (date); Schedule
+- **Classification & pay:** Classification (choice: Exempt (salaried) / Non-Exempt (hourly)); Pay type (choice: Salary / Hourly); Annual salary (number); Hourly rate (number)
+- **Additional conditions (optional — I-9 and the CA wage notice are always included)** (list; each row: Condition)
+- **Sign & return:** Response deadline (date); Signatory name; Signatory title
+
+**Starts blank (the assistant asks or flags these):** Name; Email; Position title; Position summary; Department; Reports to; Start date; Schedule; Response deadline; Signatory name; Signatory title
+
+**Blank unless the client profile has it:** Company
+
+**Good request:** "Create an Offer Letter for ABC Dental: candidate Jane Doe (jane.doe@example.com), position Dental Hygienist (cleanings and patient education), Clinical department, reports to Dr. Sam Patel, start 2026-12-01, schedule Mon-Fri 8am-5pm, Non-Exempt hourly at 52 USD, respond by 2026-11-20, signed by Dr. Sam Patel, Owner."
+
+### New Hire Welcome
+
+**Slug:** `new-hire-welcome` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** New hire
+
+Branded welcome cover for the new-hire onboarding packet (precedes gov forms).
+
+- **Dated automatically at creation:** Start date, Complete by
+
+**Fields, by form section:**
+
+- **Employee:** Name; Email; Role / title; Start date (date); Reports to; Manager email
+- **Compensation:** Type (choice: Salary / Hourly); Annual salary (if salary) (number); Hourly rate (if hourly) (number); Currency (choice: USD / EUR / GBP); PTO days/year (number)
+- **Benefits summary** (list of lines)
+- **First-week schedule** (list; each row: When; What)
+- **Packet items to complete** (list of lines)
+- **Submit & contact:** Complete by (date); HR contact name; HR contact email; HR contact phone; Personal welcome note (optional)
+
+**Starts blank (the assistant asks or flags these):** Name; Email; Role / title; Reports to; Manager email; HR contact name; HR contact email; HR contact phone
+
+**Good request:** "Create a New Hire Welcome for ABC Dental: Maria Lopez (maria@example.com), Dental Assistant, starts 2026-11-17, reports to Dr. Sam Patel (sam@abcdental.com), hourly 28 USD, HR contact Rachel Kim, rachel@ariyahr.com, 916-555-0142."
+
+### New Hire Packet
+
+**Slug:** `new-hire-packet` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** Employee
+
+Three-page new-hire packet — cover and forms checklist, employee information, emergency contacts, direct deposit authorization, handbook acknowledgment, manager day-one checklist.
+
+- **From the client profile:** company name, legal name
+
+**Fields, by form section:**
+
+- **Employer:** Company; Client legal name
+- **New hire:** Employee name; Position; Start date (date)
+- **Client-specific day-one items (the standard checklist is always included)** (list; each row: Item)
+
+**Starts blank (the assistant asks or flags these):** Employee name; Position; Start date; Client-specific day-one items (the standard checklist is always included)
+
+**Blank unless the client profile has it:** Company; Client legal name
+
+**Note:** One document with 3 internal pages (cover and forms checklist, employee information plus direct deposit, handbook acknowledgment plus manager checklist). It is not a packet of templates. Government forms (I-9, W-4) are listed in it, not generated.
+
+**Good request:** "Create a New Hire Packet for ABC Dental: employee Maria Lopez, position Dental Assistant, start date 2026-11-17, client-specific day-one items: badge pickup and bloodborne pathogens training."
+
+### Employee Information
+
+**Slug:** `employee-information` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** Employee
+
+New-hire intake: personal, contact, employment, tax, direct deposit.
+
+- **From the client profile:** company name
+- **Dated automatically at creation:** Form date
+
+**Fields, by form section:**
+
+- **Header:** Employer name; Form date (date)
+- **Personal information:** First name; Middle; Last name; Date of birth; SSN last 4
+- **Contact information:** Street address; City; State and ZIP; Phone; Alternate phone; Personal email; Emergency contact name; Relationship; Emergency phone
+- **Employment details:** Job title; Department; Supervisor; Start date (date); Type (choice: Full-time / Part-time / Temporary / Contractor (1099)); Pay rate; Pay frequency (choice: Weekly / Bi-weekly / Semi-monthly / Monthly); Worksite address
+- **Tax withholding:** Federal filing status (choice: Single or married filing separately / Married filing jointly / Head of household); Federal dependents claim (\$); Additional federal withholding (\$); State filing status; State allowances; Tax note
+- **Direct deposit:** Financial institution; Routing number; Account number; Account type (choice: Checking / Savings); Split-deposit note
+- **Certification:** Certification text
+
+**Starts blank (the assistant asks or flags these):** First name; Middle; Last name; Date of birth; SSN last 4; Street address; City; State and ZIP; Phone; Alternate phone; Personal email; Emergency contact name; Relationship; Emergency phone; Job title; Department; Supervisor; Start date; Pay rate; Worksite address; Federal dependents claim (\$); Additional federal withholding (\$); State allowances; Financial institution; Routing number; Account number
+
+**Blank unless the client profile has it:** Employer name
+
+**Good request:** "Create an Employee Information form for ABC Dental for new hire Maria A. Lopez, Dental Assistant, Clinical, supervisor Dr. Sam Patel, start 2026-11-17, 28 USD/hour, worksite 100 Main St Sacramento; personal, contact, emergency, tax and bank details from the attached completed intake (or say the employee will complete them by hand)."
+
+### Direct Deposit Authorization
+
+**Slug:** `direct-deposit` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** Employee
+
+Standalone direct-deposit authorization form (separate from full new-hire intake).
+
+- **From the client profile:** company name
+- **Dated automatically at creation:** Form date
+
+**Fields, by form section:**
+
+- **Header:** Employer name; Department (optional); Form date (date)
+- **Employee information:** Employee name; Employee ID; Phone; Home address; Email
+- **Deposit accounts** (list; each row: Bank name; Account type; Routing #; Account #; Allocation; Value)
+- **Authorization:** Authorization text; Certification text; Processing note
+
+**Starts blank (the assistant asks or flags these):** Employee name; Employee ID; Phone; Home address; Email
+
+**Blank unless the client profile has it:** Employer name
+
+**Good request:** "Create a Direct Deposit Authorization for ABC Dental: employee Maria Lopez, employee ID 1042, phone 916-555-0199, home address 22 Elm St Sacramento CA 95814, email maria@example.com; account details from the attached voided check."
+
+### 30-60-90 day plan
+
+**Slug:** `ninety-day-plan` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** Employee
+
+New-hire ramp plan: learning, contributing, owning across day 30 / 60 / 90.
+
+- **From the client profile:** company name
+- **Dated automatically at creation:** Start date
+
+**Fields, by form section:**
+
+- **Header:** Employee; Role; Manager; Start date (date); Company
+- **Goal:** Top-line goal (use \*word\*)
+- **Success metrics** (list; each row: Metric; Target)
+- **Day 30 (Learn):** Theme
+- **Day 30 objectives** (list; each row: Objective)
+- **Day 60 (Contribute):** Theme
+- **Day 60 objectives** (list; each row: Objective)
+- **Day 90 (Own):** Theme
+- **Day 90 objectives** (list; each row: Objective)
+- **Cadence:** Check-in cadence
+
+**Starts blank (the assistant asks or flags these):** Employee; Role; Manager
+
+**Blank unless the client profile has it:** Company
+
+**Good request:** "Create a 30-60-90 day plan for ABC Dental: employee Maria Lopez, role Office Manager, manager Dr. Sam Patel, start 2026-11-17, top-line goal: own scheduling and billing by day 90."
+
+### Equity Grant Notice
+
+**Slug:** `equity-grant` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** Grantee
+
+Stock option / RSU grant notice with vesting schedule, FMV, exercise terms, 83(b) reminder.
+
+- **From the client profile:** company name
+- **Dated automatically at creation:** Board approval, Grant date
+
+**Fields, by form section:**
+
+- **Company:** Company; Equity plan name; Board approval (date)
+- **Grantee:** Name; Address
+- **Grant terms:** Type (choice: ISO (Incentive Stock Options) / NSO (Non-qualified Stock Options) / RSUs (Restricted Stock Units) / Restricted Stock); Grant date (date); Shares / units (number); Exercise price (number); FMV at grant (number); Currency (choice: USD / EUR / GBP); Expiration (years) (number)
+- **Vesting:** Total vesting (years) (number); Cliff (years) (number); Frequency (choice: Monthly / Quarterly / Annual)
+- **Tax & sign:** Include 83(b) election reminder? (choice: Yes (recommended for restricted stock) / No); Signatory name; Signatory title
+
+**Starts blank (the assistant asks or flags these):** Name; Address; Signatory name; Signatory title
+
+**Blank unless the client profile has it:** Company
+
+**Good request:** "Create an Equity Grant Notice for Northwind Apparel: grantee Lee Wong, 500 Oak Ave Davis CA; ISO, 50,000 shares, exercise price 0.10 USD, FMV 0.10 USD, plan '2025 Equity Incentive Plan', 4-year vesting, 1-year cliff, monthly; signatory Dana Cole, CEO."
+
+## Contractors
+
+### Contractor Agreement (1099)
+
+**Slug:** `contractor-agreement` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** Contractor
+
+Independent contractor agreement with scope, deliverables, fees, IP assignment, and 1099 classification statement.
+
+- **Dated automatically at creation:** Effective date
+
+**Fields, by form section:**
+
+- **Document:** Effective date (date); Governing law (state)
+- **Company (your venture):** Legal name; Address; Signatory; Title
+- **Contractor:** Name (or entity); Address; Entity type (choice: Individual / sole proprietor / LLC / Corporation); EIN or SSN (last 4)
+- **Services / deliverables** (list; each row: Service)
+- **Compensation:** Structure (choice: Fixed fee / Hourly / Milestone-based); Fixed fee (USD) (number); Hourly rate (USD) (number); Milestone breakdown (if milestone); Currency (choice: USD / EUR / GBP); Payment terms
+- **Term & IP:** Term & termination; IP assignment (choice: Work-for-hire (Company owns all) / License (Contractor retains, Company licenses) / Contractor retains all IP); Include non-solicit? (choice: No / Yes)
+
+**Starts blank (the assistant asks or flags these):** Legal name; Company (your venture) → Address; Signatory; Title; Name (or entity); Contractor → Address; EIN or SSN (last 4); Milestone breakdown (if milestone)
+
+**Good request:** "Create a Contractor Agreement (1099) for ABC Dental (company legal name ABC Dental Group Inc., 100 Main St Sacramento CA, signed by Dr. Sam Patel, Owner) with contractor Lee Wong, individual, 500 Oak Ave Davis CA, SSN last 4 1234, for IT support at 85 USD/hour (milestone breakdown: not applicable), governing law California."
+
+### 1099 Contractor Onboarding Packet
+
+**Slug:** `contractor-onboarding-packet-1099` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** Contractor
+
+Multi-section onboarding packet for independent contractors — checklist, ABC-test classification screen, contractor information sheet, and acknowledgment.
+
+- **From the client profile:** company name
+- **Dated automatically at creation:** Date
+
+**Fields, by form section:**
+
+- **Packet:** Company; Date (date); Insurance required for the work
+- **Contractor information sheet:** Legal / entity name; Entity type; Business address; Contact name, phone, email; Services to be provided; Compensation basis; Invoicing cadence; Payment method; Insurance on file
+- **Compliance dates:** Agreement signed date (date); W-9 received date (date)
+- **Company signatory:** Name; Title
+
+**Starts blank (the assistant asks or flags these):** Insurance required for the work; Legal / entity name; Entity type; Business address; Contact name, phone, email; Services to be provided; Compensation basis; Invoicing cadence; Payment method; Insurance on file; Agreement signed date; W-9 received date; Name; Title
+
+**Blank unless the client profile has it:** Company
+
+**Note:** One document with 4 internal sections (checklist, ABC-test classification screen, contractor information sheet, acknowledgment). It is not a packet of templates.
+
+**Good request:** "Create a 1099 Contractor Onboarding Packet for ABC Dental: contractor Lee Wong Consulting LLC (LLC), 500 Oak Ave Davis CA, contact Lee Wong 530-555-0100 lee@example.com, services IT support, hourly 85 USD, invoiced monthly, paid by ACH, general liability insurance required and on file, agreement signed 2026-11-01, W-9 received 2026-11-01, company signatory Dr. Sam Patel, Owner."
+
+### Independent Contractor Commission Agreement
+
+**Slug:** `independent-contractor-commission-agreement` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** Contractor
+
+California commission sales agreement for independent contractors — commission earned on collection, no non-compete or customer non-solicit (B&P 16600, SB 699), confidentiality and trade-secret protection.
+
+- **From the client profile:** legal name
+- **Dated automatically at creation:** Effective date
+
+**Fields, by form section:**
+
+- **Parties:** Company legal name; State / entity type; Effective date (date); Contractor name; Contractor's trade or business
+- **Services:** Scope of services; Prospects to develop; Products or services presented
+- **Commission (earned on collection — fixed by this template):** Commission rate (%) (number); Commission base; Payment timing
+- **Term & signature:** Termination notice (days) (number); Company signatory name; Company signatory title
+
+**Starts blank (the assistant asks or flags these):** State / entity type; Contractor name; Contractor's trade or business; Scope of services; Prospects to develop; Products or services presented; Commission base; Payment timing; Company signatory name; Company signatory title
+
+**Blank unless the client profile has it:** Company legal name
+
+**Good request:** "Create an Independent Contractor Commission Agreement for ABC Dental (California corporation) with contractor Lee Wong, trade: dental equipment sales; scope: introduce ABC Dental's whitening services; prospects: dental practices in Sacramento County; products: whitening packages; 10% commission on net collected fees, paid monthly by the 15th; 30 days' termination notice; signed by Dr. Sam Patel, Owner."
+
+## Performance, pay and leave
+
+### Performance Review
+
+**Slug:** `performance-review` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** Employee
+
+Annual or quarterly performance review with ratings, narratives, goals, and signature blocks.
+
+- **From the client profile:** company name
+- **Dated automatically at creation:** Period start, Period end
+- **Team-member dropdown:** **Reviewer name** (pick a user from your team; the matching email fills itself; the `/generate` form shows a plain text box instead)
+
+**Fields, by form section:**
+
+- **Header:** Company; Employee; Role; Department; Reviewer name; Reviewer title; Period (choice: Annual / Semi-annual / Quarterly / PIP / Performance Improvement Plan); Period start (date); Period end (date)
+- **Overall:** Overall rating (choice: Exceptional / Exceeds expectations / Meets expectations / Partially meets / Below expectations)
+- **Performance areas** (list; each row: Area; Rating; Notes)
+- **Narrative:** Strengths; Growth areas; Other notes
+- **Goals from last period** (list; each row: Goal; Status)
+- **Goals for next period** (list; each row: Goal)
+
+**Starts blank (the assistant asks or flags these):** Employee; Role; Department; Reviewer name; Reviewer title; Other notes
+
+**Blank unless the client profile has it:** Company
+
+**Note:** **Period** includes a PIP option. There is no dedicated PIP template in the seed; see [Choosing a template](/documents/choosing-a-template#phrases-with-no-template).
+
+**Good request:** "Create a Performance Review for ABC Dental: employee Maria Lopez, Dental Assistant, Clinical; reviewer Dr. Sam Patel, Owner; Annual, 2026-01-01 to 2026-12-31; overall Meets expectations; other notes: none; area ratings and goals from the attached notes."
+
+### Promotion Letter
+
+**Slug:** `promotion-letter` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** Employee
+
+Promotion and compensation change letter — updated terms table, at-will continuation, wage-notice reminder, dual signature block.
+
+- **From the client profile:** company name
+- **Dated automatically at creation:** Date
+
+**Fields, by form section:**
+
+- **Letter:** Company; Date (date); Employee name
+- **New position:** New position title; Department; Reports to; Effective date (date)
+- **Classification & pay:** Classification (choice: Not set — re-test if duties changed / Exempt (salaried) / Non-Exempt (hourly)); Pay type (choice: Salary / Hourly); New annual salary (number); New hourly rate (number)
+- **Signatory:** Signatory name; Signatory title
+
+**Starts blank (the assistant asks or flags these):** Employee name; New position title; Department; Reports to; Effective date; Classification; Signatory name; Signatory title
+
+**Blank unless the client profile has it:** Company
+
+**Good request:** "Create a Promotion Letter for ABC Dental: Maria Lopez promoted to Office Manager, Operations, reports to Dr. Sam Patel, effective 2026-12-01, Exempt, salary 72,000 USD, signed by Dr. Sam Patel, Owner."
+
+### Pay Increase Notice
+
+**Slug:** `pay-increase-notice` · **Kind:** Handlebars · **Scope:** client · **Person to name:** Employee
+
+Client-facing notice confirming an approved hourly pay increase, effective timing, and employee acknowledgment.
+
+- **From the client profile:** company name
+
+**Fields, by form section:**
+
+- **Header:** Client company; Notice date (date)
+- **Employee:** Employee name; Position
+- **Compensation:** Previous hourly rate (number); New hourly rate (number); Effective date / pay period; Reason / context
+- **Employment terms:** Pay frequency (optional); FLSA classification (optional)
+- **Authorized by:** Signer name; Signer title
+
+**Starts blank:** nothing required. Every field has a default or is labelled optional; replace defaults the user did not ask for.
+
+**Note:** For an approved hourly raise. The bare word "raise" can rank `compensation-review-framework` first; say "pay increase notice".
+
+**Good request:** "Create a Pay Increase Notice for ABC Dental: Maria Lopez, Dental Assistant, from 26.00 to 28.00 USD/hour effective the pay period starting 2026-12-01, reason: annual merit increase, signed by Dr. Sam Patel, Owner."
+
+### Compensation Review Framework
+
+**Slug:** `compensation-review-framework` · **Kind:** Handlebars · **Scope:** client · **Person to name:** none · **Status:** not on the `/generate` page
+
+Structured compensation review framework for raise cadence, criteria, discretion, approval workflow, and documentation.
+
+- **From the client profile:** company name, industry, employee count
+- **Dated automatically at creation:** Effective date
+
+**Fields, by form section:**
+
+- **Framework header:** Title; Client name; Industry; Employee count; Effective date (date); Framework owner
+- **Framework content:** Purpose; Review cadence; Eligibility; Business factors; Documentation process; Approval workflow; Employee communication; Discretion statement
+- **Decision criteria** (list; each row: Criterion)
+- **Open decisions** (list; each row: Decision)
+
+**Starts blank (the assistant asks or flags these):** Framework owner
+
+**Blank unless the client profile has it:** Client name; Industry; Employee count
+
+**Good request:** "Create a Compensation Review Framework for ABC Dental: framework owner Dr. Sam Patel, Owner; annual review each January; merit and market criteria; owner approves all changes."
+
+### PTO / Leave Request
+
+**Slug:** `pto-request` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** Employee
+
+Time-off request form — vacation, sick, bereavement, jury duty, parental leave, other.
+
+- **From the client profile:** company name
+- **Dated automatically at creation:** Submitted
+
+**Fields, by form section:**
+
+- **Header:** Company; Employee; Role; Department; Submitted (date)
+- **Leave details:** Type (choice: Vacation / Sick / Bereavement / Jury duty / Parental / Unpaid …); Other (specify); Start date (date); End date (date); Total days (number); Partial day? (choice: No / Yes); Hours (if partial) (number); Reason (optional)
+- **Coverage:** Coverage plan; Coverage contact
+- **Approval:** Manager name; Manager email; Current PTO balance (number); Unit (choice: Days / Hours)
+
+**Starts blank (the assistant asks or flags these):** Employee; Role; Department; Other (specify); Start date; End date; Coverage contact; Manager name; Manager email
+
+**Blank unless the client profile has it:** Company
+
+**Good request:** "Create a PTO / Leave Request for ABC Dental: Maria Lopez, Dental Assistant, Clinical; Vacation 2026-12-22 to 2026-12-26, 3 days; coverage contact Tom Reyes; manager Dr. Sam Patel (sam@abcdental.com); other leave type: not applicable."
+
+### Accommodation request
+
+**Slug:** `accommodation-request` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** Employee
+
+ADA / reasonable accommodation request + interactive process documentation.
+
+- **From the client profile:** company name
+- **Dated automatically at creation:** Request date
+
+**Fields, by form section:**
+
+- **Header:** Employee; Role; Manager; Request date (date); Company
+- **Request:** Summary
+- **Essential job functions** (list; each row: Function)
+- **Requested accommodations** (list; each row: Accommodation)
+- **Documentation:** Medical documentation note
+- **Interactive process log** (list; each row: Date; Actor; Action)
+- **Decision:** Decision (choice: Pending / Granted (in full) / Granted (with modifications) / Denied); Rationale; Effective date (date); Next review date (date)
+- **Contact + legal:** HR contact; HR contact email; Legal note
+
+**Starts blank (the assistant asks or flags these):** Employee; Role; Manager; Rationale; Effective date; Next review date; HR contact; HR contact email
+
+**Blank unless the client profile has it:** Company
+
+**Note:** For an individual request. Operations case rules route ADA or accommodation policy questions to `compliance-checklist` instead; the assistant may confirm which one you mean.
+
+**Good request:** "Create an Accommodation request for ABC Dental: employee Maria Lopez, Dental Assistant, manager Dr. Sam Patel; requested a stool chairside and a 10-minute break every 2 hours; decision Granted (with modifications), rationale: breaks every 3 hours fit patient scheduling; effective 2026-11-10, next review 2027-02-10; HR contact Rachel Kim, rachel@ariyahr.com."
+
+### Expense Report
+
+**Slug:** `expense-report` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** Employee
+
+Itemized expense report with categories, totals, and approval block.
+
+- **From the client profile:** company name
+- **Dated automatically at creation:** Report date, Period start, Period end
+
+**Fields, by form section:**
+
+- **Header:** Company; Report name; Employee; Role; Department; Report date (date); Period start (date); Period end (date); Currency (choice: USD / EUR / GBP)
+- **Line items** (list; each row: Date; Category; Description; Merchant; Amount; Client (if billable))
+- **Approval & payment:** Manager name; Manager email; Payment method (choice: Reimbursement (employee paid) / Corporate card / Direct bill (vendor invoice)); Notes
+
+**Starts blank (the assistant asks or flags these):** Employee; Role; Department; Manager name; Manager email; Notes
+
+**Blank unless the client profile has it:** Company
+
+**Good request:** "Create an Expense Report for ABC Dental: employee Maria Lopez, Office Manager, Operations, period 2026-10-01 to 2026-10-31, line items from the attached receipts, approver Dr. Sam Patel (sam@abcdental.com), reimbursement, notes: none."
+
+## Discipline and incidents
+
+### Written Warning
+
+**Slug:** `written-warning` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** Employee
+
+Progressive-discipline documentation: incident log, corrective action, signatures.
+
+- **From the client profile:** company name
+- **Dated automatically at creation:** Date of warning
+
+**Fields, by form section:**
+
+- **Header:** Warning level (choice: Verbal Warning / Written Warning / Final Written Warning); Date of warning (date)
+- **Employer (client):** Company name; City, state
+- **Employee:** Name; Job title; Department; Supervisor / manager
+- **Issue type (check all that apply):** Performance (checkbox); Attendance / punctuality (checkbox); Conduct / behavior (checkbox); Policy violation (checkbox); Safety violation (checkbox); Other (checkbox); Describe "other"
+- **Description of issue:** Issue description
+- **Incident log** (list; each row: Date; Time; Comment)
+- **Policy or standard violated** (list; each row: Policy; Description)
+- **Prior warnings and documentation** (list; each row: Date; Type; Comment; Outcome)
+- **Required corrective action** (list; each row: Action; Description)
+- **Timeline:** Improvement deadline; Follow-up review
+- **Consequences:** Consequences body
+- **Optional clauses:** Include California at-will / non-retaliation disclaimer (choice: Yes / No); Include FEHA non-discrimination callout (choice: Yes / No)
+- **Acknowledgment text:** Acknowledgment body
+
+**Starts blank (the assistant asks or flags these):** City, state; Name; Job title; Department; Supervisor / manager; Describe "other"; Improvement deadline; Follow-up review
+
+**Blank unless the client profile has it:** Company name
+
+**Note:** Also covers verbal and final written warnings through **Warning level**. `corrective-action-warning` is a different form with the same three levels; the assistant asks which one when the request is ambiguous.
+
+**Good request:** "Create a Written Warning for ABC Dental (Sacramento, CA): Final Written Warning to Maria Lopez, Dental Assistant, Clinical, supervisor Dr. Sam Patel; issue type Attendance / punctuality (other: not applicable); late 45 minutes on 10/06, 10/14 and 10/29; improvement deadline 2026-12-01; follow-up review 2026-12-15."
+
+### Corrective Action Warning
+
+**Slug:** `corrective-action-warning` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** Employee
+
+Progressive discipline notice — verbal, written or final written warning on one form, with fixed at-will consequences and acknowledgment language.
+
+- **From the client profile:** company name
+- **Dated automatically at creation:** Date issued
+
+**Fields, by form section:**
+
+- **Notice:** Company; Warning level (choice: Verbal Warning / Written Warning / Final Written Warning); Date issued (date)
+- **Employee and incident:** Employee name; Position / department; Supervisor issuing warning; Incident date, time, location; Policy or standard violated; Prior related discussions
+- **Findings:** Description of conduct; Expected correction
+- **Employee comments:** Employee comments (recorded at the meeting; leave blank for a handwritten response)
+
+**Starts blank (the assistant asks or flags these):** Employee name; Position / department; Supervisor issuing warning; Incident date, time, location; Policy or standard violated; Prior related discussions; Description of conduct; Expected correction; Employee comments (recorded at the meeting; leave blank for a handwritten response)
+
+**Blank unless the client profile has it:** Company
+
+**Note:** Shares the warning levels with `written-warning`. Say "Corrective Action Warning" explicitly if this is the form the client uses.
+
+**Good request:** "Create a Corrective Action Warning for ABC Dental: Written Warning to Maria Lopez, Dental Assistant / Clinical, issued by Dr. Sam Patel; incident 2026-10-29 9:15am front desk; policy violated: attendance policy; prior discussion: verbal warning 2026-09-12; conduct: arrived 45 minutes late three times in October; expected correction: on time for every shift; employee comments: leave blank for a handwritten response."
+
+### HR Incident Report
+
+**Slug:** `hr-incident-report` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** Employee(s) involved
+
+Factual same-day record of a workplace incident — people involved, chronology, immediate action, and the statutory DWC-1 injury rule.
+
+- **From the client profile:** company name
+- **Dated automatically at creation:** Date report completed
+
+**Fields, by form section:**
+
+- **Report details:** Company; Completed by; Date report completed (date); Incident date and time; Location
+- **People involved:** Employee(s) involved; Witness(es) / third parties
+- **Description of incident:** Description
+- **Immediate action taken:** Action taken at the scene; Injuries reported; Police or emergency services
+- **Follow-up:** Reported to / sent to Ariya HR
+
+**Starts blank (the assistant asks or flags these):** Completed by; Incident date and time; Location; Employee(s) involved; Witness(es) / third parties; Description; Action taken at the scene; Injuries reported; Police or emergency services; Reported to / sent to Ariya HR
+
+**Blank unless the client profile has it:** Company
+
+**Note:** Default choice for any incident, investigation or complaint write-up. Two other rows share the words "HR Incident Report": `incident-report` (same title) and `incident-report-rdk`.
+
+**Good request:** "Create an HR Incident Report for ABC Dental: completed by Rachel Kim; incident 2026-10-30 2:10pm, front lobby; involved Maria Lopez (Dental Assistant); witness Tom Reyes (Hygienist); a patient shouted at and pushed Maria; at the scene the patient was asked to leave and Maria went to the break room; no injuries reported; police not called; sent to Ariya HR 2026-10-30."
+
+### HR Incident Report (incident-report)
+
+**Slug:** `incident-report` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** Employee (subject) · **Status:** not on the `/generate` page
+
+Internal HR incident documentation: parties, incident summary, supporting evidence, escalation, signatures.
+
+- **From the client profile:** company name, address
+- **Dated automatically at creation:** Date report opened
+
+**Fields, by form section:**
+
+- **Report header:** Date report opened (date); Case / reference ID; Department / location; Report prepared by; Role of preparer (choice: HR / Manager / Supervisor / Compliance / Other); Confidentiality level (choice: Confidential (HR/Legal) / Limited Distribution / General Internal); Litigation hold issued (choice: Yes / No / N/A)
+- **Employer (client):** Company name; City, state
+- **Employee subject of report:** Name; Employee ID; Job title; Work location (choice: On-Site / Remote / Hybrid)
+- **Reporter / notifying employee:** Name (or "Anonymous"); Contact information; Relationship to subject (choice: Co-worker / Supervisor / Direct Report / Guest / Third Party / Other)
+- **Other involved parties:** Other employees involved; Non-employees involved; Witness name(s)
+- **Incident type (check all that apply):** Conduct / performance (checkbox); Harassment / discrimination (FEHA) (checkbox); Retaliation / whistleblower (checkbox); Wage / hour concern (checkbox); Leave / accommodation request (checkbox); Health & safety (checkbox); Policy violation (checkbox); Workplace violence / threat (checkbox); Workers' compensation / injury (checkbox); Employee wellness concern (checkbox); Other (describe)
+- **Incident summary:** Date of incident; Time of incident; Location of incident; Immediate actions taken; Detailed description of incident
+- **Supporting documentation (check all that apply):** Photos / video (checkbox); Written statements (checkbox); Emails / text messages (checkbox); Time records (checkbox); Security / camera footage (checkbox); Medical documentation (checkbox); Other (describe)
+- **Prior history:** Prior incidents or complaints involving this employee? (choice: Yes / No / Unknown); If yes, describe briefly
+- **Reporting & escalation (route to):** Direct manager (checkbox); HR / Director (checkbox); Owner / Principal (checkbox); Other (checkbox); Other recipient (name / email)
+- **Optional clauses:** Include completion instructions (checkbox); Include response-timeline callout (checkbox); Include confidentiality / non-retaliation notice (checkbox)
+- **Certification text:** Certification body
+
+**Starts blank (the assistant asks or flags these):** Case / reference ID; Department / location; Report prepared by; Name; Employee ID; Job title; Name (or "Anonymous"); Contact information; Other employees involved; Non-employees involved; Witness name(s); Incident type (check all that apply) → Other (describe); Date of incident; Time of incident; Location of incident; Immediate actions taken; Supporting documentation (check all that apply) → Other (describe); If yes, describe briefly; Other recipient (name / email)
+
+**Blank unless the client profile has it:** Company name; City, state
+
+**Note:** Same title as `hr-incident-report`. Prefer `hr-incident-report` unless the user explicitly wants this longer investigation form; name the slug `incident-report` in the request so the assistant does not pick the other one.
+
+**Good request:** "Create the incident-report template (the long HR Incident Report investigation form) for ABC Dental: case ID 2026-014, Clinical / Sacramento, prepared by Rachel Kim; subject Maria Lopez, ID 1042, Dental Assistant; reporter Tom Reyes (Co-worker, tom@abcdental.com); no other employees, non-employees or witnesses; incident 2026-10-30, 2:10pm, front lobby; immediate action: patient removed; prior history: No; route to HR / Director."
+
+### HR Incident Report (Riverboat Delta King)
+
+**Slug:** `incident-report-rdk` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** Employee (subject) · **Status:** not on the `/generate` page
+
+Internal HR incident documentation: parties, incident summary, supporting evidence, escalation, signatures.
+
+- **From the client profile:** company name, address
+- **Dated automatically at creation:** Date report opened
+
+**Fields, by form section:**
+
+- **Report header:** Date report opened (date); Case / reference ID; Department / location; Report prepared by; Role of preparer (choice: HR / Manager / Supervisor / Compliance / Other); Confidentiality level (choice: Confidential (HR/Legal) / Limited Distribution / General Internal); Litigation hold issued (choice: Yes / No / N/A)
+- **Employer (client):** Company name; City, state
+- **Employee subject of report:** Name; Employee ID; Job title; Work location (choice: On-Site / Remote / Hybrid)
+- **Reporter / notifying employee:** Name (or "Anonymous"); Contact information; Relationship to subject (choice: Co-worker / Supervisor / Direct Report / Guest / Third Party / Other)
+- **Other involved parties:** Other employees involved; Non-employees involved; Witness name(s)
+- **Incident type (check all that apply):** Conduct / performance (checkbox); Harassment / discrimination (FEHA) (checkbox); Retaliation / whistleblower (checkbox); Wage / hour concern (checkbox); Leave / accommodation request (checkbox); Health & safety (checkbox); Policy violation (checkbox); Workplace violence / threat (checkbox); Workers' compensation / injury (checkbox); Employee wellness concern (checkbox); Other (describe)
+- **Incident summary:** Date of incident; Time of incident; Location of incident; Immediate actions taken; Detailed description of incident
+- **Supporting documentation (check all that apply):** Photos / video (checkbox); Written statements (checkbox); Emails / text messages (checkbox); Time records (checkbox); Security / camera footage (checkbox); Medical documentation (checkbox); Other (describe)
+- **Prior history:** Prior incidents or complaints involving this employee? (choice: Yes / No / Unknown); If yes, describe briefly
+- **Reporting & escalation (route to):** Direct manager (checkbox); HR / Director (checkbox); Owner / Principal (checkbox); Other (checkbox); Other recipient (name / email)
+- **Optional clauses:** Include completion instructions (checkbox); Include response-timeline callout (checkbox); Include confidentiality / non-retaliation notice (checkbox)
+- **Certification text:** Certification body
+
+**Starts blank (the assistant asks or flags these):** Case / reference ID; Department / location; Report prepared by; Name; Employee ID; Job title; Name (or "Anonymous"); Contact information; Other employees involved; Non-employees involved; Witness name(s); Incident type (check all that apply) → Other (describe); Date of incident; Time of incident; Location of incident; Immediate actions taken; Supporting documentation (check all that apply) → Other (describe); If yes, describe briefly; Other recipient (name / email)
+
+**Blank unless the client profile has it:** Company name; City, state
+
+**Note:** Client-specific layout (Riverboat Delta King) described as retired in the code. Client-workspace document suggestions can still propose it. Do not pick it unless the user asks for this layout. Active state in your tenant is unverified.
+
+**Good request:** Use only when the user asks for the Riverboat Delta King layout by name; give the same facts as for `incident-report`.
+
+## Separation
+
+### Termination Letter
+
+**Slug:** `termination-letter` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** Employee
+
+Employee separation notice with final-pay date, COBRA info, return-of-property, severance (optional).
+
+- **From the client profile:** company name, address
+- **Dated automatically at creation:** Last day worked, Final pay date, Active benefits end
+
+**Fields, by form section:**
+
+- **Company:** Company; Address; State (full name)
+- **Employee:** Name; Address; Role
+- **Separation:** Last day worked (date); Reason (choice: Voluntary resignation / Involuntary, no cause / Involuntary, for cause / Layoff (position eliminated)); Final pay date (date)
+- **Final pay items** (list; each row: Item)
+- **Severance (optional):** Severance offered? (choice: No / Yes (specify below)); Severance terms (if yes)
+- **Benefits:** COBRA continuation eligible? (choice: Yes (20+ employees, included) / No (under 20 employees, state continuation may apply)); Active benefits end (date)
+- **Items to return** (list; each row: Item)
+- **Ongoing obligations** (list; each row: Obligation)
+- **HR contact & signatory:** HR contact name; HR contact email; HR contact phone; Signatory name; Signatory title
+
+**Starts blank (the assistant asks or flags these):** Name; Employee → Address; Role; HR contact name; HR contact email; HR contact phone; Signatory name
+
+**Blank unless the client profile has it:** Company; Company → Address
+
+**Good request:** "Create a Termination Letter for ABC Dental: Maria Lopez, 22 Elm St Sacramento CA 95814, Dental Assistant; last day 2026-11-14, Layoff (position eliminated), final pay 2026-11-14; HR contact Rachel Kim, rachel@ariyahr.com, 916-555-0142; signed by Dr. Sam Patel."
+
+### Termination Packet
+
+**Slug:** `termination-packet` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** Employee
+
+Complete California separation packet — termination notice, CUIC 1089 change-in-relationship notice, offboarding acknowledgment, and manager checklist.
+
+- **From the client profile:** company name, address
+
+**Fields, by form section:**
+
+- **Employer:** Client legal name; Address
+- **Employee:** Employee name; Employee number; Position title
+- **Separation:** Effective date (date); Action taken (Section 1089 notice) (choice: Discharged / Laid off / Placed on leave of absence / Employment status changed); Status change detail (if status changed); Final pay timing (choice: Discharge or layoff — final pay on the last day (Labor Code 201) / Resignation with 72+ hours’ notice — final pay on the last day (Labor Code 202) / Resignation with less than 72 hours’ notice — final pay within 72 hours (Labor Code 202)); Reason (one factual paragraph)
+- **Company signatory:** Signatory name; Signatory title
+
+**Starts blank (the assistant asks or flags these):** Employee name; Employee number; Position title; Effective date; Status change detail (if status changed); Reason (one factual paragraph); Signatory name; Signatory title
+
+**Blank unless the client profile has it:** Client legal name; Address
+
+**Note:** One document with 4 internal pages (termination notice, CUIC 1089 change-in-relationship notice, offboarding acknowledgment, manager checklist). It is not a packet of templates.
+
+**Good request:** "Create a Termination Packet for ABC Dental: Maria Lopez, employee number 1042, Dental Assistant; effective 2026-11-14; Laid off (status change detail: not applicable); final pay on the last day; reason: position eliminated when the Davis office closed; signed by Dr. Sam Patel, Owner."
+
+### Resignation Acknowledgment
+
+**Slug:** `resignation-acknowledgment` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** Employee
+
+Acknowledgment of resignation — receipt confirmation, Labor Code 202 final-pay timing, COBRA and separation-notice next steps, dual signature block.
+
+- **From the client profile:** legal name
+
+**Fields, by form section:**
+
+- **Employer:** Client legal name; Signatory name; Signatory title
+- **Employee:** Employee name; Position
+- **Dates:** Resignation received (date); Last day of work (date); Notice given (drives Labor Code 202 final-pay timing) (choice: Not set — show both statutory timings / At least 72 hours — final pay on the last day / Less than 72 hours — final pay within 72 hours)
+- **Additional next steps (COBRA, separation notices and property return are always included)** (list; each row: Step)
+
+**Starts blank (the assistant asks or flags these):** Signatory name; Signatory title; Employee name; Position; Resignation received; Last day of work; Notice given (drives Labor Code 202 final-pay timing); Additional next steps (COBRA, separation notices and property return are always included)
+
+**Blank unless the client profile has it:** Client legal name
+
+**Good request:** "Create a Resignation Acknowledgment for ABC Dental: Maria Lopez, Dental Assistant; resignation received 2026-10-31, last day 2026-11-14, notice at least 72 hours; signed by Dr. Sam Patel, Owner; additional next step: return the key fob."
+
+### Severance summary
+
+**Slug:** `severance-summary` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** Employee
+
+Plain-language cover summarizing a severance package (legal agreement separate).
+
+- **From the client profile:** company name, state
+- **Dated automatically at creation:** Last day
+
+**Fields, by form section:**
+
+- **Header:** Employee; Role; Last day (date); Separation type (choice: Mutual / negotiated / Reduction in force / Restructure / role eliminated); Company; State
+- **Cash:** Cash severance (number); Currency (choice: USD / EUR / GBP); Equivalent weeks (number)
+- **Benefits & equity:** Benefits continuation; PTO payout; Equity treatment; Outplacement / support
+- **Conditions to receive** (list; each row: Condition)
+- **Comms:** What you can share; HR contact name; HR contact email; Legal note
+
+**Starts blank (the assistant asks or flags these):** Employee; Role; HR contact name; HR contact email
+
+**Blank unless the client profile has it:** Company
+
+**Good request:** "Create a Severance summary for ABC Dental: Maria Lopez, Dental Assistant, last day 2026-11-14, Reduction in force, 6,000 USD cash (6 weeks), COBRA paid for 3 months; HR contact Rachel Kim, rachel@ariyahr.com."
+
+### Exit interview
+
+**Slug:** `exit-interview` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** Employee
+
+Structured exit interview with categories + likert scores + qualitative notes.
+
+- **From the client profile:** company name
+- **Dated automatically at creation:** Last day
+
+**Fields, by form section:**
+
+- **Header:** Employee; Role; Tenure; Last day (date); Interviewer; Company; Reason for leaving (choice: Voluntary resignation / Mutual separation / Involuntary (with cause) / Reduction in force / Retirement); Where to next? (choice: Similar role, different company / Different role, different company / Sabbatical / time off / Starting a business / Going back to school / Other / declined to answer)
+- **Category scores (1-5)** (list; each row: Category; Score; Notes)
+- **Qualitative:** What worked; What didn't work; Advice for the company; Would recommend? (choice: Yes — would actively recommend / Yes — with caveats / Neutral / No); Knowledge transfer status; Final note (optional)
+
+**Starts blank (the assistant asks or flags these):** Employee; Role; Interviewer
+
+**Blank unless the client profile has it:** Company
+
+**Good request:** "Create an Exit interview for ABC Dental: employee Maria Lopez, Dental Assistant, tenure 3 years, last day 2026-11-14, interviewer Rachel Kim, Voluntary resignation; scores and comments from the attached notes."
+
+## Policies, handbooks and compliance
+
+### Employee Handbook
+
+**Slug:** `employee-handbook` · **Kind:** Handlebars + LLM chapters · **Scope:** client · **Person to name:** none
+
+California employee handbook — 8 generated chapters (EEO, wage and hour, conduct, leaves, safety, privacy) mirroring the client's source handbook or the Ariya outline, plus acknowledgment of receipt.
+
+- **From the client profile:** company name
+- **Dated automatically at creation:** Effective date
+
+**Fields, by form section:**
+
+- **Employer & scope:** Client legal name; DBA (if any); Effective date (date); Coverage note; Authorized officer title
+- **Welcome — the client's voice:** Welcome paragraph; Company history & mission
+- **2. Respectful workplace:** Reporting channels
+- **3. Pay, hours & classifications:** Hours thresholds; Work schedule & remote work; Pay frequency & paydays; BYOD / mileage stipend; Retirement savings
+- **4. Standards of conduct:** Conflicts, outside work & gifts; BYOD rules; Cannabis carve-outs; Industry-specific policy; Approved AI tools
+- **5. Time off & leaves:** Paid time off; Paid sick leave method; Observed holidays; Workers' comp carrier; Personal leave
+- **6. Performance & separation:** Review cadence; Requested notice (days) (number)
+- **7. Health & safety:** Remote / home-office safety
+- **8. Privacy:** Attach full CCPA/CPRA notice as an appendix (checkbox)
+
+**Starts blank (the assistant asks or flags these):** DBA (if any); Coverage note; Authorized officer title; Welcome paragraph; Company history & mission; Reporting channels; Hours thresholds; Work schedule & remote work; Pay frequency & paydays; BYOD / mileage stipend; Retirement savings; Conflicts, outside work & gifts; BYOD rules; Cannabis carve-outs; Industry-specific policy; Approved AI tools; Paid time off; Paid sick leave method; Observed holidays; Workers' comp carrier; Personal leave; Review cadence; Remote / home-office safety
+
+**Blank unless the client profile has it:** Client legal name
+
+**Note:** Always written by the LLM, from every entry point (even the Generate button): 8 chapters plus a fixed cover at-will callout and acknowledgment page. Slow.
+
+**Note:** To rebuild the client's existing handbook, attach it to the chat first; the assistant then mirrors its structure.
+
+**Good request:** "Create an Employee Handbook for ABC Dental from the attached current handbook: no DBA, covers all California employees, officer title Owner, paid biweekly on Fridays, PTO 10 days a year, sick leave front-loaded 40 hours, 6 paid holidays, workers' comp carrier State Fund, annual reviews."
+
+### Employee Handbook Discovery & Assessment
+
+**Slug:** `employee-handbook-discovery-assessment` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none
+
+Handbook working-session intake — engagement context, company/workforce, pay, leave, conduct, benefits, decisions to confirm, and CA compliance flags.
+
+- **From the client profile:** company name, signer / contact name, contact title, industry
+- **Dated automatically at creation:** Session date
+
+**Fields, by form section:**
+
+- **Session:** Client company; Affiliated brands; Prepared for; Title; Session date (date)
+- **What we already know:** Industry; Footprint; Headcount; Payroll & benefits; Current handbook; Open questions
+- **Company & workforce:** Legal entity name / DBA; Worksite locations; Exempt / non-exempt split; Part-time, seasonal, or minor employees; Independent contractors in use; Equipment model
+- **Pay & scheduling:** Pay frequency and paydays; Overtime exposure / typical schedules; Alternative workweek schedules; Commissions, bonuses, tips; Timekeeping method
+- **Leave & time off:** PTO / vacation policy and accrual; Paid sick leave method; Paid holidays observed; Other leaves in practice
+- **Conduct & workplace policies:** Discipline practice today; Remote work expectations; Technology, social media, confidentiality; Dress code / safety requirements; Harassment prevention training status
+- **Benefits & extras:** Health, dental, vision; Retirement plan; Perks and stipends
+- **Decisions to confirm in session** (list; each row: Decision)
+- **Compliance:** Compliance flags to review
+
+**Starts blank (the assistant asks or flags these):** Affiliated brands; Footprint; Headcount; Payroll & benefits; Current handbook; Open questions; Legal entity name / DBA; Worksite locations; Exempt / non-exempt split; Part-time, seasonal, or minor employees; Independent contractors in use; Equipment model; Pay frequency and paydays; Overtime exposure / typical schedules; Alternative workweek schedules; Commissions, bonuses, tips; Timekeeping method; PTO / vacation policy and accrual; Paid sick leave method; Paid holidays observed; Other leaves in practice; Discipline practice today; Remote work expectations; Technology, social media, confidentiality; Dress code / safety requirements; Harassment prevention training status; Health, dental, vision; Retirement plan; Perks and stipends; Decisions to confirm in session; Compliance flags to review
+
+**Blank unless the client profile has it:** Client company; Prepared for; Title; Industry
+
+**Good request:** "Create an Employee Handbook Discovery & Assessment for ABC Dental for the 2026-11-12 working session, prepared for Dr. Sam Patel, Owner; footprint, headcount, pay, leave, conduct, benefits and compliance answers from the attached intake questionnaire and call notes."
+
+### Employee Handbook Assessment
+
+**Slug:** `employee-handbook-assessment` · **Kind:** Handlebars · **Scope:** client · **Person to name:** none · **Status:** not on the `/generate` page
+
+Custom handbook discovery assessment that maps client context and sources into the Employee Handbook template.
+
+- **From the client profile:** company name, address, industry, employee count
+- **Dated automatically at creation:** Assessment date
+- **Team-member dropdown:** **Facilitator**; **Open decisions → Owner** (pick a user from your team; the matching email fills itself; the `/generate` form shows a plain text box instead)
+
+**Fields, by form section:**
+
+- **Assessment header:** Title; Client name; Client address; Industry; Employee count; Assessment date (date); Facilitator; Review status; Purpose
+- **Company and workforce context:** Company voice; Workforce profile; Operating model
+- **Policy discovery:** Payroll and wage/hour practices; Benefits, time off, and leaves; Safety and jobsite practices; Employee relations and conduct; Technology, records, and privacy
+- **Handbook modules** (list; each row: Module; Include?; Customization notes; Reference basis)
+- **Open decisions** (list; each row: Topic; Current answer; Decision needed; Owner)
+- **Generation and publication:** Generation instructions; Publication gate
+
+**Starts blank (the assistant asks or flags these):** Facilitator
+
+**Blank unless the client profile has it:** Client name; Client address; Industry; Employee count
+
+**Note:** Retired in favour of **Employee Handbook Discovery & Assessment** (`employee-handbook-discovery-assessment`) per a repo repair script, but re-seeded as active. Whether it is active in your tenant is unverified. Prefer the successor unless the user names this one.
+
+**Good request:** "Create an Employee Handbook Assessment for ABC Dental, facilitator Rachel Kim (only if the user asked for this older template by name)."
+
+### Employee Handbook Development Agreement
+
+**Slug:** `employee-handbook-development-agreement` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none
+
+Standalone project agreement to build a California-compliant employee handbook — scope, exclusions, process, flat fee and kill fee, general terms, dual signature block.
+
+- **From the client profile:** legal name, industry
+- **Dated automatically at creation:** Effective date
+
+**Fields, by form section:**
+
+- **Client:** Client legal name; City, State
+- **Engagement:** Effective date (date); Industry (draft is tailored to it); Revision limit
+- **Investment:** Handbook flat fee (number); Kill fee (number); Payment due (days from invoice) (number)
+
+**Starts blank (the assistant asks or flags these):** City, State; Revision limit
+
+**Blank unless the client profile has it:** Client legal name; Industry (draft is tailored to it)
+
+**Good request:** "Create an Employee Handbook Development Agreement for ABC Dental, Sacramento, CA: effective 2026-12-01, revision limit two rounds, flat fee 3,500 USD, kill fee 1,000 USD, payment due 15 days from invoice."
+
+### AI and Confidential Data Policy
+
+**Slug:** `ai-confidential-data-policy` · **Kind:** Handlebars · **Scope:** client · **Person to name:** none · **Status:** not on the `/generate` page
+
+Practical employee policy for generative AI, confidential information, approved tools, and data protection.
+
+- **From the client profile:** company name, industry
+- **Dated automatically at creation:** Effective date
+
+**Fields, by form section:**
+
+- **Policy header:** Title; Client name; Industry; Effective date (date); Policy owner
+- **Policy content:** Purpose; Covered information; Approved use; Prohibited use; Manager responsibilities; Client-specific examples; Non-retaliation
+- **Employee responsibilities** (list; each row: Responsibility)
+- **Open decisions** (list; each row: Decision)
+
+**Starts blank (the assistant asks or flags these):** Policy owner
+
+**Blank unless the client profile has it:** Client name; Industry
+
+**Good request:** "Create an AI and Confidential Data Policy for ABC Dental: policy owner Rachel Kim, Office Manager; approved tool: ChatGPT Team; never paste patient records into AI tools."
+
+### Remote Work and Expense Reimbursement Policy
+
+**Slug:** `remote-work-expense-reimbursement-policy` · **Kind:** Handlebars · **Scope:** client · **Person to name:** none · **Status:** not on the `/generate` page
+
+Policy for remote work, work locations, equipment, timekeeping, safety, confidential data, and business expense reimbursement.
+
+- **From the client profile:** company name, industry, employee count
+- **Dated automatically at creation:** Effective date
+
+**Fields, by form section:**
+
+- **Policy header:** Title; Client name; Industry; Employee count; Effective date (date); Policy owner
+- **Policy content:** Purpose; Eligible roles and approval; Schedule and timekeeping; Equipment and technology; Expense reimbursement; Workspace safety; Confidentiality and security; Non-retaliation
+- **Employee responsibilities** (list; each row: Responsibility)
+- **Open decisions** (list; each row: Decision)
+
+**Starts blank (the assistant asks or flags these):** Policy owner
+
+**Blank unless the client profile has it:** Client name; Industry; Employee count
+
+**Good request:** "Create a Remote Work and Expense Reimbursement Policy for ABC Dental: policy owner Rachel Kim, Office Manager; remote work for billing staff only, with manager approval; internet reimbursed at 50 USD a month."
+
+### Injury and Illness Prevention Program
+
+**Slug:** `injury-illness-prevention-program` · **Kind:** Handlebars · **Scope:** client · **Person to name:** none · **Status:** not on the `/generate` page
+
+IIPP framework for responsibility, communication, hazard assessment, correction, training, injury reporting, and recordkeeping.
+
+- **From the client profile:** company name, industry, employee count
+- **Dated automatically at creation:** Effective date
+
+**Fields, by form section:**
+
+- **Program header:** Title; Client name; Industry; Employee count; Effective date (date); Safety owner
+- **Program content:** Responsibility; Communication; Hazard assessment; Hazard correction; Injury reporting; Training; Recordkeeping; Site-specific risks
+- **Safety controls** (list; each row: Control)
+- **Open decisions** (list; each row: Decision)
+- **Legal notice:** Legal notice
+
+**Starts blank (the assistant asks or flags these):** Safety owner
+
+**Blank unless the client profile has it:** Client name; Industry; Employee count
+
+**Good request:** "Create an Injury and Illness Prevention Program for ABC Dental: safety owner Rachel Kim, Office Manager; site-specific risks: sharps, X-ray and chemical disinfectants."
+
+### Workplace Violence Prevention Plan
+
+**Slug:** `workplace-violence-prevention-plan` · **Kind:** Handlebars · **Scope:** client · **Person to name:** none · **Status:** not on the `/generate` page
+
+Client-specific WVPP framework with reporting, training, hazard review, response, and annual review cadence.
+
+- **From the client profile:** company name, industry, employee count
+- **Dated automatically at creation:** Effective date
+
+**Fields, by form section:**
+
+- **Plan header:** Title; Client name; Industry; Employee count; Effective date (date); Plan owner; Review cadence
+- **Plan content:** Purpose; Scope; Risk profile; Reporting procedure; Incident response; Training plan; Recordkeeping; Annual review
+- **Prevention controls** (list; each row: Control)
+- **Open decisions** (list; each row: Decision)
+- **Legal notice:** Legal notice
+
+**Starts blank (the assistant asks or flags these):** Plan owner
+
+**Blank unless the client profile has it:** Client name; Industry; Employee count
+
+**Good request:** "Create a Workplace Violence Prevention Plan for ABC Dental: plan owner Rachel Kim, Office Manager; annual review."
+
+### Wage Theft Prevention Notice
+
+**Slug:** `wage-theft-prevention-notice` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** Employee
+
+California Labor Code 2810.5 Notice to Employee — employee, employer, wage, workers’ comp and paid-sick-leave disclosures with receipt acknowledgment.
+
+- **From the client profile:** legal name, DBA, address
+
+**Fields, by form section:**
+
+- **Employee:** Employee name; Position; Start date (date)
+- **Employer:** Legal entity name; DBA / operating name(s); Physical and mailing address; Telephone
+- **Wage information:** Rate(s) of pay; Overtime rate(s); Basis of pay; Allowances claimed; Regular payday
+- **Workers' compensation:** Insurance carrier; Carrier address and phone; Policy number
+- **Paid sick leave:** Method (choice: Not selected (blank checkboxes) / Accrues at 1 hour per 30 hours worked / Front-loaded / Per CBA); Front-loaded hours per year
+- **Employer representative:** Name; Title
+
+**Starts blank (the assistant asks or flags these):** Employee name; Position; Start date; Telephone; Rate(s) of pay; Overtime rate(s); Basis of pay; Allowances claimed; Regular payday; Insurance carrier; Carrier address and phone; Policy number; Method; Front-loaded hours per year; Name; Title
+
+**Blank unless the client profile has it:** Legal entity name; DBA / operating name(s); Physical and mailing address
+
+**Good request:** "Create a Wage Theft Prevention Notice for ABC Dental: Maria Lopez, Dental Assistant, start 2026-11-17; employer phone 916-555-0100; 28 USD/hour, overtime 42 USD/hour, hourly basis, no allowances, paid biweekly on Friday; workers' comp carrier State Fund, 333 Bush St San Francisco, 888-555-0100, policy 1234567; sick leave accrues 1 hour per 30 hours worked (front-loaded hours: not applicable); employer representative Dr. Sam Patel, Owner."
+
+### HR Compliance Checklist
+
+**Slug:** `compliance-checklist` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none
+
+Multi-state HR compliance checklist for a client (Federal + CA + NV starter content). Arctic Robot reuses the structure for the EU regulatory clock (ECGT/EUDR/DPP/CSRD dates).
+
+- **From the client profile:** company name, industry, employee count
+- **Dated automatically at creation:** Date
+
+**Fields, by form section:**
+
+- **Client:** Client name; Industry; Employee count (number)
+- **Jurisdictions:** Include checklists for (checkboxes)
+- **Prepared by:** Consultant; Date (date)
+- **Notes (optional):** Notes shown at bottom
+
+**Starts blank (the assistant asks or flags these):** Consultant
+
+**Blank unless the client profile has it:** Client name; Industry; Employee count
+
+**Note:** Operations case rules also route handbook, leave, wage-hour and ADA policy questions here.
+
+**Good request:** "Create an HR Compliance Checklist for ABC Dental (dental, 24 employees): consultant Rachel Kim, include the Federal and California checklists."
+
+### Time Off Policy Intake
+
+**Slug:** `time-off-policy-intake` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none
+
+Structured intake for client PTO, sick leave, and holiday policies.
+
+- **From the client profile:** company name, signer / contact name, industry
+- **Dated automatically at creation:** Date
+
+**Fields, by form section:**
+
+- **Header:** Company; Contact; Date (date); Industry
+- **Leave types covered** (list; each row: Type; Selected)
+- **1. General policy details:** Policy effective date; Applies to (choice: All / Full-time / Part-time / Other)
+- **2. Accrual method:** Accrual basis (choice: Per hour worked / Per pay period / Monthly / Annual lump sum / Other); Accrual rate; Carryover (choice: Allowed with cap / Use it or Lose it (banned in CA) / Other); Carryover max (hours); Annual accrual cap (hours)
+- **3. Eligibility & waiting periods:** Eligibility begins (choice: Date of hire / After waiting period / Other); If waiting period: how long; Usage wait (choice: None / After 30 days / After 90 days / Other)
+- **4. Usage rules:** Minimum increment (choice: 1 hour / Half day / Full day); Approval (choice: Supervisor required / Self-service); Notice required (foreseeable); Blackout dates
+- **5. Holidays observed** (list; each row: Holiday; Observed)
+- **Holiday pay rules:** Pay rule (choice: Full-time only / Part-time prorated / Must work day before/after / Other)
+- **6. Payout & termination:** Payout notes
+- **7. State compliance:** Operates in California? (choice: Yes / No); Other states with specific requirements
+- **8. Additional notes:** Additional notes
+- **Industry benchmark table:** Include benchmark table (choice: Yes / No)
+- **Benchmark rows** (list; each row: Industry; PTO; Sick; Holidays)
+
+**Starts blank (the assistant asks or flags these):** Policy effective date; Accrual rate; Carryover max (hours); Annual accrual cap (hours); If waiting period: how long; Notice required (foreseeable); Blackout dates; Other states with specific requirements; Additional notes
+
+**Blank unless the client profile has it:** Company; Contact; Industry
+
+**Good request:** "Create a Time Off Policy Intake for ABC Dental: effective 2027-01-01; accrual 1 hour per 30 hours worked; carryover capped at 80 hours; annual accrual cap 120 hours; 90-day waiting period; 2 weeks' notice for foreseeable leave; no blackout dates; California only, no other states; no additional notes."
+
+### Industry Resource Center
+
+**Slug:** `industry-resource` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none
+
+One-page compliance + dates + forms reference, customized per industry.
+
+- **From the client profile:** industry, company name
+- **Dated automatically at creation:** Year
+
+**Fields, by form section:**
+
+- **Industry:** Industry (choice: Restaurant & Hospitality / Landscaping & Construction / Creative Services & Agencies / Venture Studio / Tech / Fashion & Apparel); Year (number)
+- **For (optional):** Client name; Doc title
+
+**Starts blank:** nothing required. Every field has a default or is labelled optional; replace defaults the user did not ask for.
+
+**Good request:** "Create an Industry Resource Center for Golden Gate Bistro: industry Restaurant & Hospitality, year 2027."
+
+### Workers Comp Summary
+
+**Slug:** `workers-comp-summary` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none
+
+Workers compensation coverage summary for a client — carrier, policy, classes, premium, posting requirements.
+
+- **From the client profile:** company name, state, employee count
+- **Dated automatically at creation:** Policy year
+
+**Fields, by form section:**
+
+- **Header:** Client; State; Employees (number); Policy year (number)
+- **Policy:** Carrier; Policy number; Effective date (date); Expiration (date); Annual premium (number); Currency (choice: USD / EUR / GBP); Experience mod (number)
+- **Class codes** (list; each row: Code; Description; Payroll; Rate / \$100)
+- **Required postings** (list; each row: Posting)
+- **Claims history** (list; each row: Year; Claims; Total; Status)
+- **Notes:** Renewal notes
+
+**Starts blank (the assistant asks or flags these):** Policy number; Effective date; Expiration
+
+**Blank unless the client profile has it:** Client; State
+
+**Good request:** "Create a Workers Comp Summary for ABC Dental: carrier State Fund, policy 1234567, effective 2026-07-01, expiration 2027-06-30, annual premium 8,400 USD, experience mod 0.92."
+
+## Client engagement and reporting
+
+### Client Intake Form
+
+**Slug:** `intake-form` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none
+
+Discovery questionnaire sent to a new client at engagement kickoff.
+
+- **From the client profile:** company name, industry, employee count, state, signer / contact name, contact email
+- **Dated automatically at creation:** Sent, Due back by
+
+**Fields, by form section:**
+
+- **Header:** Form title; Client name; Sent (date); Due back by (date)
+- **Pre-fill (optional):** Industry; Employees (number); State; Contact; Contact email
+- **Sections** (list; each row: Section name; Questions)
+- **Intro note (top of form):** Note to client
+
+**Blank unless the client profile has it:** Client name
+
+**Good request:** "Create a Client Intake Form for ABC Dental, sent 2026-11-03, due back 2026-11-17."
+
+### Company Information
+
+**Slug:** `company-info` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none
+
+Branded one-pager summarizing what we have on file for a client — entity, contacts, engagement, key facts.
+
+- **From the client profile:** company name, legal name, DBA, address, industry, state, EIN, employee count, signer / contact name, contact email, contact phone, service tier, engagement start
+- **Dated automatically at creation:** As of
+
+**Fields, by form section:**
+
+- **Document:** Title; As of (date)
+- **Entity:** Company name; Legal name; DBA; Address; Industry; State; EIN; Employee count (number)
+- **Primary contact:** Name; Email; Phone
+- **Additional contacts** (list; each row: Role; Name; Email)
+- **Engagement:** Service tier; Engagement start (date); Notes
+- **Key facts** (list; each row: Label; Value)
+- **Our team for this engagement** (list; each row: Role; Name)
+
+**Blank unless the client profile has it:** Company name; Legal name; DBA; Address; Industry; State; EIN; Name; Email; Phone; Service tier; Engagement start
+
+**Good request:** "Create a Company Information sheet for ABC Dental, service tier Elevated HR, engagement start 2026-09-01 (everything else from the client profile)."
+
+### HR Assessment
+
+**Slug:** `hr-assessment` · **Kind:** Handlebars · **Scope:** client · **Person to name:** none · **Status:** not on the `/generate` page
+
+Ariya HR discovery assessment grouped by the five fixed sections, feeding a prioritized HR Road Map.
+
+- **From the client profile:** company name, industry, employee count
+- **Dated automatically at creation:** Assessment date
+- **Team-member dropdown:** **Facilitator** (pick a user from your team; the matching email fills itself; the `/generate` form shows a plain text box instead)
+
+**Fields, by form section:**
+
+- **Assessment header:** Title; Client name; Industry; Employee count; Assessment date (date); Facilitator; Review status; Purpose
+- **Methodology:** Methodology
+- **Assessment items** (list; each row: Section (one of the five fixed discovery sections); Question; Current state; Risk; Roadmap action)
+- **Roadmap priorities** (list; each row: Priority)
+- **Consultant notes:** Notes
+
+**Starts blank (the assistant asks or flags these):** Facilitator
+
+**Blank unless the client profile has it:** Client name; Industry; Employee count
+
+**Good request:** "Create an HR Assessment for ABC Dental: facilitator Rachel Kim; items and roadmap priorities from the attached discovery questionnaire answers."
+
+### HR Audit Report
+
+**Slug:** `hr-audit-report` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none
+
+Multi-section HR audit findings + severity + recommendations + action items.
+
+- **From the client profile:** company name, industry, employee count
+- **Dated automatically at creation:** Audit date, Next review date
+- **Team-member dropdown:** **Audited by** (pick a user from your team; the matching email fills itself; the `/generate` form shows a plain text box instead)
+
+**Fields, by form section:**
+
+- **Header:** Report title; Client name; Industry; Employee count (number); Audit date (date); Audited by
+- **Executive summary:** Summary
+- **Findings by area (top-level)** (list; each row: Area name)
+- **Footer:** Next review date (date); Methodology note
+
+**Starts blank (the assistant asks or flags these):** Audited by
+
+**Blank unless the client profile has it:** Client name; Industry
+
+**Good request:** "Create an HR Audit Report for ABC Dental: audited by Rachel Kim on 2026-10-30; findings by area from the attached audit notes."
+
+### HR Roadmap
+
+**Slug:** `hr-roadmap` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none
+
+12-month Elevated HR engagement roadmap with quarterly phases, deliverables, and outcomes.
+
+- **From the client profile:** company name
+- **Dated automatically at creation:** Date
+
+**Fields, by form section:**
+
+- **Header:** Title; Subtitle; Prepared for; Prepared by; Date (date)
+- **Current state:** Where the client is today
+- **Prime objectives** (list; each row: Objective)
+- **Phases** (list; each row: Name; Quarter (e.g. Q1, Q1 – Q2); Objective; Deliverables (one per line); Outcome)
+- **Investment:** Investment summary; Already in place — not duplicated (one per line); Referred out (one per line)
+
+**Starts blank (the assistant asks or flags these):** Prepared by; Already in place — not duplicated (one per line); Referred out (one per line)
+
+**Blank unless the client profile has it:** Prepared for
+
+**Note:** Generic advisory roadmap document. Asking the assistant for an "HR roadmap" by title can match **Elevated HR Roadmap** first (module-generated); say the slug `hr-roadmap` to be safe.
+
+**Good request:** "Create an HR Roadmap (hr-roadmap) for ABC Dental: prepared by Rachel Kim; already in place: payroll and I-9 process; referred out: benefits brokerage; phases from the attached assessment."
+
+### AI Readiness Audit Report
+
+**Slug:** `ai-readiness-audit-report` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none
+
+Phase 1 headline deliverable — executive readout with scorecard summary, top initiatives, 6/12-month roadmap, regulatory runway, and Phase 2 next-step.
+
+- **From the client profile:** company name, industry, signer / contact name, contact title
+- **Dated automatically at creation:** Report date
+- **Team-member dropdown:** **Prepared by** (pick a user from your team; the matching email fills itself; the `/generate` form shows a plain text box instead)
+
+**Fields, by form section:**
+
+- **Header:** Title; Subtitle; Version; Report date (date); Prepared by; Preparer title
+- **Client + engagement:** Client name; Industry; Brand stage; Sponsor name; Sponsor title; Audit duration; Audit scope
+- **Executive summary:** Headline; Top recommendation
+- **Three key takeaways** (list; each row: Takeaway)
+- **Scorecard summary:** Overall mean (0-3) (number); Functions scored (number); Strongest function code; Strongest function name; Strongest mean (number); Weakest function code; Weakest function name; Weakest mean (number)
+- **Function rollup** (list; each row: Code; Name; Mean)
+- **Top initiatives** (list; each row: Rank; Title; Tier; ROI band; Timeline)
+- **6-month roadmap** (list; each row: Milestone)
+- **12-month roadmap** (list; each row: Milestone)
+- **Regulatory dates (EU-shipping clients)** (list; each row: Regulation; Date; Status)
+- **Next step:** Phase 2 decision window; Phase 2 scope; Contact line
+
+**Starts blank (the assistant asks or flags these):** Prepared by; Preparer title; Brand stage
+
+**Blank unless the client profile has it:** Client name; Industry; Sponsor name; Sponsor title
+
+**Good request:** "Create an AI Readiness Audit Report for Northwind Apparel: prepared by Alex Chen, Senior Consultant; brand stage Growth; sponsor Jane Park, COO; scores, initiatives and roadmap from the attached scorecard and opportunity register."
+
+### AI Readiness Scorecard
+
+**Slug:** `readiness-scorecard` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none
+
+Arctic Robot 9×6 readiness framework — 9 functions × 6 dimensions, scored 0-3 with evidence, plus per-function summaries.
+
+- **From the client profile:** company name, industry
+- **Dated automatically at creation:** As of
+- **Team-member dropdown:** **Prepared by** (pick a user from your team; the matching email fills itself; the `/generate` form shows a plain text box instead)
+
+**Fields, by form section:**
+
+- **Header:** Title; Version; As of (date); Prepared by
+- **Client:** Client name; Industry; Brand stage
+- **F1: Strategy & Leadership**, **F2: Data & Tech Foundation**, **F3: Talent & Capability**, **F4: Operations & Process**, **F5: Customer & Brand**, **F6: Commercial & Sales**, **F7: Creative & Design**, **F8: Risk & Governance**, **F9: Sustainability & Compliance** (nine sections with the same fields): Vision score (choice: — not scored — / 0 · Absent / 1 · Aware / 2 · Active / 3 · Embedded); Vision evidence; Data score (choice: — not scored — / 0 · Absent / 1 · Aware / 2 · Active / 3 · Embedded); Data evidence; Tooling score (choice: — not scored — / 0 · Absent / 1 · Aware / 2 · Active / 3 · Embedded); Tooling evidence; Team score (choice: — not scored — / 0 · Absent / 1 · Aware / 2 · Active / 3 · Embedded); Team evidence; Process score (choice: — not scored — / 0 · Absent / 1 · Aware / 2 · Active / 3 · Embedded); Process evidence; Outcomes score (choice: — not scored — / 0 · Absent / 1 · Aware / 2 · Active / 3 · Embedded); Outcomes evidence; Function summary; Recommended first initiative
+- **Executive takeaway:** One-paragraph executive takeaway
+
+**Starts blank (the assistant asks or flags these):** Prepared by; Brand stage; every score and evidence field, **Function summary** and **Recommended first initiative** in F1 to F9
+
+**Blank unless the client profile has it:** Client name; Industry
+
+**Good request:** "Create an AI Readiness Scorecard for Northwind Apparel: prepared by Alex Chen, brand stage Growth; every score and evidence line (9 functions x 6 dimensions) from the attached scored workbook."
+
+### Opportunity Register
+
+**Slug:** `opportunity-register` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none
+
+Ranked AI initiative table — tier, effort, impact, ROI band, timeline. Each entry maps to a Use Case Library reference.
+
+- **From the client profile:** company name, industry
+- **Dated automatically at creation:** As of
+
+**Fields, by form section:**
+
+- **Header:** Title; Version; As of (date); Audit reference; Prepared by
+- **Client:** Client name; Industry
+- **Initiatives (ranked)** (list; each row: Rank; Title; Function; UC ref; Tier; Effort; Impact; ROI low (\$K); ROI high (\$K); Timeline; Owner; Description)
+- **Summary:** One-paragraph summary
+
+**Starts blank (the assistant asks or flags these):** Audit reference; Prepared by
+
+**Blank unless the client profile has it:** Client name; Industry
+
+**Good request:** "Create an Opportunity Register for Northwind Apparel: audit reference AR-2026-03, prepared by Alex Chen; ranked initiatives from the attached audit workbook."
+
+### Quarterly Business Review
+
+**Slug:** `qbr` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none
+
+Client QBR — health score, results, lookback, lookforward, asks, executive summary.
+
+- **From the client profile:** company name, industry, employee count
+- **Dated automatically at creation:** Review date
+
+**Fields, by form section:**
+
+- **Header:** Title; Client; Industry; Employees (number); Quarter; Prepared by; Review date (date)
+- **Health:** Score (1-10) (number); Status (choice: Green / Yellow / Red)
+- **Executive summary:** Summary
+- **KPIs** (list; each row: Name; Value; Delta)
+- **Wins this quarter** (list; each row: Win)
+- **Challenges** (list; each row: Challenge)
+- **Next quarter focus** (list; each row: Item)
+- **Asks of client** (list; each row: Ask)
+- **Relationship notes:** Notes
+
+**Starts blank (the assistant asks or flags these):** Prepared by
+
+**Blank unless the client profile has it:** Client; Industry
+
+**Good request:** "Create a Quarterly Business Review for ABC Dental for Q3 2026, prepared by Rachel Kim, from the attached quarter notes."
+
+### Status Report
+
+**Slug:** `status-report` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none
+
+Weekly or monthly client status update — wins, in-progress, blocked, asks, metrics.
+
+- **From the client profile:** company name
+- **Dated automatically at creation:** Period start, Period end
+
+**Fields, by form section:**
+
+- **Header:** Title; Client; Cadence (choice: Weekly / Biweekly / Monthly / Quarterly); Period start (date); Period end (date); Prepared by; Health (choice: Green — on track / Yellow — needs attention / Red — at risk)
+- **TL;DR:** One-paragraph summary
+- **Wins** (list; each row: Win)
+- **In progress** (list; each row: Item)
+- **Blocked / waiting** (list; each row: Blocker)
+- **Asks for client** (list; each row: Ask)
+- **Metrics** (list; each row: Label; Value)
+- **Next period:** What we will work on next
+- The **Health** options start with a coloured dot (green, yellow, red).
+
+**Starts blank (the assistant asks or flags these):** Prepared by
+
+**Blank unless the client profile has it:** Client
+
+**Good request:** "Create a Status Report for ABC Dental: Monthly, October 2026, prepared by Rachel Kim, health Green; wins, blockers and asks from the attached notes."
+
+### Meeting Agenda & Minutes
+
+**Slug:** `meeting-agenda` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none
+
+Combined meeting agenda + minutes — pre-meeting agenda + post-meeting decisions, action items, parking lot.
+
+- **From the client profile:** company name
+- **Dated automatically at creation:** Date, Next meeting date
+
+**Fields, by form section:**
+
+- **Header:** Company; Meeting title; Type (choice: Client meeting / Internal / Board / 1:1); Date (date); Time; Duration; Location; Facilitator; Note taker
+- **Attendees** (list; each row: Name; Role)
+- **Agenda items** (list; each row: Time; Topic; Owner)
+- **Decisions made** (list; each row: Decision)
+- **Action items** (list; each row: Action; Owner; Due)
+- **Parking lot** (list; each row: Item)
+- **Next meeting:** Next meeting date (date)
+
+**Starts blank (the assistant asks or flags these):** Facilitator; Note taker
+
+**Blank unless the client profile has it:** Company
+
+**Good request:** "Create a Meeting Agenda & Minutes for ABC Dental: Client meeting 2026-11-05 10am, 60 minutes, Zoom; facilitator Rachel Kim, note taker Tom Reyes; attendee Dr. Sam Patel; agenda: handbook review, PTO policy, Q1 plan."
+
+### SOP / Runbook
+
+**Slug:** `sop` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none
+
+Standard Operating Procedure with purpose, scope, steps, owner, and review cadence.
+
+- **From the client profile:** company name
+- **Dated automatically at creation:** Effective date, Next review
+
+**Fields, by form section:**
+
+- **Header:** Company; SOP title; SOP ID; Version; Owner; Effective date (date); Next review (date)
+- **Purpose & scope:** Purpose; Scope
+- **Definitions** (list; each row: Term; Definition)
+- **Preconditions** (list; each row: Precondition)
+- **Steps** (list; each row: #; Title; Detail)
+- **Escalation:** Escalation rules
+- **Change log** (list; each row: Version; Date; Author; Notes)
+
+**Starts blank (the assistant asks or flags these):** Owner
+
+**Blank unless the client profile has it:** Company
+
+**Good request:** "Create an SOP / Runbook for ABC Dental: 'New patient intake', owner Rachel Kim; steps from the attached checklist."
+
+### Sales to Implementation Handoff Form
+
+**Slug:** `sales-to-implementation-handoff` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none
+
+Internal handoff from sales to implementation — engagement summary, company snapshot, payroll profile, contacts, banking, compliance flags, and open items.
+
+- **From the client profile:** legal name, address, industry
+
+**Fields, by form section:**
+
+- **Engagement summary:** Client legal name / DBA; Services sold; Pricing agreed; CSA signed date (date); Target first payroll date (date); Referral source
+- **Company snapshot:** Entity type and EIN; Business address; Industry / what they do; Headcount and worksites; Current payroll provider
+- **Payroll profile:** Pay frequency and paydays; Pay types in use; Benefits and deductions; Timekeeping method; State tax accounts
+- **Contacts:** Owner / signer; Day-to-day payroll contact; CPA / bookkeeper
+- **Banking:** Bank confirmation received; ACH authorization signed (date)
+- **Compliance and risk flags** (list; each row: Flag)
+- **Open items for implementation** (list; each row: Item; Owner; Due date)
+
+**Starts blank (the assistant asks or flags these):** Services sold; Pricing agreed; CSA signed date; Target first payroll date; Referral source; Entity type and EIN; Headcount and worksites; Current payroll provider; Pay frequency and paydays; Pay types in use; Benefits and deductions; Timekeeping method; State tax accounts; Owner / signer; Day-to-day payroll contact; CPA / bookkeeper; Bank confirmation received; ACH authorization signed; Compliance and risk flags; Open items for implementation
+
+**Blank unless the client profile has it:** Client legal name / DBA; Business address; Industry / what they do
+
+**Good request:** "Create a Sales to Implementation Handoff Form for ABC Dental: CSA signed 2026-11-01, target first payroll 2026-12-05; services, pricing, payroll profile, contacts, banking and open items from the attached signed CSA and sales notes."
+
+### Personal Engagement Letter
+
+**Slug:** `personal-engagement-letter` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none
+
+One-page personal advisory MOU — scope, term, fee, termination, signature. Drafted in Aaron Lavee Document Design Guidebook style.
+
+- **From the client profile:** company name, signer / contact name, contact title, address
+- **Dated automatically at creation:** Effective date
+
+**Fields, by form section:**
+
+- **Reference:** Letter #; Effective date (date)
+- **Counterparty:** Counterparty; Contact name; Contact title; Address
+- **Engagement:** Role; Scope; Time commitment; Term
+- **Compensation:** Fee (USD) (number); Fee frequency; Payment terms
+- **Standard terms:** Confidentiality; IP and conflicts; Governing law
+- **Signatures:** Aaron’s signing name; Aaron’s title (optional); Counterparty signing name; Counterparty signing title
+
+**Starts blank (the assistant asks or flags these):** Counterparty signing name; Counterparty signing title
+
+**Blank unless the client profile has it:** Counterparty; Contact name; Contact title; Address
+
+**Good request:** "Create a Personal Engagement Letter with Northwind Apparel: role Advisor, scope: brand and hiring strategy, 4 hours a month, 12-month term, 2,000 USD monthly; counterparty signer Dana Cole, CEO."
+
+## Agreements, quotes and invoices
+
+### Client Service Agreement
+
+**Slug:** `client-service-agreement` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none
+
+Ariya HR client service agreement — services, term, ACH fee terms, client responsibilities, confidentiality, California general terms, dual signature block.
+
+- **From the client profile:** legal name, signer / contact name, contact title
+
+**Fields, by form section:**
+
+- **Parties:** Client legal name; Effective date (date); Service line
+- **Services included (§1)** (list; each row: Service)
+- **Term (§2):** Engagement type (choice: Month to month (standard) / Project-based); Project term language
+- **Fees and liability:** Service Proposal date (date); Liability cap look-back (months) (number)
+- **Signatories:** Company signatory name; Company signatory title; Client signatory name; Client signatory title
+
+**Starts blank (the assistant asks or flags these):** Effective date; Service line; Project term language; Service Proposal date; Liability cap look-back (months); Company signatory name; Company signatory title
+
+**Blank unless the client profile has it:** Client legal name; Client signatory name; Client signatory title
+
+**Note:** Ariya's own client service agreement. `service-agreement` is a different, generic template; asking for "service agreement" by title matches this one first.
+
+**Good request:** "Create a Client Service Agreement for ABC Dental: effective 2026-12-01, service line Elevated HR, month to month (project term language: not applicable), Service Proposal dated 2026-11-15, liability cap look-back 12 months; company signatory Rachel Kim, Principal; client signatory Dr. Sam Patel, Owner."
+
+### Service Agreement
+
+**Slug:** `service-agreement` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none
+
+Multi-page service agreement with placeholders, scope, fees, term, and signature block.
+
+- **From the client profile:** legal name, address, contact email, signer / contact name
+- **Dated automatically at creation:** Effective date
+
+**Fields, by form section:**
+
+- **Document:** Agreement title; Effective date (date)
+- **Tier (Ariya offerings):** Apply a tier (choice: — pick a tier to auto-fill services & fee —)
+- **Provider (your venture):** Legal name; Address; Email
+- **Client:** Legal name; Address; Email; Signatory name; Signatory title
+- **Included services** (list; each row: Service)
+- **Excluded services** (list; each row: Exclusion)
+- **Fees & terms:** Monthly fee (number); Currency (choice: USD / EUR / GBP); Payment terms; Term & renewal; Governing law (state)
+- **Optional clauses:** Include Confidentiality clause (choice: Yes / No); Include Indemnification clause (choice: Yes / No); Include Arbitration clause (choice: Yes / No)
+
+**Starts blank (the assistant asks or flags these):** Apply a tier; Provider (your venture) → Legal name; Provider (your venture) → Address; Provider (your venture) → Email; Signatory title
+
+**Blank unless the client profile has it:** Client → Legal name; Client → Address; Client → Email; Signatory name
+
+**Note:** Generic multi-page agreement. Asking for "service agreement" by title matches `client-service-agreement` first, so say "Service Agreement (service-agreement)".
+
+**Good request:** "Create a Service Agreement (service-agreement) between Ariya HR LLC (100 Main St Sacramento CA, contracts@ariyahr.com) and ABC Dental (signatory Dr. Sam Patel, Owner): tier Elevated HR, 1,200 USD monthly, net 15, 12-month term renewing monthly, governing law California."
+
+### Non-Disclosure Agreement
+
+**Slug:** `nda` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none
+
+Mutual or one-way NDA with term, governing law, and signature blocks.
+
+- **From the client profile:** legal name, address
+- **Dated automatically at creation:** Effective date
+
+**Fields, by form section:**
+
+- **Document:** Effective date (date); Type (choice: Mutual (both parties share) / One-way (Party A discloses to Party B))
+- **Party A (your venture):** Legal name; Address; Signatory; Title
+- **Party B (counterparty):** Legal name; Address; Signatory; Title
+- **Terms:** Purpose; Confidentiality term; Governing law (state); Include non-solicit clause? (choice: No / Yes (specify period)); Non-solicit period (if yes)
+
+**Starts blank (the assistant asks or flags these):** Party A (your venture) → Legal name; Party A (your venture) → Address; Party A (your venture) → Signatory; Party A (your venture) → Title; Party B (counterparty) → Signatory; Party B (counterparty) → Title
+
+**Blank unless the client profile has it:** Party B (counterparty) → Legal name; Party B (counterparty) → Address
+
+**Note:** The assistant's word search does not rank this template for the bare word "NDA". Always say "non-disclosure agreement".
+
+**Good request:** "Create a Non-Disclosure Agreement between Ariya HR LLC (100 Main St Sacramento CA; signed by Rachel Kim, Principal) and ABC Dental (signed by Dr. Sam Patel, Owner): mutual, purpose HR consulting evaluation, 2-year term, governing law California."
+
+### Pricing Quote
+
+**Slug:** `pricing-quote` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none
+
+Sales pricing quote / estimate with line items, terms, and validity period.
+
+- **From the client profile:** company name, address, contact email
+- **Dated automatically at creation:** Issue date, Valid until
+
+**Fields, by form section:**
+
+- **Quote details:** Quote #; Issue date (date); Valid until (date); Prepared by; Prepared by email
+- **Client:** Client; Address; Email
+- **Pricing:** Currency (choice: USD / EUR / GBP); Discount (flat amount) (number); Discount reason; Tax % (number)
+- **Line items** (list; each row: Description; Qty; Unit price)
+- **Terms:** Payment terms; Acceptance note
+
+**Starts blank (the assistant asks or flags these):** Prepared by; Prepared by email; Discount reason
+
+**Blank unless the client profile has it:** Client; Address; Email
+
+**Good request:** "Create a Pricing Quote for ABC Dental: prepared by Rachel Kim (rachel@ariyahr.com); Elevated HR setup 1 x 1,500 USD and monthly service 12 x 1,200 USD; no discount (discount reason: none); valid 30 days."
+
+### Invoice
+
+**Slug:** `invoice` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none
+
+Branded invoice with line items, automatic totals, and PDF export.
+
+- **From the client profile:** company name, address, contact email
+- **Dated automatically at creation:** Date, Due
+
+**Fields, by form section:**
+
+- **Invoice:** Invoice #; Date (date); Due (date); Currency (choice: USD / EUR / GBP)
+- **From (your venture):** Name; Address; Email
+- **Bill to:** Client; Address; Email
+- **Line items** (list; each row: Description; Qty; Price)
+- **Totals & terms:** Tax % (number); Payment terms; Payment instructions; Notes
+
+**Starts blank (the assistant asks or flags these):** Name; From (your venture) → Address; From (your venture) → Email; Payment instructions; Notes
+
+**Blank unless the client profile has it:** Client; Bill to → Address; Bill to → Email
+
+**Note:** A stale tenant row once shadowed the platform `invoice` on one environment. If the form shows unexpected fields, check which row Documents → Templates shows for `invoice`.
+
+**Good request:** "Create an Invoice for ABC Dental from Ariya HR LLC (100 Main St Sacramento CA 95814, billing@ariyahr.com): 1 x 'Elevated HR, November 2026' at 1,200 USD; payment instructions: ACH to the account on file; notes: thank you."
+
+### Influencer agreement
+
+**Slug:** `influencer-agreement` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** Creator
+
+Short-form creator agreement: deliverables, fee, usage rights, exclusivity, term.
+
+- **Dated automatically at creation:** Effective date
+
+**Fields, by form section:**
+
+- **Parties:** Brand entity; Creator name; Creator handle; Effective date (date); Campaign
+- **Deliverables** (list; each row: Deliverable)
+- **Timeline & fee:** Timeline; Fee (number); Currency (choice: USD / EUR / GBP); Payment terms
+- **Product & rights:** Product provided; Usage rights; Exclusivity; Term & cancellation
+- **Legal & sign:** Governing law; Brand signatory; Brand title
+
+**Starts blank (the assistant asks or flags these):** Creator name; Creator handle
+
+**Good request:** "Create an Influencer agreement for Northwind Apparel with creator Jamie Rivera (@jamiestyle): 2 Instagram reels and 3 stories in December, fee 2,500 USD net 30, 6-month organic usage rights, brand signatory Dana Cole, CEO."
+
+## Investor and venture
+
+### Board update
+
+**Slug:** `board-update` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none
+
+One-page board update: ask, KPIs, wins, lowlights, decisions needed.
+
+- **Dated automatically at creation:** Date
+
+**Fields, by form section:**
+
+- **Header:** Company; Period; Sent by; Date (date); Headline (use \*word\* for emphasis)
+- **Ask:** The single most important thing you need from the board
+- **KPIs** (list; each row: Metric; Value; Δ)
+- **Wins** (list; each row: Win)
+- **Lowlights** (list; each row: Lowlight)
+- **Decisions needed** (list; each row: Decision)
+- **Calendar:** Key dates
+
+**Starts blank (the assistant asks or flags these):** Company; Sent by
+
+**Good request:** "Create a Board update for Northwind Apparel: company Northwind Apparel Inc., period Q3 2026, sent by Dana Cole; ask: approve the Series A timeline; KPIs, wins, lowlights and decisions from the attached notes."
+
+### Deal memo (short)
+
+**Slug:** `deal-memo` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none
+
+1-2 page initial deal memo for IC discussion: thesis, signal, questions, next step.
+
+- **Dated automatically at creation:** Date
+
+**Fields, by form section:**
+
+- **Header:** Target; Sector; Stage; Date (date); Author; Source of deal
+- **Thesis:** Thesis (use \*word\*)
+- **Positive signal** (list; each row: Signal)
+- **Concerns** (list; each row: Concern)
+- **Key questions** (list; each row: Question)
+- **Next step:** Next step (choice: Invest more time (deeper dive) / Pass (write back) / Park (revisit in 6 months) / Submit to full IC for term sheet); What specifically?
+
+**Starts blank (the assistant asks or flags these):** Author
+
+**Good request:** "Create a Deal memo (short) for client Northwind Ventures on Acme Robotics (Seed, robotics), author Dana Cole, source: warm intro; thesis and questions from the attached deck."
+
+### Investment memo
+
+**Slug:** `investment-memo` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none
+
+Partner-facing investment memo: thesis, opportunity, risks, recommendation.
+
+- **Dated automatically at creation:** Memo date
+
+**Fields, by form section:**
+
+- **Header:** Title; Target company; Sector; Stage; Check size (USD) (number); Target ownership % (number); Prepared by; Memo date (date)
+- **Thesis:** Thesis (use \*word\* for emphasis)
+- **Opportunity bullets** (list; each row: Point)
+- **Risks** (list; each row: Risk)
+- **Financials** (list; each row: Metric; Value)
+- **Diligence:** Diligence notes
+- **Recommendation:** Recommendation (choice: Invest / Pass / Follow (re-review later)); Rationale
+
+**Starts blank (the assistant asks or flags these):** Prepared by
+
+**Good request:** "Create an Investment memo for client Northwind Ventures on Acme Robotics: Seed, robotics, check 500,000 USD for 8%, prepared by Dana Cole, recommendation Invest; thesis, risks and financials from the attached deck."
+
+### LP onboarding packet
+
+**Slug:** `lp-onboarding` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** LP contact
+
+New LP welcome — fund overview, key contacts, reporting cadence, capital call mechanics.
+
+- **Dated automatically at creation:** Commitment date
+
+**Fields, by form section:**
+
+- **LP:** LP contact name; LP legal entity; Commitment (USD) (number); Vintage year (number); Commitment date (date)
+- **Welcome:** Welcome note (use \*word\*)
+- **Fund overview:** Fund size (number); Strategy; Deployment pace; Target returns
+- **Capital calls:** How calls work
+- **Reporting cadence** (list; each row: What; When)
+- **Key contacts** (list; each row: Role; Name; Email; Phone)
+- **Portal & kit:** LP portal URL
+- **Welcome kit (what you should have)** (list; each row: Item)
+
+**Starts blank (the assistant asks or flags these):** LP contact name; LP legal entity
+
+**Good request:** "Create an LP onboarding packet for client Northwind Ventures: LP contact Jane Park, LP legal entity Park Family Trust, commitment 250,000 USD, vintage 2026, committed 2026-10-15."
+
+### LP quarterly update
+
+**Slug:** `lp-update` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none
+
+Quarterly investor letter: portfolio performance, new investments, exits, fund-level metrics.
+
+- **Dated automatically at creation:** Sent date
+
+**Fields, by form section:**
+
+- **Header:** Quarter; Sent date (date); Headline (use \*word\*); Summary
+- **Fund metrics** (list; each row: Label; Value)
+- **New investments** (list; each row: Company; Stage; Amount; Sector)
+- **Exits & distributions** (list; each row: Company; Detail)
+- **Portfolio highlights** (list; each row: Item)
+- **Challenges & ahead:** Challenges; Looking ahead
+- **Signature:** Name; Title
+
+**Starts blank:** nothing required. Every field has a default or is labelled optional; replace defaults the user did not ask for.
+
+**Good request:** "Create an LP quarterly update for Northwind Ventures for Q3 2026, signed by Dana Cole, Managing Partner; metrics and investments from the attached quarterly report."
+
+### Term sheet
+
+**Slug:** `term-sheet` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none
+
+Non-binding investment term sheet — round, valuation, ownership, governance, key terms.
+
+- **Dated automatically at creation:** Issued, Expires
+
+**Fields, by form section:**
+
+- **Header:** Company; Issued (date); Expires (date); Round; Lead
+- **Economics:** Total raise (USD) (number); Pre-money (USD) (number); Lead check (USD) (number); Lead ownership % (number)
+- **Standard terms:** Pro-rata; Liquidation pref; Anti-dilution; Founder vesting; Board composition
+- **Protective provisions** (list; each row: Item)
+- **Conditions to closing** (list; each row: Condition)
+- **Legal:** Lead investor counsel; Notes
+
+**Starts blank:** nothing required. Every field has a default or is labelled optional; replace defaults the user did not ask for.
+
+**Good request:** "Create a Term sheet for Northwind Apparel: 3,000,000 USD Series A led by Bay Capital, 12,000,000 USD pre-money, lead check 2,000,000 USD for 13.3%, 1x non-participating preference, broad-based weighted-average anti-dilution."
+
+### Energy project assessment
+
+**Slug:** `energy-project-assessment` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none
+
+Site-level assessment for an energy infra project: capacity, offtake, interconnection, returns.
+
+- **Dated automatically at creation:** Date
+- **Team-member dropdown:** **Assessed by** (pick a user from your team; the matching email fills itself; the `/generate` form shows a plain text box instead)
+
+**Fields, by form section:**
+
+- **Project:** Name; Type; Site; Assessed by; Date (date)
+- **Summary:** Executive summary (use \*word\*)
+- **Capacity & specs** (list; each row: Metric; Value)
+- **Commercial:** Offtake / revenue model; Interconnection status; CapEx (USD) (number); Annual OpEx (USD) (number); Project IRR % (number); Payback (years) (number)
+- **Key risks** (list; each row: Risk)
+- **Milestones** (list; each row: Milestone; Target; Status)
+- **Recommendation:** Recommendation (choice: Fund / Pass / Defer pending diligence); Rationale
+
+**Starts blank (the assistant asks or flags these):** Assessed by
+
+**Good request:** "Create an Energy project assessment for client Northwind Ventures on the Sunfield Solar 20 MW project: assessed by Dana Cole; capacity, commercial terms and risks from the attached site data; recommendation Defer pending diligence."
+
+## Retail and wholesale operations
+
+### Returns policy
+
+**Slug:** `returns-policy` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none
+
+Customer-facing returns + exchange policy for DTC orders.
+
+- **Dated automatically at creation:** Effective date
+
+**Fields, by form section:**
+
+- **Header:** Brand; Effective date (date); Top-line summary
+- **Window & condition:** Return window; Condition
+- **Eligible for return** (list; each row: Item)
+- **NOT eligible for return** (list; each row: Item)
+- **Process** (list; each row: Step)
+- **Refunds & exchanges:** Refund method; Exchanges; International
+- **Contact:** Returns email; Contact note
+
+**Starts blank:** nothing required. Every field has a default or is labelled optional; replace defaults the user did not ask for.
+
+**Good request:** "Create a Returns policy for Northwind Apparel effective 2027-01-01: 30-day window, unworn with tags, refunds to the original payment method, free exchanges, returns@northwind.com."
+
+### Tech pack (cover sheet)
+
+**Slug:** `tech-pack` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none
+
+Production tech pack cover sheet for a single SKU — bill of materials, construction notes, sizing.
+
+- **Dated automatically at creation:** Issued
+
+**Fields, by form section:**
+
+- **Header:** SKU; Piece name; Colorway; Season; Designer; Pattern maker; Factory; Issued (date); Sample round
+- **Construction:** Construction notes
+- **Bill of materials** (list; each row: Component; Material; Supplier; Qty)
+- **Sizing (cm, finished)** (list; each row: Size; Chest; Length; Hem)
+- **Quality + packaging:** Quality notes; Packaging
+- **Target economics:** Target qty (number); Unit cost (number); Retail price (number)
+
+**Starts blank (the assistant asks or flags these):** Designer; Pattern maker; Factory
+
+**Good request:** "Create a Tech pack (cover sheet) for Northwind Apparel: SKU NW-1001 Alpine Parka, colorway Black, season FW26, designer Lee Wong, pattern maker Ana Ruiz, factory Shenzhen Outerwear Co., sample round 2."
+
+### Wholesale order
+
+**Slug:** `wholesale-order` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none
+
+Wholesale order form: account, shipping, line items, totals, terms.
+
+- **From the client profile:** company name, address
+- **Dated automatically at creation:** Order #, Order date
+
+**Fields, by form section:**
+
+- **Order:** Order #; Order date (date); Season; Currency (choice: USD / EUR / GBP)
+- **Account:** Account name; Buyer / contact; Bill-to address
+- **Shipping:** Ship-to address (if different); Requested ship date (date); Shipping fee (number)
+- **Line items** (list; each row: SKU; Piece; Size; Qty; Unit)
+- **Terms & notes:** Terms; Internal notes (printed)
+
+**Starts blank (the assistant asks or flags these):** Buyer / contact; Ship-to address (if different); Requested ship date; Internal notes (printed)
+
+**Blank unless the client profile has it:** Account name; Bill-to address
+
+**Good request:** "Create a Wholesale order for client Bay Boutique: buyer Kim Lee, ship-to same as bill-to, requested ship date 2027-01-15, line items from the attached order sheet, internal notes: none."
+
+## Generated by other modules
+
+### Elevated HR Assessment
+
+**Slug:** `elevated-hr-assessment` · **Kind:** Handlebars · **Scope:** client · **Person to name:** none · **Status:** generated by another module, not on the `/generate` page
+
+HR discovery assessment generated from a client’s live questionnaire answers, grouped by the five fixed discovery sections.
+
+- **From the client profile:** company name, industry
+- **Dated automatically at creation:** Assessment date
+
+**Fields, by form section:**
+
+- **Header:** Title; Client name; Industry; Assessment date (date); Facilitator; Review status; Answered count; Gap count
+- **Sections** (list; each row: Section name)
+
+**Starts blank (the assistant asks or flags these):** Sections
+
+**Blank unless the client profile has it:** Client name; Industry
+
+**Note:** Created by the HR Roadmap module from live questionnaire answers. Do not pick it by hand.
+
+**Good request:** none. Do not request this template by hand; its module creates it from structured data.
+
+### Elevated HR Roadmap
+
+**Slug:** `elevated-hr-roadmap` · **Kind:** Handlebars · **Scope:** client · **Person to name:** none · **Status:** generated by another module, not on the `/generate` page
+
+12-month Elevated HR engagement roadmap generated from a client’s live roadmap phases and tasks.
+
+- **From the client profile:** company name
+- **Dated automatically at creation:** Date
+
+**Fields, by form section:**
+
+- **Header:** Title; Prepared for; Date (date); Overall progress
+- **Phases** (list; each row: Phase #; Name; Quarter; Date range; Objective)
+
+**Starts blank (the assistant asks or flags these):** Phases
+
+**Blank unless the client profile has it:** Prepared for
+
+**Note:** Created by the HR Roadmap module from live roadmap phases and tasks. Do not pick it by hand. For a free-form roadmap use **HR Roadmap** (`hr-roadmap`).
+
+**Good request:** none. Do not request this template by hand; its module creates it from structured data.
+
+### Elevated HR Roadmap Progress Report
+
+**Slug:** `elevated-hr-roadmap-progress` · **Kind:** Handlebars · **Scope:** client · **Person to name:** none · **Status:** generated by another module, not on the `/generate` page
+
+Client-facing progress report comparing the HR work Ariya delivered against the client’s Elevated HR roadmap: completed initiatives with evidence, outstanding items, deliverables and totals.
+
+- **From the client profile:** company name
+- **Dated automatically at creation:** Date
+
+**Fields, by form section:**
+
+- **Header:** Title; Prepared for; Date (date); Period; Roadmap on file (checkbox); Roadmap name; Roadmap start
+- **Totals:** Complete; In progress; Not started; Requests received; Requests closed; Documents delivered
+- **Overview:** Overview
+- **Completed** (list; each row: Initiative; Done; Evidence)
+- **Outstanding** (list; each row: Initiative; Status; Status class; Where it stands)
+- **Deliverables** (list; each row: Document; Date; Roadmap initiative)
+- **Additional support** (list; each row: Work; Date)
+- **Footer:** Note
+
+**Starts blank (the assistant asks or flags these):** Period; Roadmap name; Roadmap start; Overview; Completed; Outstanding; Deliverables; Additional support; Note
+
+**Blank unless the client profile has it:** Prepared for
+
+**Note:** One per finalized HR Roadmap progress run. Do not pick it by hand.
+
+**Good request:** none. Do not request this template by hand; its module creates it from structured data.
+
+### iSolved Billing Memo
+
+**Slug:** `implementation-billing-memo` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none · **Status:** generated by another module, not on the `/generate` page
+
+Editable iSolved SBO Billing Instruction Memo draft for implementation setup.
+
+- **From the client profile:** legal name, EIN, signer / contact name, contact email, contact phone, address, employee count
+
+**Fields, by form section:**
+
+- **Partner:** Partner Rep Name; Partner Rep Email (email)
+- **Client Data - Left Column:** Full Company Legal Name; FEIN; Number of FEINs; Signer First and Last Name; Signer's Email (email); Phone Number (tel); Client's Full Address
+- **Client Data - Right Column:** Initial Term Contract Length (choice: 1 Year / 2 Year / 3 Year); Total Employee Count; Anticipated Go Live Date (date)
+- **Products and Pricing:** Implementation Quantity; Implementation Flat Rate; Implementation Misc.; Core Bundle Quantity; Core Bundle PEPM; Core Bundle Flat Rate; Core Bundle Misc.
+- **Notes:** Additional Pricing Notes; W2 / 1099 Pricing Notes
+
+**Starts blank (the assistant asks or flags these):** Anticipated Go Live Date; Implementation Quantity; Implementation Flat Rate; Implementation Misc.; Core Bundle Quantity; Core Bundle PEPM; Core Bundle Flat Rate; Core Bundle Misc.; Additional Pricing Notes; W2 / 1099 Pricing Notes
+
+**Blank unless the client profile has it:** Full Company Legal Name; FEIN; Signer First and Last Name; Signer's Email; Phone Number; Client's Full Address; Total Employee Count
+
+**Note:** Generated by the Implementation module from implementation intake. Do not pick it by hand. Shares routing words with the tenant `billing-memo` (Sales page).
+
+**Good request:** none. Do not request this template by hand; its module creates it from structured data.
+
+## Inactive in the seed
+
+### Company Implementation Kit
+
+**Slug:** `implementation-kit` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none · **Status:** inactive in the seed
+
+New-client payroll implementation kit — initial information form, authorized contacts, electronic funding authorization, payroll ACH processing, signature page, and reporting agent authorization worksheet.
+
+Deactivated by the seed and replaced by the PDF form [ISolved Implementation Kit Form](/documents/catalog/pdf-forms#isolved-implementation-kit-form). Its fields are not listed here. If it appears in **Documents** → **Templates**, a tenant re-activated it; prefer the PDF form anyway.
+
+### California POA Declaration (DE 48)
+
+**Slug:** `implementation-ca-poa` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none · **Status:** inactive in the seed
+
+Preparation sheet for the California EDD Power of Attorney Declaration (DE 48) — employer information, representative designation, authorized acts, and signature requirements.
+
+Deactivated by the seed and replaced by the PDF form [Power of Attorney California](/documents/catalog/pdf-forms#power-of-attorney-california). Its fields are not listed here. If it appears in **Documents** → **Templates**, a tenant re-activated it; prefer the PDF form anyway.
+
+## Related
+
+- [Template catalog overview](/documents/template-catalog)
+- [Choosing a template](/documents/choosing-a-template)
+- [How templates work](/documents/how-templates-work)
+- [Create a document](/documents/create-a-document)
+- [Templates page](/documents/templates)
+
+## Source files
+
+- `packages/core/src/documents/templates/platform/{slug}/meta.json` (seed source for field labels, defaults and client prefill)
+- `packages/core/src/db/migrations/0100_platform_templates_handlebars.sql`
+- `packages/core/src/db/migrations/0120_team_member_fields.sql`
+- `packages/core/src/documents/registry-fill.ts` (which fields count as required)
+- `packages/core/src/documents/engine/from-registry.ts` (client prefill)
+- `packages/core/src/db/migrations/0110_hr_roadmap_document_templates_rework.sql` (`elevated-hr-roadmap`, `elevated-hr-assessment`)
+- `packages/core/src/db/migrations/0137_roadmap_progress_template.sql` (`elevated-hr-roadmap-progress`)
+- `packages/core/src/db/migrations/0129_hide_superseded_implementation_templates.sql`
+- `packages/templates/src/templates/employee-handbook.ts` (handbook chapters)
+- `packages/core/src/ops/service-desk/case-documents.ts` (incident and warning routing)

@@ -1,0 +1,249 @@
+---
+title: "Sales templates"
+sidebarTitle: "Sales"
+description: "Look up every seeded Sales template: proposals, discovery summaries, tier flyers and workers comp pieces, plus the tenant billing memo."
+keywords: ["sales templates", "proposal", "HR proposal", "services proposal", "consulting proposal", "discovery summary", "tier flyer", "workers comp proposal", "billing memo"]
+---
+
+<Info>
+**Reference page** · **Live source of truth:** sidebar **Documents** → **Templates** tab (`/documents/templates`), one template at `/documents/templates/{slug}` · **Roles:** Principal ✓ Operator ✓ can create documents from these templates; only a Principal (or Admin) can fork, edit, lock or deactivate a template · **Baseline:** what the repo seeds; your tenant may differ.
+</Info>
+
+The **Sales** category holds 7 seeded platform templates. Tenant `ariya` also has a **Billing Memo** in this category (shown as "Sales").
+
+<Warning>
+Four templates answer to the word "proposal": **HR Proposal** (`proposal`), **Services Proposal**, **Consulting Proposal** and **Workers' Comp Proposal**. A bare "proposal" request matches `proposal`; the assistant must confirm which one. Always say the full title.
+</Warning>
+
+<Note>
+Every good request names a client because the Document Assistant will not draft until a client is bound, even for internal pieces such as flyers. Example people, amounts and dates are fictional; swap in the user's facts. Facts you leave out become flagged gaps or a follow-up question, never invented values.
+</Note>
+
+## How to read an entry
+
+- **Fields, by form section** uses the labels the template form shows. "(list; each row: …)" is a repeatable list with an add button. Types other than text are shown in brackets, for example (date) or (number); "(choice: …)" lists the dropdown options.
+- **Starts blank** fields have no default and no client value, and their label does not say "optional". The assistant reports each one as a gap, or asks when it is a true blocker such as the person's name.
+- **Blank unless the client profile has it** fields fill themselves from the client record. Put the value in the request only if the client profile lacks it.
+- All other fields start with a default from the template. The assistant only changes a default when it has a source for the new value.
+
+## Templates on this page
+
+- **HR sales documents:** [HR Proposal](/documents/catalog/sales#hr-proposal), [Services Proposal](/documents/catalog/sales#services-proposal), [Consulting Proposal](/documents/catalog/sales#consulting-proposal), [Discovery Summary](/documents/catalog/sales#discovery-summary), [Tier Flyer](/documents/catalog/sales#tier-flyer), [Workers' Comp Proposal](/documents/catalog/sales#workers%E2%80%99-comp-proposal), [Workers' Comp Contractor One-Pager](/documents/catalog/sales#workers%E2%80%99-comp-contractor-one-pager)
+- **Tenant ariya only:** [Billing Memo](/documents/catalog/sales#billing-memo)
+
+## HR sales documents
+
+### HR Proposal
+
+**Slug:** `proposal` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none
+
+Multi-page HR services proposal: pain points, recommended tier, comparison, next steps.
+
+- **From the client profile:** company name, signer / contact name, contact title, employee count, industry
+- **Dated automatically at creation:** Date
+
+**Fields, by form section:**
+
+- **Header:** Title (use \*italics\* for emphasis); Subtitle; Prepared by; Date (date); Validity (days) (number)
+- **Client:** Client name; Contact name; Contact title; Employee count; Industry
+- **Narrative:** Cover tagline; Pain-points footer note; Compliance exposure \$; Risk callout body; ROI body
+- **Pain points** (list; each row: Title; Detail)
+- **Tier (Ariya offerings):** Apply a tier (choice: — pick a tier to auto-fill recommendation & fee —)
+- **Recommendation:** Recommended tier (choice: HR OnDemand / Elevated HR); Recommended monthly fee; Go-live timeline; Compliance timeline
+- **Tier table headings:** Basic tier label; Premium tier label; PEPM footnote
+- **Tier comparison rows** (list; each row: Feature; Basic value; Premium value)
+- **Add-ons** (list; each row: Add-on)
+- **Next steps** (list; each row: Action; Timeline)
+- **CTA:** CTA body
+- **Fillable PDF acceptance fields:** Acceptance note; Authorized signer name; Authorized signer title; Authorized signature; Signature date (date)
+
+**Starts blank (the assistant asks or flags these):** Prepared by; Compliance exposure \$; Apply a tier; Recommended monthly fee; Authorized signer name; Authorized signer title; Authorized signature; Signature date
+
+**Blank unless the client profile has it:** Client name; Contact name; Contact title; Employee count; Industry
+
+**Good request:** "Create an HR Proposal for ABC Dental: prepared by Rachel Kim; compliance exposure 25,000 USD; tier Elevated HR at 1,200 USD a month; authorized signer Dr. Sam Patel, Owner; leave signature and signature date blank for signing."
+
+### Services Proposal
+
+**Slug:** `services-proposal` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none
+
+Ariya HR services proposal — why Ariya, onboarding steps, payroll core bundle, optional modules, Elevated HR, itemized pricing.
+
+- **From the client profile:** company name, signer / contact name, employee count, industry
+- **Dated automatically at creation:** Date
+
+**Fields, by form section:**
+
+- **Prepared for:** Client company; Client short name; City, State; Employees; Attn; Date (date)
+- **Positioning:** Industry; Industry experience; Accounting system
+- **Payroll Core bundle** (list; each row: Bold lead-in; Detail)
+- **Optional modules** (list; each row: Module; Description)
+- **Elevated HR inclusions** (list; each row: Bold lead-in; Detail)
+- **Investment:** Discount applied to every line (%) (number)
+- **Itemized pricing** (list; each row: Line item; Sub-line; List price; Client price)
+- **Example monthly totals** (list; each row: Configuration; Maths; Monthly total)
+- **Notes:** Deal notes
+
+**Starts blank (the assistant asks or flags these):** Client short name; City, State; Industry experience; Accounting system; Deal notes
+
+**Blank unless the client profile has it:** Client company; Employees; Attn; Industry
+
+**Good request:** "Create a Services Proposal for ABC Dental: short name 'ABC', Sacramento, CA, attn Dr. Sam Patel; industry experience: 12 dental practices served; accounting system QuickBooks Online; deal notes: 10% first-year discount."
+
+### Consulting Proposal
+
+**Slug:** `consulting-proposal` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none
+
+Project-based HR consulting proposal (distinct from recurring HR services).
+
+- **From the client profile:** company name, signer / contact name, contact title, employee count, industry
+- **Dated automatically at creation:** Date
+
+**Fields, by form section:**
+
+- **Header:** Title (use \*italics\* for emphasis); Subtitle; Prepared by; Date (date); Validity (days) (number)
+- **Client:** Client name; Contact name; Contact title; Employee count; Industry
+- **Engagement:** Engagement name; Context · problem to solve; Why now
+- **Scope · in** (list; each row: Item; Detail)
+- **Scope · out** (list; each row: Item)
+- **Deliverables** (list; each row: Deliverable; Timeline; Acceptance signal)
+- **Milestones** (list; each row: When; Milestone)
+- **Fees:** Fee structure (choice: Fixed fee / Time and materials); Fixed fee; Setup fee (optional); T&M hourly rate; T&M estimated range; Payment terms; Expenses note
+- **Assumptions** (list; each row: Assumption)
+- **Acceptance criteria** (list; each row: Criterion)
+- **CTA:** CTA body
+
+**Starts blank (the assistant asks or flags these):** Prepared by; Fixed fee; T&M hourly rate; T&M estimated range
+
+**Blank unless the client profile has it:** Client name; Contact name; Contact title; Employee count; Industry
+
+**Good request:** "Create a Consulting Proposal for ABC Dental: prepared by Rachel Kim; engagement 'Handbook rebuild'; Fixed fee 6,500 USD (T&M hourly rate and range: not applicable); contact Dr. Sam Patel, Owner."
+
+### Discovery Summary
+
+**Slug:** `discovery-summary` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none
+
+Short post-call recap: what we heard, where we would focus first, open questions.
+
+- **From the client profile:** company name, signer / contact name, contact title, industry
+- **Dated automatically at creation:** Call date, Prepared date
+- **Team-member dropdown:** **Prepared by**; **Our attendees → Name** (pick a user from your team; the matching email fills itself; the `/generate` form shows a plain text box instead)
+
+**Fields, by form section:**
+
+- **Header:** Title; Call date (date); Prepared by; Prepared date (date)
+- **Client:** Client name; Primary contact name; Primary contact title; Industry
+- **Their attendees** (list; each row: Name; Role)
+- **Our attendees** (list; each row: Name; Role)
+- **What we heard** (list; each row: Item)
+- **Featured quote (optional):** Quote; Attributed to
+- **Where we would focus first** (list; each row: Area; Detail)
+- **Open questions** (list; each row: Question)
+- **Closing:** Next step; Closing
+
+**Starts blank (the assistant asks or flags these):** Prepared by
+
+**Blank unless the client profile has it:** Client name; Primary contact name; Primary contact title; Industry
+
+**Good request:** "Create a Discovery Summary for ABC Dental: call 2026-10-29, prepared by Rachel Kim; their attendee Dr. Sam Patel (Owner), ours Rachel Kim (Consultant); what we heard and open questions from the attached call notes."
+
+### Tier Flyer
+
+**Slug:** `tier-flyer` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none
+
+Single-page marketing flyer for an HR service tier (HR OnDemand, Elevated HR, etc.).
+
+**Fields, by form section:**
+
+- **Tier (Ariya offerings):** Apply a tier (choice: — pick a tier to auto-fill headline, subhead, and features —)
+- **Headline:** Tier name; Headline; Sub-headline
+- **Features (4 max for layout)** (list; each row: Title; Detail)
+- **CTA + side cards:** CTA button text; "Why it works" label; "Why it works" title; "Why it works" body; Contact card title; Contact card footer
+
+**Starts blank (the assistant asks or flags these):** Apply a tier
+
+**Good request:** "Create a Tier Flyer for client ABC Dental for the Elevated HR tier."
+
+### Workers' Comp Proposal
+
+**Slug:** `wc-proposal` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none
+
+Single-page WC pay-as-you-go proposal: services, pricing crew sizes, signature.
+
+- **From the client profile:** company name
+- **Dated automatically at creation:** Date
+
+**Fields, by form section:**
+
+- **Tier (Ariya offerings):** Apply a tier (choice: — pick a tier to auto-fill pricing —)
+- **Header:** Headline; Subhead; Client name; Prepared by; Date (date)
+- **Services — Workers' Comp** (list; each row: Service)
+- **Services — Payroll & Tax** (list; each row: Service)
+- **Services — Timekeeping** (list; each row: Service)
+- **Pricing:** Headline pricing; Detail line; Timekeeping note
+- **Crew-size pricing table** (list; each row: Crew size; Base; Employee \$; Total)
+- **Getting started steps** (list; each row: Title; Description)
+- **CTA:** CTA body
+
+**Starts blank (the assistant asks or flags these):** Apply a tier; Prepared by
+
+**Blank unless the client profile has it:** Client name
+
+**Good request:** "Create a Workers' Comp Proposal for Valley Landscaping: prepared by Rachel Kim; name the Ariya tier to apply."
+
+### Workers' Comp Contractor One-Pager
+
+**Slug:** `wc-contractor-onepager` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none
+
+Single-page WC + contractor solution leave-behind for sales meetings.
+
+- **Dated automatically at creation:** Meta date
+
+**Fields, by form section:**
+
+- **Header:** Eyebrow; Headline; Subhead; Meta line; Meta date
+- **Hero band:** Hero title; Hero sub
+- **Stats (3 for layout)** (list; each row: Value; Label; Note)
+- **Features (6 for layout)** (list; each row: Title; Body)
+- **Promise band:** Promise
+- **How It Works:** Section label
+- **Steps (3 for layout)** (list; each row: Title; Body)
+- **CTA:** CTA title; CTA body
+
+**Starts blank:** nothing required. Every field has a default or is labelled optional; replace defaults the user did not ask for.
+
+**Good request:** "Create a Workers' Comp Contractor One-Pager for client Valley Landscaping for a sales meeting on 2026-11-12."
+
+## Tenant ariya only
+
+### Billing Memo
+
+**Slug:** `billing-memo` · **Kind:** Legacy authored (fields plus prose sections) · **Scope:** client · **Person to name:** none · **Status:** seeded only for tenant `ariya`; generated by another module
+
+Implementation billing memo used by the Implementation module. Other tenants do not have this row.
+
+**Fields:** company data; contract setup; products and pricing (Product 1 to 3: Name, Qty, PEPM, Flat Rate, Misc.); Additional Pricing Notes.
+
+**How it is filled:** the Implementation module builds it from implementation intake. The module uses any `billing-memo` or `billing-memo-*` row, or the template locked in **Settings** → **Implementation Catalog**. Legacy templates write prose sections with an LLM and turn unknown facts into fillable placeholders.
+
+**Note:** Shares routing words with `implementation-billing-memo` ("iSolved Billing Memo", Business page). In tenant `ariya`, a title match on "billing memo" lands on this row first.
+
+**Good request:** none. Do not request this template by hand; generate it from the Implementation module.
+
+## Related
+
+- [Template catalog overview](/documents/template-catalog)
+- [Choosing a template](/documents/choosing-a-template)
+- [How templates work](/documents/how-templates-work)
+- [Create a document](/documents/create-a-document)
+- [Templates page](/documents/templates)
+
+## Source files
+
+- `packages/core/src/documents/templates/platform/{slug}/meta.json` (seed source for field labels, defaults and client prefill)
+- `packages/core/src/db/migrations/0100_platform_templates_handlebars.sql`
+- `packages/core/src/db/migrations/0120_team_member_fields.sql`
+- `packages/core/src/documents/registry-fill.ts` (which fields count as required)
+- `packages/core/src/documents/engine/from-registry.ts` (client prefill)
+- `packages/core/src/db/migrations/0094_replace_billing_memo_template.sql`
+- `packages/core/src/entities/implementation/billing-memo-generate.ts`

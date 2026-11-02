@@ -1,0 +1,169 @@
+---
+title: "Choosing a template"
+sidebarTitle: "Choosing a template"
+description: "Map what a user says to the template the Document Assistant will pick, and the facts to put in the request so the draft does not block."
+keywords: ["which template", "choose template", "offer letter", "write up", "written warning", "PIP", "NDA", "incident report", "termination", "handbook", "proposal", "service agreement", "DE 48", "Form 8655"]
+---
+
+<Info>
+**Use with:** the Document Assistant chat (`/documents/chat/{sessionId}`), reached from sidebar **Documents** → send a request · **Roles:** Principal ✓ Operator ✓ · **Verify in:** sidebar **Documents** → **Templates**, because tenants can rename, add or deactivate templates.
+</Info>
+
+Use this page to turn a user's words into a template title and a complete request. Each template links to its catalog entry, which lists every field and a full good request. The click path for sending the request is [Create a document](/documents/create-a-document).
+
+<Note>
+Unverified: the word-search results on this page (ties, sort order, "matches nothing") come from an offline simulation of the assistant's template search against the seeded catalog, using the short phrase only. A real sentence has more words and can rank differently, and the assistant makes the final pick. Treat them as warnings, not guarantees.
+</Note>
+
+## Rules that make routing reliable
+
+1. **Name the client exactly.** The assistant binds a client only on one confident match, and drafts nothing until it has one.
+2. **Say the full template title** as shown in **Documents** → **Templates**: "non-disclosure agreement", "incident report", "Corrective Action Warning". Platform templates have no aliases, words under 3 characters are ignored, and abbreviations (NDA, PIP, DE 48, QBR) are unreliable.
+3. **When two templates share a title or a word, add the slug** in the request, for example "Service Agreement (service-agreement)".
+4. **Expect a confirmation question** whenever several templates share a word: warnings, proposals, service agreements, handbook variants, incident reports, workers' comp. Answer it with the title.
+5. **Put every fact in the first request.** The assistant asks only for true blockers (for example the employee name on an offer letter) and flags the rest as blank gaps. It never fills in values you did not give.
+6. **Attach source files** (notes, spreadsheets, an existing handbook) instead of pasting long data. Attached files count as a valid source for field values.
+7. **Create the three PDF forms from Documents → Templates**, not the assistant.
+8. **Do not hand-pick** `elevated-hr-roadmap`, `elevated-hr-assessment`, `elevated-hr-roadmap-progress`, `implementation-billing-memo` or `billing-memo`. Their modules create them.
+
+## Routing cheat-sheet
+
+Read "Put in the request" as the minimum facts that avoid a follow-up question or a blank gap. The linked catalog entry has the complete list.
+
+### Hiring and onboarding
+
+| User says | Template | Put in the request | Watch out |
+|---|---|---|---|
+| "offer letter"; "job offer"; "offer" | [Offer Letter](/documents/catalog/business#offer-letter) `offer-letter` | Candidate name and email, position title and summary, department, reports to, start date, schedule, classification and pay, response deadline, signatory name and title | A bare "job offer" ties with Job Description in the word search (Job Description sorts first). Say "offer letter". |
+| "new hire packet"; "onboarding"; "I-9"; "W-4" | [New Hire Packet](/documents/catalog/business#new-hire-packet) `new-hire-packet` | Employee name, position, start date, client-specific day-one items | "Onboarding" alone matches **1099 Contractor Onboarding Packet** by title. "New hire packet" ties with New Hire Welcome. I-9 and W-4 are listed in the packet, not generated. |
+| "job description"; "role profile"; "duties" | [Job Description](/documents/catalog/business#job-description) `job-description` | Job title, department, reports to, location, employment type, FLSA class, salary range, pay-transparency note | — |
+| "employee information form" | [Employee Information](/documents/catalog/business#employee-information) `employee-information` | Employee's personal, contact, emergency, job, tax and bank details, or say the employee completes them by hand | The word search ties three templates and sorts this one after AI and Confidential Data Policy. Say the full title. |
+| "direct deposit" | [Direct Deposit Authorization](/documents/catalog/business#direct-deposit-authorization) `direct-deposit` | Employee name, ID, phone, home address, email; account details | Direct deposit is also page 2 of the New Hire Packet. |
+| "30-60-90 plan"; "90 day plan" | [30-60-90 day plan](/documents/catalog/business#30-60-90-day-plan) `ninety-day-plan` | Employee, role, manager, start date, top-line goal | Client-workspace suggestions map "90 days" or "next 90" to HR Roadmap instead. |
+| "equity grant" | [Equity Grant Notice](/documents/catalog/business#equity-grant-notice) `equity-grant` | Grantee name and address, grant type, shares, price, FMV, vesting, signatory | — |
+| "contractor agreement"; "1099 agreement" | [Contractor Agreement (1099)](/documents/catalog/business#contractor-agreement-1099) `contractor-agreement` | Company legal name, address and signatory; contractor name, address, entity type, EIN or SSN last 4; services; fee structure | Ties with Independent Contractor Commission Agreement in the word search. Confirm. |
+| "commission agreement" | [Independent Contractor Commission Agreement](/documents/catalog/business#independent-contractor-commission-agreement) `independent-contractor-commission-agreement` | Contractor name and trade, scope, prospects, products, commission rate and base, payment timing, signatory | — |
+| "1099 contractor onboarding" | [1099 Contractor Onboarding Packet](/documents/catalog/business#1099-contractor-onboarding-packet) `contractor-onboarding-packet-1099` | Contractor entity, address, contact, services, compensation basis, invoicing, payment method, insurance, agreement and W-9 dates, signatory | One document with 4 sections, not a packet of templates. |
+
+### Performance, pay and leave
+
+| User says | Template | Put in the request | Watch out |
+|---|---|---|---|
+| "performance review"; "annual review" | [Performance Review](/documents/catalog/business#performance-review) `performance-review` | Employee, role, department, reviewer name and title, period, ratings or notes | Reviewer is a team-member dropdown in the database form. |
+| "promotion" | [Promotion Letter](/documents/catalog/business#promotion-letter) `promotion-letter` | Employee, new title, department, reports to, effective date, classification, pay, signatory | — |
+| "pay increase"; "salary increase" | [Pay Increase Notice](/documents/catalog/business#pay-increase-notice) `pay-increase-notice` | Employee, position, previous and new hourly rate, effective pay period, reason, signer | For hourly increases. A bare "raise" is unverified (see below). |
+| "compensation review"; "pay bands" | [Compensation Review Framework](/documents/catalog/business#compensation-review-framework) `compensation-review-framework` | Framework owner, cadence, criteria | Database-only: not on the `/generate` page. |
+| "PTO request"; "leave request" | [PTO / Leave Request](/documents/catalog/business#pto-%2F-leave-request) `pto-request` | Employee, role, department, leave type, dates, coverage contact, manager name and email | — |
+| "time off policy" | [Time Off Policy Intake](/documents/catalog/business#time-off-policy-intake) `time-off-policy-intake` | Effective date, accrual rate, carryover and caps, waiting period, notice, blackout dates, states | — |
+| "accommodation request"; "ADA request"; "interactive process" | [Accommodation request](/documents/catalog/business#accommodation-request) `accommodation-request` | Employee, role, manager, the request, decision and rationale, effective and review dates, HR contact | Operations case rules route ADA or accommodation **policy** questions to HR Compliance Checklist. Confirm whether this is an individual request. |
+| "expense report" | [Expense Report](/documents/catalog/business#expense-report) `expense-report` | Employee, role, department, period, line items, approver name and email | — |
+
+### Discipline and incidents
+
+| User says | Template | Put in the request | Watch out |
+|---|---|---|---|
+| "incident report"; "workplace incident"; "investigation summary"; "complaint"; "harassment"; "witness statement" | [HR Incident Report](/documents/catalog/business#hr-incident-report) `hr-incident-report` | Who completed it, incident date, time and location, people involved, witnesses, what happened, action taken, injuries, police, who it was sent to | Three rows share the words "HR Incident Report" (`hr-incident-report`, `incident-report`, `incident-report-rdk`); prefer `hr-incident-report`. Client-workspace suggestions can still propose the retired `incident-report-rdk`. "Investigation" or "harassment complaint" alone match nothing, so the assistant asks. In Operations cases a bare "injury" or "accident" suggests HR Roadmap ("Incident Documentation Memo"). |
+| "written warning"; "final written warning"; "verbal warning" | [Written Warning](/documents/catalog/business#written-warning) `written-warning` | Warning level, employee, job title, department, supervisor, issue type and description, deadline and follow-up dates | The word search ties Corrective Action Warning and sorts it first; for "final written warning" Corrective Action Warning even scores higher. Two different forms exist. Confirm. |
+| "corrective action"; "write-up"; "discipline"; "disciplinary action" | [Written Warning](/documents/catalog/business#written-warning) `written-warning` or [Corrective Action Warning](/documents/catalog/business#corrective-action-warning) `corrective-action-warning` | As for the chosen form | Ambiguous by design: rules pick Written Warning, a title match picks Corrective Action Warning, and "write-up" matches nothing. Ask which form the client uses. |
+
+### Separation
+
+| User says | Template | Put in the request | Watch out |
+|---|---|---|---|
+| "termination"; "termination letter"; "final pay"; "layoff" | [Termination Letter](/documents/catalog/business#termination-letter) `termination-letter` | Employee name, address and role, last day, reason, final pay date, HR contact name, email and phone, signatory | In the word search "termination letter" ties Personal Engagement Letter, which sorts first. Say "Termination Letter" and name the employee. |
+| "termination packet"; "separation packet"; "offboarding" | [Termination Packet](/documents/catalog/business#termination-packet) `termination-packet` | Employee name, number and position, effective date, action taken, final pay timing, one-paragraph reason, signatory | One document with 4 pages (notice, CUIC 1089 notice, acknowledgment, manager checklist). |
+| "severance"; "separation package"; "release agreement" | [Severance summary](/documents/catalog/business#severance-summary) `severance-summary` | Employee, role, last day, separation type, cash and weeks, benefits, conditions, HR contact | A plain-language cover summary; the legal release agreement is separate and has no template. |
+| "resignation" | [Resignation Acknowledgment](/documents/catalog/business#resignation-acknowledgment) `resignation-acknowledgment` | Employee, position, date received, last day, notice given, signatory | — |
+| "exit interview" | [Exit interview](/documents/catalog/business#exit-interview) `exit-interview` | Employee, role, tenure, last day, interviewer, reason for leaving | — |
+
+### Policies, handbooks and compliance
+
+| User says | Template | Put in the request | Watch out |
+|---|---|---|---|
+| "handbook"; "employee handbook"; "policy update"; "policy language" | [Employee Handbook](/documents/catalog/business#employee-handbook) `employee-handbook` | Attach the current handbook if one exists; pay schedule, PTO, sick leave method, holidays, workers' comp carrier, officer title | Always LLM-written; slow. Ties five handbook templates in the word search (this one sorts first). Operations case rules send "handbook" questions to HR Compliance Checklist. |
+| "handbook assessment"; "handbook discovery"; "handbook gap analysis" | [Employee Handbook Discovery & Assessment](/documents/catalog/business#employee-handbook-discovery-%26-assessment) `employee-handbook-discovery-assessment` | Session date, who it is prepared for; attach the intake questionnaire and call notes | A title match on "handbook assessment" lands on the older **Employee Handbook Assessment** (`employee-handbook-assessment`), whose active state is unverified. Confirm. |
+| "handbook development agreement"; "handbook engagement" | [Employee Handbook Development Agreement](/documents/catalog/business#employee-handbook-development-agreement) `employee-handbook-development-agreement` | City and state, effective date, revision limit, flat fee, kill fee, payment days | — |
+| "compliance checklist"; "compliance review"; leave, FMLA or sick leave questions; "wage-hour"; "meal/rest breaks" | [HR Compliance Checklist](/documents/catalog/business#hr-compliance-checklist) `compliance-checklist` | Consultant, jurisdictions to include | — |
+| "HR audit" | [HR Audit Report](/documents/catalog/business#hr-audit-report) `hr-audit-report` | Auditor, audit date, findings by area | Ties AI Readiness Audit Report in the word search. Client-workspace suggestions route "audit" to HR Compliance Checklist. |
+| "workers comp"; "workplace injury claim" | [Workers Comp Summary](/documents/catalog/business#workers-comp-summary) `workers-comp-summary` | Carrier, policy number, effective and expiration dates, premium | Four templates tie in the word search; the two `wc-*` templates are sales collateral. |
+| "IIPP"; "injury and illness prevention program" | [Injury and Illness Prevention Program](/documents/catalog/business#injury-and-illness-prevention-program) `injury-illness-prevention-program` | Safety owner, site-specific risks | Database-only: not on the `/generate` page. |
+| "workplace violence prevention plan" | [Workplace Violence Prevention Plan](/documents/catalog/business#workplace-violence-prevention-plan) `workplace-violence-prevention-plan` | Plan owner, review cadence | "SB 553" alone matches nothing. Database-only: not on `/generate`. |
+| "remote work policy"; "expense reimbursement policy" | [Remote Work and Expense Reimbursement Policy](/documents/catalog/business#remote-work-and-expense-reimbursement-policy) `remote-work-expense-reimbursement-policy` | Policy owner, eligible roles, reimbursement rules | Database-only: not on `/generate`. |
+| "AI policy"; "confidential data policy" | [AI and Confidential Data Policy](/documents/catalog/business#ai-and-confidential-data-policy) `ai-confidential-data-policy` | Policy owner, approved tools, prohibited uses | Weak word match; say the full title. Database-only: not on `/generate`. |
+| "wage theft notice"; "Labor Code 2810.5"; "wage notice" | [Wage Theft Prevention Notice](/documents/catalog/business#wage-theft-prevention-notice) `wage-theft-prevention-notice` | Employee, position, start date, employer phone, pay rates and basis, payday, workers' comp carrier details, sick leave method, employer representative | "Wage notice" ties Promotion Letter, which sorts first. Say "wage theft prevention notice". |
+
+### Agreements, sales and finance
+
+| User says | Template | Put in the request | Watch out |
+|---|---|---|---|
+| "NDA"; "non-disclosure"; "confidentiality agreement" | [Non-Disclosure Agreement](/documents/catalog/business#non-disclosure-agreement) `nda` | Both parties' legal names, addresses, signatories and titles; mutual or one-way; purpose; term; governing law | The word search does not rank this template for "NDA". Always say "non-disclosure agreement". |
+| "service agreement" | [Service Agreement](/documents/catalog/business#service-agreement) `service-agreement` or [Client Service Agreement](/documents/catalog/business#client-service-agreement) `client-service-agreement` | Parties, tier or services, fee, term, signatories | A title match picks Client Service Agreement (Ariya's own) first. Two different templates. Confirm. |
+| "proposal"; "HR proposal"; "services proposal" | [HR Proposal](/documents/catalog/sales#hr-proposal) `proposal`; [Services Proposal](/documents/catalog/sales#services-proposal) `services-proposal`; [Consulting Proposal](/documents/catalog/sales#consulting-proposal) `consulting-proposal`; [Workers' Comp Proposal](/documents/catalog/sales#workers%E2%80%99-comp-proposal) `wc-proposal` | As for the chosen proposal | Four-way tie. A bare "proposal" matches `proposal` (HR Proposal). Must confirm. |
+| "invoice" | [Invoice](/documents/catalog/business#invoice) `invoice` | Your firm's name, address and email; line items; payment instructions; notes | A stale tenant row once shadowed this template on one environment. |
+| "pricing quote"; "quote" | [Pricing Quote](/documents/catalog/business#pricing-quote) `pricing-quote` | Preparer name and email, line items, discount reason, validity | — |
+| "QBR"; "quarterly business review" | [Quarterly Business Review](/documents/catalog/business#quarterly-business-review) `qbr` | Quarter, preparer | In the word search "quarterly business review" ties Performance Review, which sorts first. Say the full title. |
+| "status report" | [Status Report](/documents/catalog/business#status-report) `status-report` | Cadence, period, preparer, health | Client-workspace suggestions map "status report" to Quarterly Business Review. |
+| "sales handoff"; "sales to implementation" | [Sales to Implementation Handoff Form](/documents/catalog/business#sales-to-implementation-handoff-form) `sales-to-implementation-handoff` | Attach the signed CSA and sales notes; CSA date; first payroll date | — |
+| "intake form" | [Client Intake Form](/documents/catalog/business#client-intake-form) `intake-form` | Sent and due-back dates | The word search ties Direct Deposit Authorization and Employee Information, which sort first. Say "Client Intake Form". |
+| "company information" | [Company Information](/documents/catalog/business#company-information) `company-info` | Service tier, engagement start (rest from the client profile) | — |
+| "meeting agenda"; "meeting minutes" | [Meeting Agenda & Minutes](/documents/catalog/business#meeting-agenda-%26-minutes) `meeting-agenda` | Meeting type, date, time, facilitator, note taker, attendees, agenda | — |
+| "SOP"; "runbook" | [SOP / Runbook](/documents/catalog/business#sop-%2F-runbook) `sop` | SOP title, owner, steps | — |
+| "HR roadmap"; "road map" | [HR Roadmap](/documents/catalog/business#hr-roadmap) `hr-roadmap` | Preparer, what is already in place, what is referred out, phases | A title match on "HR roadmap" picks **Elevated HR Roadmap**, which the HR Roadmap module generates. Say the slug `hr-roadmap`. |
+| "HR assessment" | [HR Assessment](/documents/catalog/business#hr-assessment) `hr-assessment` | Facilitator; attach questionnaire answers | Database-only. **Elevated HR Assessment** is module-generated; do not pick it. |
+| "billing memo" | [Billing Memo](/documents/catalog/sales#billing-memo) `billing-memo` (tenant `ariya`) or [iSolved Billing Memo](/documents/catalog/business#isolved-billing-memo) `implementation-billing-memo` | Generated from the Implementation module | Usually created by the Implementation module, not by hand. |
+| "press release"; "case study"; "business card" | [Press Release](/documents/catalog/marketing#press-release) `press-release`; [Case Study](/documents/catalog/marketing#case-study) `case-study`; [Business card](/documents/catalog/print-and-social#business-card) `business-card` | See each catalog entry | — |
+
+### Official PDF forms
+
+| User says | Template | Put in the request | Watch out |
+|---|---|---|---|
+| "implementation kit"; "initial information form"; "payroll ACH"; "onboarding kit" | [ISolved Implementation Kit Form](/documents/catalog/pdf-forms#isolved-implementation-kit-form) `isolved-implementation-kit-form` | Client legal name, DBA, FEIN, employee count, address on the client profile; pay dates; bank details | PDF form: create it from **Documents** → **Templates**; the assistant refuses. The HTML look-alike `implementation-kit` is inactive. |
+| "Form 8655"; "reporting agent authorization" | [Report Authorization Form](/documents/catalog/pdf-forms#report-authorization-form) `report-authorization-form` | Taxpayer name, trade name, EIN, address, contact on the client profile; forms and years | PDF form: Documents UI only. |
+| "CA POA"; "DE 48"; "EDD power of attorney" | [Power of Attorney California](/documents/catalog/pdf-forms#power-of-attorney-california) `power-of-attorney-california` | Employer account number, FEIN, owner name, DBA, addresses; authorization type | "DE 48" matches nothing in the word search (words under 3 characters are ignored). PDF form: Documents UI only. `implementation-ca-poa` is inactive. |
+
+## Phrases with no template
+
+No seeded template exists for these. Tell the user, and ask which existing template to use or whether a Principal should create one in **Settings** → **Templates**.
+
+| User says | What exists instead | Watch out |
+|---|---|---|
+| "PIP"; "performance improvement plan" | Operations case and client-workspace rules route to [Written Warning](/documents/catalog/business#written-warning) `written-warning`. [Performance Review](/documents/catalog/business#performance-review) `performance-review` has a **PIP / Performance Improvement Plan** period option. | "PIP" matches nothing in the word search; "performance improvement plan" surfaces Performance Review and 30-60-90 day plan. Whether your tenant has its own PIP template is unverified; check **Documents** → **Templates**. |
+| "separation agreement" | [Severance summary](/documents/catalog/business#severance-summary) `severance-summary` (cover summary) or [Termination Letter](/documents/catalog/business#termination-letter) `termination-letter` | Client-workspace rules map "separation" to Termination Letter. Unverified whether a tenant template exists. Ask. |
+| "handbook addendum" | None seeded | Exists only as an HR Roadmap linked-document value; a tenant may have authored one (unverified). Ask. |
+| "ERISA plan document" | None | Client-workspace suggestions report "Missing template: ERISA plan document". |
+
+## Unverified mappings
+
+<Note>
+Unverified: these phrases have no routing rule or only a weak word match. Do not rely on them; rewrite the request with the full template title.
+</Note>
+
+| User says | Likely result | Say instead |
+|---|---|---|
+| "welcome letter for new hire" | [New Hire Welcome](/documents/catalog/business#new-hire-welcome) `new-hire-welcome`, weak match ranked behind unrelated templates | "New Hire Welcome" |
+| "let go" | No rule; probably nothing | "Termination Letter" for [Termination Letter](/documents/catalog/business#termination-letter) `termination-letter` |
+| "raise" (alone) | [Compensation Review Framework](/documents/catalog/business#compensation-review-framework) `compensation-review-framework` may rank first | "Pay Increase Notice" for [Pay Increase Notice](/documents/catalog/business#pay-increase-notice) `pay-increase-notice` |
+
+## Other places that suggest templates
+
+- **Operations cases** show "SUGGESTED TEMPLATES" from keyword rules: warning or PIP language suggests Written Warning; investigation language suggests HR Incident Report ("Incident / Investigation Summary"); compliance language (including "handbook") suggests HR Compliance Checklist; onboarding or hiring words suggest New Hire Packet; job-description words suggest Job Description; other cases fall back to HR Roadmap.
+- **Client workspace document opportunities** suggest templates from client evidence. They can still propose the retired `incident-report-rdk`, and they map "status report" to Quarterly Business Review and "90 days" to HR Roadmap.
+- **HR Roadmap tasks** have a "linked doc type" with a **Draft** action. Several values (`pip`, `separation-agreement`, `handbook-addendum`, `policy`, `safety-manual`, `onboarding-checklist`, `offboarding-checklist`, `idp`, `training-plan`, `verbal-warning`, `audit-guide`, `compliance-audit`, `hr-proposal`) are not template slugs, so the draft lands on the nearest template or on HR Roadmap.
+
+## Related
+
+- [Create a document](/documents/create-a-document)
+- [Template catalog](/documents/template-catalog)
+- [How templates work](/documents/how-templates-work#how-the-assistant-picks-a-template)
+- [Templates page](/documents/templates)
+
+## Source files
+
+- `packages/core/src/documents/agent-tools-read.ts` (template word search, client binding)
+- `packages/core/src/documents/agent-prompt.ts` (confirm-when-ambiguous rule, blocker policy)
+- `packages/core/src/documents/engine/template-resolver.ts` (title and alias matching)
+- `packages/core/src/ops/service-desk/case-documents.ts` (Operations case suggestions)
+- `packages/core/src/documents/engine/client-document-opportunities.ts`
+- `packages/core/src/documents/engine/client-document-evidence.ts`
+- `packages/shared/src/hr-document-types.ts` (HR Roadmap linked doc types)
+- `packages/core/src/documents/pdf-form-manifests/index.ts` (PDF form aliases)
