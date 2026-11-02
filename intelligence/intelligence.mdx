@@ -1,0 +1,374 @@
+---
+title: "Intelligence, HR Intel, Playground, Memory, Granola and Usage"
+sidebarTitle: "Intelligence"
+description: "Search and ask HR Intel, generate client HR Intel briefs, run Playground prompts, curate agent memory, attach Granola meeting notes and read API usage."
+keywords: ["intelligence", "hr intel", "ask hr intel", "compliance question", "trusted sources", "client brief", "obligations", "playground", "test the agent", "memory", "memory proposals", "approve memory", "granola", "meeting notes", "attach meeting", "usage", "tokens", "api cost"]
+---
+
+<Info>
+**URL:** `/intelligence`, `/hr-intel` (optional `?client={clientSlug}`), `/playground`, `/memory`, `/granola`, `/usage` · **Reach:** sidebar **Intelligence**, then Quick Actions or the Intelligence tab bar · **Roles:** Principal ✓ Operator ✗ (Operator: `/granola` only) · **Ready when:** the page h1 is visible (`Intelligence`, `HR Intel`, `Playground`, `Memory Health`, `Granola Inbox` or `Usage`) and no `Loading…` text remains.
+</Info>
+
+This section covers Ariya's own research and agent-tuning tools. Data Health, CRM Hygiene, Compare Versions and Trusted Sources are on [Data and sources](/intelligence/data-and-sources).
+
+<Note>**Operator:** only **Granola** is available. `/intelligence`, `/hr-intel` and `/usage` show `Intelligence: overview, HR Intel, usage, AI Insights is not available on the Operator profile.` `/playground` and `/memory` show `Reply Voice, governance, skills and memory is not available on the Operator profile.` Admin (for reference) gets Intelligence, HR Intel, Usage and Granola but not Playground or Memory.</Note>
+
+## Page map
+
+### Intelligence overview on /intelligence
+- h1 **Intelligence**, description `Use HR Intel, source trust, memory, integration health, and usage signals before operators act.`
+- Tab bar is the **Operations** bar (`Inbox`, `Deliverables`, `AI Insights`, `Settings`), not the Intelligence tabs. `/intelligence?source=operations` (the **AI Insights** tab) is the same page.
+- Sections top to bottom: `Intelligence Health` with h2 `Signals operators should check before acting` (four tiles) and link **Open HR Intel**; `HR Intel Operating Lane` with h2 `From trusted source to reviewed client output`, link **Start in HR Intel** and four lane cards each ending **Open lane**; `Needs Review`; `Client Coverage`; `Recent Activity`; `Quick Actions`.
+- Every status value on this page is fixed text, not live data.
+
+### HR Intel on /hr-intel
+- h1 **HR Intel**, description `Trusted HR and compliance intelligence for Ariya operators.` Header button **Refresh**.
+- Operations tab bar (same as `/intelligence`).
+- Top to bottom: `HR Intel Status` card (mode badge; metrics `Active`, `Primary`, `Review`, `Due Soon`, `Coverage`, `Missing Topics`) beside a `Trusted Sources` card (up to 6 sources); with `?client=` only, a strip `HR Intel client context` with **Generate brief** and **Back to client**; cards `Search Trusted Corpus` and `Ask HR Intel`; `Compliance obligation signals` (badge `{n} active`); with `?client=` only, `Client HR Intel brief`; `Strategy Brief Preview`.
+
+### Playground on /playground
+- h1 **Playground**, description `Test agent behavior. Each chat is a session — multi-turn works, history persists.`
+- Totals strip: `{n} turn(s) · ${cost} spent · {n} tool(s) fired · ⏱ {s}s avg` and `session {id8}`.
+- Three panes: left sessions rail (**New chat**, buckets `Today`, `Yesterday`, `Earlier`, footer `{n} session(s)`); center chat thread and message box; right `Trace` inspector.
+
+### Memory Health on /memory
+- h1 **Memory Health**, description `Curate the agent's institutional memory: proposals, contradictions, top-applied, and per-client coverage.`
+- Stat cards `Tenant memories`, `Client memories`, `Applied (30d)`, `Embedding coverage`.
+- Tabs: **Proposals** (count badge), **Contradictions** (count badge), **Top applied**, **By client**, **Distribution**.
+
+### Granola Inbox on /granola
+- Compact sticky header (no **?** button, no breadcrumbs for Operators): h1 **Granola Inbox**, description `Attach user-owned Granola meeting notes to client review queues.`
+- Metric tiles `Notes`, `Available`, `Attached`, `Ignored`; card `Connection` (status badge, key label, provider email, `last sync {date}`, button **Sync**); connect form (only when not connected); card `Inbox` with one row per note.
+
+### Usage on /usage
+- h1 **Usage**, description `API usage and cost tracking`.
+- Stat bar `{Period} Tokens`, `{Period} API Calls`, `Clients`, `Documents`; period buttons **Today**, **Week** (default), **Month**.
+- Sections `Token Usage by Model` and `Tool Usage`.
+
+## Recipes
+
+### Open Intelligence and follow a quick action
+**Risk:** `READ` · **Roles:** Principal (Admin sees fewer links)
+**Inputs from Clarwiz:** the destination.
+**Preconditions:** Principal account.
+
+1. Open `/intelligence` (or sidebar **Intelligence**).
+   - Wait for: h1 **Intelligence** (static page; no loading).
+2. Click the link you need:
+
+| Link text | Where on the page | Opens |
+|---|---|---|
+| **Open HR Intel**, **Start in HR Intel**, lane `Ariya surface` **Open lane**, quick **Ask HR Intel** | Health, Lane, Quick Actions | `/hr-intel` |
+| lane `Proxy Ask service`, needs-review **Google Workspace**, quick **Integration health** | Lane, Needs Review, Quick Actions | `/settings/integrations` |
+| lane `Approved facts to documents` | Lane | `/generate?source=hr-intel` |
+| lane `Evaluation and staging gate`, needs-review **Trusted source freshness** | Lane, Needs Review | `/admin/trusted-sources` |
+| needs-review **Memory proposals**, quick **Review memory** | Principal only | `/memory` |
+| quick **Skills** | Principal only | `/admin/skills` |
+| quick **Playground** | Principal only | `/playground` |
+| quick **Usage signals** | Quick Actions | `/usage` |
+
+**Done when:** the destination h1 is visible.
+
+### Search the trusted corpus
+**Risk:** `READ` · **Roles:** Principal
+**Inputs from Clarwiz:** search terms; jurisdiction (two-letter state, default `CA`).
+**Preconditions:** none.
+
+1. Open `/hr-intel`.
+   - Wait for: `HR Intel Status` populated and the **Refresh** icon not spinning.
+2. Click **Query** (input, id "hr-intel-search"; visual: `Search Trusted Corpus` card). Clear it and type the terms (default text is `wage hour overtime notices`).
+3. Click **Jurisdiction** (input, id "hr-intel-jurisdiction"), clear it and type the code. It auto-uppercases. The same value is used by Ask and the client brief.
+4. Click **Search** (submit; disabled while Query is empty).
+   - Wait for: `Searching...` to return to **Search**.
+
+**Done when:** result rows appear (title, source, snippet, badges), up to 6.
+
+| If you see | Why | Do this |
+|---|---|---|
+| `No trusted-source matches for this query. Try fewer terms or inspect the trusted source catalog.` | No match | Use fewer terms. |
+| `Run a search to inspect local trusted-source matches.` | No search run yet | Click **Search**. |
+| `Search failed: {error}` | Server error | Retry once; report. |
+
+### Ask HR Intel a question
+**Risk:** `AI` (answers from Ariya's local catalog or Ariya's HR Intel service) · **Roles:** Principal
+**Inputs from Clarwiz:** the question; jurisdiction.
+**Preconditions:** set **Jurisdiction** first (see previous recipe).
+
+1. Open `/hr-intel` and wait for `HR Intel Status`.
+2. Click **Question** (textarea, id "hr-intel-question"; visual: `Ask HR Intel` card). Clear the default text and type the question.
+3. Click the ask button. Its label is **Ask local catalog** or **Ask HR Intel**, depending on the environment.
+   - Alternative: click a quick prompt under `Try a source-backed question` (**California workplace posting obligations**, **Client research briefing**, **Wage-hour source check**). It fills Question and asks at once.
+   - Wait for: `Asking...` to return to the normal label.
+
+**Done when:** answer text appears with tiles `Source`, `Boundary`, `Confidence` and citation chips (`{source name}` with ↗ opens the source in a new tab).
+
+| If you see | Why | Do this |
+|---|---|---|
+| `Ask unavailable: HR Intel answering is not configured. Use source search and the strategy brief for local catalog review.` | Ask disabled in this environment | Use [Search the trusted corpus](#search-the-trusted-corpus). |
+| `Local catalog answer: cites seeded sources and obligations only. Keep the advisory boundary visible before client use.` | Local mode notice, not an error | Report the answer with this caveat. |
+| `Ask unavailable: {error}` | Server error | Retry once; report. |
+| Ask button disabled | Question empty or Ask disabled | Fill Question; read the notice. |
+
+### Generate a client HR Intel brief
+**Risk:** `WRITE` `AI` (saves the brief and creates action records) · **Roles:** Principal
+**Inputs from Clarwiz:** client slug; jurisdiction.
+**Preconditions:** client exists.
+
+1. Open `/hr-intel?client={clientSlug}`.
+   - Wait for: strip `HR Intel client context` with `Source review and obligation actions will preserve client context for {slug}.`
+2. Set **Jurisdiction** if needed.
+3. Click **Generate brief** (button; visual: in the client context strip).
+   - Wait for: `Generating...` on the button and `Generating source-backed client brief...` in the `Client HR Intel brief` card. This is an AI step; allow up to a few minutes.
+
+**Done when:** the `Client HR Intel brief` card shows tiles `Record`, `Status`, `Review required`, `Applied`, `Policy`, lists `Likely applicable obligations` and `Review recommendations`, and handoff links.
+
+| If you see | Why | Do this |
+|---|---|---|
+| `Client brief unavailable: {error}` | Server error | Retry once; report. |
+| `Generate a client brief to see likely obligations, risk areas, citations, and safe handoffs.` | No brief yet | Click **Generate brief**. |
+
+Other buttons in the card: **Refresh brief** re-reads without saving; **Back to client** opens `/clients/{slug}`.
+
+### Approve or apply an HR Intel action
+**Risk:** `WRITE` (no confirm dialog) · **Roles:** Principal
+**Inputs from Clarwiz:** which action row.
+**Preconditions:** a brief exists for `/hr-intel?client={clientSlug}`.
+
+1. Scroll to `Pending action review` in the `Client HR Intel brief` card. Click **Refresh actions** to reload.
+2. On the pending row, click **Approve**.
+   - Wait for: `Approving...` to finish; the row moves to approved. The note `Approved from HR Intel client brief review.` is recorded.
+3. When the work is done, on the approved row click **Mark applied**.
+   - Wait for: `Applying...` to finish.
+4. **Open handoff** on a row opens the downstream page.
+
+**Done when:** the row shows the new state. There is no toast.
+
+| If you see | Why | Do this |
+|---|---|---|
+| `No pending or approved HR Intel actions for this client.` | Nothing to review | Generate a brief first. |
+| `Action queue unavailable: {error}` | Server error | Report. |
+
+### Run a prompt in the Playground
+**Risk:** `AI` (a real agent turn that may call tools and write data) · **Roles:** Principal only
+**Inputs from Clarwiz:** the prompt.
+**Preconditions:** Principal account. Use a new chat unless Clarwiz names an existing one.
+
+1. Open `/playground`.
+   - Wait for: h1 **Playground**, **New chat** in the left rail, `Trace` on the right. The page reopens your last chat.
+2. Click **New chat** (button; visual: top of the left rail) to start clean.
+3. Click the message box (textarea, placeholder `Type a message — e.g. "what is overdue?" or "compliance for delta king"`; visual: bottom of the center pane). Example chips above it fill the box without sending.
+4. Type the prompt. Press Enter (Shift+Enter = new line) or click **Send** (icon button, aria-label "Send", title "Send (Enter)"; visual: right end of the message box).
+   - Wait for: a `Thinking…` bubble and the box disabled (send button title "Running…"). The reply arrives all at once, not streamed.
+
+**Done when:** an assistant bubble appears and `Trace` shows `Skills matched ({n})`, `Tool calls ({n})`, `Model`, `Cost`, `Duration`, `Tokens`. The first turn names the session in the left rail.
+
+| If you see | Why | Do this |
+|---|---|---|
+| Red box with an error and your message removed | Run failed | Retry once; report the text. |
+| Assistant bubble `Error: {error}` | Agent error in the turn | Report. |
+
+<Warning>Playground runs the real agent. If the prompt asks it to send, delete or change something, it may do so. Do not ask it to send email or change external systems without approval.</Warning>
+
+### Inspect a Playground turn
+**Risk:** `READ` · **Roles:** Principal
+**Inputs from Clarwiz:** none.
+**Preconditions:** a chat with at least one reply.
+
+1. To open an older chat, click its row in the left rail (title or `Untitled chat`, with relative time).
+2. Click an assistant bubble (title "Click to view this turn's trace").
+
+**Done when:** `Trace` shows that turn. Empty texts: `Click an assistant bubble to inspect its trace.`, `No skill matched (zero-match path).`, `No tools called.` Empty rail: `No chats yet. Start one below.`
+
+### Approve a memory proposal
+**Risk:** `WRITE` · **Roles:** Principal only
+**Inputs from Clarwiz:** which proposal (content or client).
+**Preconditions:** Principal account.
+
+1. Open `/memory`.
+   - Wait for: h1 **Memory Health** and the four stat cards (`Loading…` disappears).
+2. Click the **Proposals** tab (role "tab"). The page remembers your last tab; `?tab=` in the URL is ignored here.
+3. Find the row in the `Curation queue` table (columns Scope, Category, Content, Source, Created, Actions). Content is cut to 3 lines; hover for the full text.
+4. Click **Approve** on that row.
+
+**Done when:** toast `Approved` and the list reloads without the row.
+
+| If you see | Why | Do this |
+|---|---|---|
+| `No proposals pending. The extractor will surface new ones as conversations and doc edits happen.` | Queue empty | Nothing to do. |
+| Red toast with server text | Save failed | Report. |
+| Toast `Failed to load memory health: {error}` and nothing under the header | Load failed | Reload once; report. |
+
+### Archive a memory proposal
+**Risk:** `DESTRUCTIVE` (soft; no confirm) · **Roles:** Principal only
+**Inputs from Clarwiz:** which proposal; approval.
+**Preconditions:** as above.
+
+1. Open `/memory`, tab **Proposals**, find the row.
+
+<Warning>**Approval required (DESTRUCTIVE).** Stop here and get approval before clicking **Archive**. It archives at once with no confirm dialog.</Warning>
+
+2. Click **Archive** on that row.
+
+**Done when:** toast `Archived` and the row leaves the queue.
+
+### Review memory health
+**Risk:** `READ` · **Roles:** Principal only
+**Inputs from Clarwiz:** none.
+**Preconditions:** none.
+
+1. Open `/memory` and click a tab:
+   - **Contradictions**: `Active memories with corrections logged` (empty `No contradictions.`).
+   - **Top applied**: `Top-applied — candidates for platform promotion` (empty `No memories applied yet.`).
+   - **By client**: `Memory richness per client`; client names link to `/clients/{slug}`.
+   - **Distribution**: `Distribution by scope × status × source × category`; an amber card `Off-canonical categories coerced` appears when relevant.
+
+**Done when:** the tab table is visible.
+
+### Connect Granola
+**Risk:** `EXTERNAL` (connects a third-party account with an API key) · **Roles:** Principal, Operator (each person connects their own)
+**Inputs from Clarwiz:** none. The API key is a credential and must not be typed by the agent.
+**Preconditions:** `Connection` card status is not `connected`.
+
+1. Open `/granola`.
+   - Wait for: h1 **Granola Inbox**, metric tiles, and the `Connection` card (`Loading Granola inbox...` disappears).
+2. Read the status badge: `connected`, `not_connected`, `not_configured`, `revoked` or `error`.
+
+<Warning>**Approval required (EXTERNAL) and human hand-off.** Stop here. Connecting needs the person's Granola **API key** (password input, placeholder "grn_..."). A human must type it, optionally fill **Granola email** (placeholder "name@example.com"), set **Personal notes** and **Public notes**, and click **Connect**.</Warning>
+
+3. Wait for the human to finish.
+
+**Done when:** toast `Granola connected`, the form is replaced by boundary text with a check icon, and the badge reads `connected`. Failure shows a red alert with the server message (fallback `Unable to connect Granola.`). During proxy login it fails with `Not available during proxy login: changing this person's Granola connection.`
+
+### Sync Granola notes
+**Risk:** `EXTERNAL` `WRITE` (reads the Granola account, saves notes in Ariya) · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** approval.
+**Preconditions:** status `connected` (otherwise **Sync** is disabled).
+
+1. Open `/granola` and wait for the `Connection` card.
+
+<Warning>**Approval required (EXTERNAL).** Stop here and get approval before clicking **Sync**. It pulls notes from the person's Granola account.</Warning>
+
+2. Click **Sync** (button; visual: right side of the `Connection` card).
+   - Wait for: the spinner to stop.
+
+**Done when:** toast `Granola sync complete: {n} notes` and the `Inbox` card lists the notes.
+
+| If you see | Why | Do this |
+|---|---|---|
+| Red alert `Unable to sync Granola.` or server text | Sync failed | Report. |
+| `No Granola notes synced.` | No notes yet | Report as empty. |
+
+### Attach a Granola note to a client
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** the note (title or date) and the client.
+**Preconditions:** notes listed in `Inbox`.
+
+1. Open `/granola`. Find the note row (title or `Untitled Granola note`; date or `No date`). The **Granola** ↗ link opens the note in Granola in a new tab.
+2. On that row, click **Select client** (dropdown, not searchable; visual: right part of the row) and click the client option.
+3. Click **Attach** on the same row (disabled until a client is chosen, or if already `attached`).
+
+**Done when:** toast `Granola note attached to client review queue` and the row badge reads `attached`. Failure: red alert `Unable to attach Granola note.` or server text.
+
+### Review an attached note on the client
+**Risk:** `READ` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** client slug.
+**Preconditions:** note attached.
+
+1. On the `/granola` row, the **Review** button appears only while a client is selected on that row. Clicking it opens `/clients/{slug}?tab=granola`, which is not a valid client tab.
+2. Instead open `/clients/{clientSlug}` and click the client's **Meetings** tab.
+
+**Done when:** the meeting appears on the client's **Meetings** tab.
+
+### Read API usage
+**Risk:** `READ` · **Roles:** Principal
+**Inputs from Clarwiz:** period (today, week, month).
+**Preconditions:** your tenant is `ariya` (see the gotcha below).
+
+1. Open `/usage`.
+   - Wait for: h1 **Usage** and the stat bar. There is no loading indicator; give it a few seconds.
+2. Click **Today**, **Week** or **Month**.
+3. Read `Token Usage by Model` (`{in} input + {out} output tokens`; table Model, Calls, Input Tokens, Output Tokens, Cache Tokens, Total row) and `Tool Usage` (`{n} total calls`; table Tool, Calls, Avg Duration, Error Rate). An `LLM` badge marks `create_document` and `edit_document`. Error rates above 10% are red.
+
+**Done when:** both tables or their empty texts (`No API usage in this period.`, `No tool usage in this period.`) are visible.
+
+## Controls reference
+
+### HR Intel controls
+
+| Visible text | Type | Locator | What it does | Risk |
+|---|---|---|---|---|
+| **Refresh** | button | page header | Reloads health, sources, brief, obligations | READ |
+| **Query** | input | id "hr-intel-search" | Search terms | — |
+| **Jurisdiction** | input | id "hr-intel-jurisdiction" | State code for search, ask, brief | — |
+| **Search** (`Searching...`) | submit | `Search Trusted Corpus` card | Searches | READ |
+| **Question** | textarea | id "hr-intel-question" | Question text | — |
+| **Ask local catalog** / **Ask HR Intel** (`Asking...`) | submit | `Ask HR Intel` card | Asks | AI |
+| Quick prompts | buttons | under `Try a source-backed question` | Fill and ask | AI |
+| **Open source** | link, new tab | result rows | Opens citation | READ |
+| **Review compliance**, **Review tracked obligations** | links | obligations | Open `/compliance?source=hr-intel…` | READ |
+| **Draft guidance** | link | obligations | Opens `/generate?template=ca-hr-compliance&source=hr-intel…` | READ |
+| **Manage trusted sources** | link | sources card | Opens `/admin/trusted-sources` | READ |
+| **Generate brief** (`Generating...`) | button | client strip | Saves a brief | WRITE AI |
+| **Back to client** | link | client strip | Opens `/clients/{slug}` | READ |
+| **Refresh brief**, **Refresh actions** | buttons | brief card | Re-read | READ |
+| **Approve** (`Approving...`), **Mark applied** (`Applying...`) | buttons | action rows | Review transitions | WRITE |
+| **Open handoff** | link | action rows | Downstream page | READ |
+
+### Playground controls
+
+| Visible text | Type | Locator | What it does | Risk |
+|---|---|---|---|---|
+| **New chat** | button | left rail top | Starts a new session | READ |
+| `{title}` or `Untitled chat` | button | left rail rows | Loads a chat | READ |
+| Example chips | buttons | above message box | Fill message box | READ |
+| Message box | textarea | placeholder starts `Type a message` | Prompt | — |
+| (send icon) | icon button | aria-label "Send", title "Send (Enter)" | Runs agent turn | AI |
+| Assistant bubble | clickable | title "Click to view this turn's trace" | Shows trace | READ |
+
+### Memory and Granola controls
+
+| Visible text | Type | Locator | What it does | Risk |
+|---|---|---|---|---|
+| **Proposals**, **Contradictions**, **Top applied**, **By client**, **Distribution** | tabs | `/memory` under stat cards | Switch table | READ |
+| **Approve** | button | proposal row | Activates memory | WRITE |
+| **Archive** | button | proposal row | Archives, no confirm | DESTRUCTIVE |
+| **Sync** | button | Granola `Connection` card | Pulls notes | EXTERNAL WRITE |
+| **API key**, **Granola email**, **Personal notes**, **Public notes**, **Connect** | inputs, checkboxes, button | Granola connect form | Human only | EXTERNAL |
+| **Select client** | dropdown | each note row | Pick client | — |
+| **Attach** | button | each note row | Attach to client | WRITE |
+| **Review** | button link | note row with intake and client chosen | Opens client page | READ |
+| **Granola** ↗ | link, new tab | note row | Opens Granola | READ |
+| **Today**, **Week**, **Month** | buttons | `/usage` | Change period | READ |
+
+## Waits and signals
+- `/intelligence` is static: ready as soon as the h1 shows.
+- HR Intel never uses toasts. Results, answers and errors appear inline in their cards. Card loading text: `Loading obligation signals...`.
+- Playground replies are not streamed. `Thinking…` can last a minute or more.
+- Memory and Granola report saves through toasts (`Approved`, `Archived`, `Granola connected`, `Granola sync complete: {n} notes`, `Granola note attached to client review queue`).
+- Usage has no loading indicator and no error message.
+
+## Gotchas
+- `/intelligence` and `/hr-intel` show the Operations tab bar. To reach Playground, Memory or Usage from there, use **Quick Actions** or open the URL.
+- Every status on `/intelligence` is hard-coded text; do not report it as live health.
+- HR Intel **Jurisdiction** is shared by search, ask and the client brief. Set it before each.
+- HR Intel **Approve** and **Mark applied** have no confirm.
+- Playground reopens the last chat (stored in this browser); click **New chat** for a clean run. `Run {Skill}` entries in the command palette open `/playground` but do not prefill anything.
+- Memory: tenant-scope proposals are always saved against tenant `ariya`, even when you are viewing another tenant with `?tenant_id=`.
+- Granola: the client choice on a row is lost on reload, so **Review** disappears until you pick the client again. **Review** points to `?tab=granola`, which is not a real tab; use the client's **Meetings** tab.
+- Granola has a compact header with no **?** button; press `?` (outside a field) for help.
+- In-app help for Granola says the list is called "Notes"; the card is titled `Inbox`. It says failures read "Unable to connect Granola."; the app shows the server message and uses that text only as a fallback.
+- Usage reads tenant `ariya` only. In any other tenant it silently shows zeros and the empty texts.
+
+## Related
+- [Data and sources](/intelligence/data-and-sources)
+- [Roles and access](/start/roles-and-access)
+- [Global UI patterns](/start/global-ui)
+
+## Source files
+- `packages/web/src/app/(dashboard)/intelligence/page.tsx`
+- `packages/web/src/app/(dashboard)/hr-intel/page.tsx`
+- `packages/web/src/app/(dashboard)/playground/page.tsx`
+- `packages/web/src/app/(dashboard)/memory/page.tsx`
+- `packages/web/src/app/(dashboard)/granola/page.tsx`
+- `packages/web/src/app/(dashboard)/granola/granola-inbox.tsx`
+- `packages/web/src/app/(dashboard)/usage/page.tsx`

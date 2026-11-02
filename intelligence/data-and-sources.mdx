@@ -1,0 +1,282 @@
+---
+title: "Data Health, CRM Hygiene, Compare Versions and Trusted Sources"
+sidebarTitle: "Data and sources"
+description: "Check HubSpot sync health, run a HubSpot sync, review unlinked CRM contacts, compare two document versions and maintain HR Intel trusted sources."
+keywords: ["data health", "hubspot sync", "sync hubspot", "crm hygiene", "unlinked contacts", "export contacts csv", "compare versions", "document diff", "what changed", "trusted sources", "source catalog", "mark source reviewed", "archive source"]
+---
+
+<Info>
+**URL:** `/data-health`, `/crm-hygiene` (`?tab=all`, `needs-review`, `no-suggestion`, `skipped`; `?emailDomain={domain}`), `/compare?doc={documentId}&from={v}&to={v}`, `/admin/trusted-sources` · **Reach:** mostly by URL; see each recipe · **Roles:** Principal ✓ Operator ✗ (Operator: `/compare` only) · **Ready when:** the page h1 (`Data Health`, `CRM Hygiene`, `Compare Versions`, `Trusted Sources`) is visible and its loading text is gone.
+</Info>
+
+Data and source-quality pages. None of them is in the sidebar except Trusted Sources (Intelligence tab bar, Principal).
+
+<Note>**Operator:** `/data-health` and `/crm-hygiene` render but their data calls are Principal-only, so they show `Failed to load Data Health: Your profile cannot view Platform Admin, integrations, tenant switching. Allowed: Principal.` (derived from code). `/admin/trusted-sources` shows the toast `Failed to load trusted sources: Principal access required` and zeros. Only `/compare` works for an Operator.</Note>
+
+## Page map
+
+### Data Health on /data-health
+- h1 **Data Health**, description `HubSpot sync state, import policy, and CRM hygiene — explained in plain language.` Header buttons **Sync HubSpot** and **Refresh**. No tab bar.
+- Summary: `Generated {date}` and `{n} clients · {n} contacts · {n} unlinked`.
+- Narrative banners (labels such as `No changes`, `All up to date`, `Lifecycle policy applied`, `Sync failed`).
+- `Scheduled sync daemon` (badge `Enabled` or `Disabled`; `Interval`, `Last cycle` or `No runs yet`, `Runs (24h)`, `Runs (7d)`).
+- `HubSpot CRM` card (`Read-only setup gate for company and contact sync dry-runs.`; rows such as `Tenant target`, `Live sync flag`, `External writes`; `Blockers`; read-only sub-sections).
+- `Import policy` (`Allowed lifecycle stages`, `Excluded lifecycle stages`).
+- `CRM hygiene` (link **Open unlinked queue →**; stat links `Clients`, `Contacts`, `Linked`, `Unlinked`, `With suggestions`).
+
+### CRM Hygiene on /crm-hygiene
+- h1 **CRM Hygiene**, description `Turn unlinked contacts and skipped HubSpot records into reviewable, actionable work.`
+- Tabs: **All unlinked** `{n}`, **With suggestions** `{n}`, **No suggestion** `{n}`, **Skipped by policy** `{n}`.
+- Scope strip (not on Skipped): label `Scope`, **Domain** input, **Imported** dropdown, **Clear scope**, badge `No scope filters` when empty.
+- Queue card: title such as `Unlinked contacts ({n})`; **Export CSV**; search and **Lifecycle** filter; table Contact, Email, Stage, Domain, Suggested client; **Load more**.
+- Side card on the All tab: `Top unlinked email domains`.
+- Footer links: `Open the basic unlinked queue on /contacts`, `Open Data Health`.
+
+### Compare Versions on /compare
+- h1 **Compare Versions**, description `Field-by-field diff between two versions of a document.`
+- Selects **Document**, **From version**, **To version**; checkbox **Show unchanged rows**; button **Open document**.
+- Summary line, then a table `Field`, `v{from}`, `v{to}`, `Status`.
+
+### Trusted Sources on /admin/trusted-sources
+- h1 **Trusted Sources**, description `Maintain HR Intel grounding sources, freshness, and review history.` Header **Reload**. Intelligence tab bar; sidebar highlights **Intelligence**.
+- Metric tiles `Visible`, `Fresh`, `Due soon`, `Stale`, `Review`.
+- Card `Trusted Source Catalog` with `{visible} source shown from {total} catalog records.`, **Refresh**, filters, table with per-row **Open source**, **Edit**, **Review**, **Archive**.
+- `Edit source` card at the bottom of the page while editing, with `Review history`.
+
+## Recipes
+
+### Check Data Health
+**Risk:** `READ` · **Roles:** Principal
+**Inputs from Clarwiz:** none.
+**Preconditions:** Principal account.
+
+1. Open `/data-health` (no menu entry; also reachable from `/getting-started` step 1 and **Open Data Health** on `/crm-hygiene`).
+   - Wait for: `Loading Data Health...` to be replaced by `Generated {date}`.
+2. Read the summary line, the banners, `Scheduled sync daemon` and the `HubSpot CRM` `Blockers` list.
+3. To re-read, click **Refresh** (button; visual: page header, right).
+
+**Done when:** `Generated {date}` and the cards are visible.
+
+| If you see | Why | Do this |
+|---|---|---|
+| `Failed to load Data Health: {error}` | Load failed or your profile is not Principal | Use the Principal account; otherwise report. |
+
+### Run a HubSpot sync
+**Risk:** `EXTERNAL` `WRITE` (reads HubSpot, changes Ariya client and contact rows) · **Roles:** Principal
+**Inputs from Clarwiz:** approval.
+**Preconditions:** `/data-health` loaded.
+
+1. Open `/data-health` and wait for `Generated {date}`.
+2. Read `External writes` in the `HubSpot CRM` card and report it with the approval request.
+
+<Warning>**Approval required (EXTERNAL).** Stop here and get approval before clicking **Sync HubSpot**. It starts at once with no confirm dialog and can change many client and contact rows.</Warning>
+
+3. Click **Sync HubSpot** (button; visual: page header, left of **Refresh**).
+   - Wait for: the icon to stop spinning. It can take several minutes.
+
+**Done when:** toast `HubSpot sync completed: {n} company rows and {m} contact rows changed.` (or warning `HubSpot sync finished with issues: {n} blocker(s).`) and a result card with `Status`, `Companies changed`, `Contacts changed`, `HubSpot writes` (`Enabled` or `Off`).
+
+| If you see | Why | Do this |
+|---|---|---|
+| Toast and card `HubSpot sync failed: {error}` | Sync failed | Report the text. Do not retry without approval. |
+| `HubSpot sync finished with issues: {n} blocker(s).` | Partial | Report the blockers listed in the card. |
+
+### Review unlinked CRM contacts
+**Risk:** `READ` · **Roles:** Principal
+**Inputs from Clarwiz:** optional tab, domain, lifecycle stage, search text.
+**Preconditions:** Principal account.
+
+1. Open `/crm-hygiene?tab={tab}` where tab is `all`, `needs-review` (**With suggestions**), `no-suggestion` or `skipped`.
+   - Wait for: tab labels with counts and the queue table or its empty text.
+2. Optional scope: click **Domain** (input, placeholder "e.g. acme.com") and type a domain (clear with the X button, aria-label "Clear domain filter"); pick **Imported** (native select: `All time`, `Last 24h`, `Last 7 days`, `Last 30 days`). **Clear scope** resets both.
+3. Optional filter: type in the search box (placeholder "Search unlinked contacts..."; waits 250 ms after typing) and pick **Lifecycle** (`All stages`, `Subscriber`, `Lead`, `MQL`, `SQL`, `Opportunity`, `Customer`).
+4. Read rows. **Suggested client** shows a badge linking to `/clients/{slug}` or `No exact domain match`.
+5. Click **Load more** until it disappears if you need every row.
+
+**Done when:** the table shows the rows you need, or `No unlinked contacts match the current filters.`
+
+<Note>Unverified at runtime: the contacts API this queue calls does not appear to be mounted on the server, so the queue and the domain card may show `Failed to load CRM hygiene data: Not Found` or `Domain breakdown unavailable: Not Found`. Report it rather than retrying.</Note>
+
+| If you see | Why | Do this |
+|---|---|---|
+| `Failed to load CRM hygiene data: {error}` | Queue failed | Report. |
+| `Domain breakdown unavailable: {error}` | Domain card failed | Report. |
+| `Policy state unavailable: {error}` | Data Health part failed (often non-Principal) | Use the Principal account. |
+
+This page is read-only. Linking contacts to clients happens in HubSpot, not here.
+
+### Drill into one email domain
+**Risk:** `READ` · **Roles:** Principal
+**Inputs from Clarwiz:** the domain.
+**Preconditions:** none.
+
+1. Open `/crm-hygiene?tab=needs-review&emailDomain={domain}` directly. Or on the **All unlinked** tab, in `Top unlinked email domains`, click the arrow link at the end of the domain row (badges `matches client`, `personal`, `no client match`).
+
+**Done when:** the **With suggestions** tab is active with the **Domain** scope set.
+
+### Export unlinked contacts as CSV
+**Risk:** `READ` (downloads a file) · **Roles:** Principal
+**Inputs from Clarwiz:** tab and filters.
+**Preconditions:** queue loaded.
+
+1. Set the tab and filters as in [Review unlinked CRM contacts](#review-unlinked-crm-contacts).
+2. Click **Export CSV** (button; visual: queue card header).
+   - Wait for: `Exporting...` to return to **Export CSV**.
+
+**Done when:** a file named `hubspot-unlinked-contacts{suffix}.csv` downloads.
+
+### See contacts skipped by lifecycle policy
+**Risk:** `READ` · **Roles:** Principal
+**Inputs from Clarwiz:** none.
+**Preconditions:** none.
+
+1. Open `/crm-hygiene?tab=skipped`.
+   - Wait for: card `Skipped by lifecycle policy` (fallbacks `Loading lifecycle policy...`, `Lifecycle policy unavailable.`).
+2. Use **Open Data Health for sync details** or **HubSpot integration health** (opens `/admin/integrations`) for more.
+
+**Done when:** the policy card is visible.
+
+### Compare two versions of a document
+**Risk:** `READ` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** document ID (or title) and the two version numbers.
+**Preconditions:** the document has at least two versions.
+
+1. Open `/compare?doc={documentId}&from={v}&to={v}`. Without `from` and `to` the page compares oldest to latest. Alternative: on the document's History sheet click **Compare any two versions →** (shown only with 2 or more versions).
+   - Wait for: `Loading...` to clear and the summary `v{from} · {time} → v{to} · {time}` with added, removed, changed and unchanged counts.
+2. To change the document, click **Document** (dropdown, placeholder `Select a document...`; options sorted by title) and pick one.
+3. To change versions, click **From version** or **To version** and pick `v{n} — {edit description}`. The URL updates as you change selects.
+4. Tick **Show unchanged rows** to include unchanged fields.
+5. Read the table: `Status` is `added`, `removed`, `changed` or `unchanged`; empty values show `(empty)`; values longer than 240 characters are cut (hover for the full text).
+6. **Open document** opens `/documents/{id}`.
+
+**Done when:** the table or `No changes between these two versions.` is visible.
+
+| If you see | Why | Do this |
+|---|---|---|
+| `Pick a document to compare versions.` | No `doc` in URL | Pick a document. |
+| `This document has only {n} version(s) — nothing to compare yet.` | Single version | Report. |
+| `Failed to load documents` / `Failed to load versions` | Load failed | Reload once; report. |
+
+### Find a trusted source
+**Risk:** `READ` · **Roles:** Principal (internal tenant)
+**Inputs from Clarwiz:** filters (status, freshness, trust, scope, country, topic).
+**Preconditions:** Principal in tenant `ariya` or `pilot`.
+
+1. Open `/admin/trusted-sources` (or Intelligence tab **Trusted Sources**, or **Manage trusted sources** on `/hr-intel`).
+   - Wait for: `Loading trusted sources...` to be replaced by `{visible} source shown from {total} catalog records.`
+2. Set filters in the catalog card. Each change reloads at once:
+   - **Status**: `All`, `Active`, `Needs review`, `Marked stale`, `Archived`.
+   - **Freshness**: `All`, `Fresh`, `Due soon`, `Stale`, `Needs review`, `Archived`.
+   - **Trust**: `All`, `Primary authority`, `Secondary authority`, `Legal analysis`, `Professional`, `Vendor`, `News`, `Internal`, `Web`.
+   - **Scope**: `All`, `Federal`, `State`, `Local`, `Professional`, `Vendor`, `Internal`.
+   - **Country** (placeholder "US") and **Topic** (placeholder "wage-hour") reload on every keystroke; type the whole value, then wait 2 seconds.
+3. **Open source** ↗ on a row opens the source in a new tab.
+
+**Done when:** the table shows the matching rows, or `No trusted sources match the current filters.`
+
+### Edit a trusted source
+**Risk:** `WRITE` · **Roles:** Principal (internal tenant)
+**Inputs from Clarwiz:** the source and the field values.
+**Preconditions:** source found.
+
+1. Click **Edit** on the row.
+   - Wait for: the `Edit source` card at the **bottom of the page**. Scroll down.
+2. Change fields: **Name**, **Publisher**, **URL**, **Trust**, **Scope**, **Status** (`Active`, `Needs review`, `Stale`, `Archived`), **Country**, **Region**, **Locality**, **Owner**, **Refresh cadence days**, **Topics** (comma-separated).
+3. Click **Save source** (disabled until Name, Publisher, Trust, Scope, Country, Owner, a cadence above 0 and at least one topic are set). **Cancel** discards.
+   - Wait for: `Saving...` to finish.
+
+**Done when:** toast `Trusted source updated`. The card's `Review history` lists events as `{eventType} by {actor} on {date}` or `No review events recorded yet.`
+
+### Mark a trusted source reviewed
+**Risk:** `WRITE` · **Roles:** Principal (internal tenant)
+**Inputs from Clarwiz:** the source; optional review note.
+**Preconditions:** source found.
+
+1. Click **Review** on the row.
+   - Wait for: a **native browser prompt** `Review note for {name}` with default text `Reviewed source page and metadata.`
+2. Keep or replace the note, then accept the prompt (OK). Dismissing it cancels.
+
+**Done when:** toast `Source marked reviewed`.
+
+### Archive a trusted source
+**Risk:** `DESTRUCTIVE` (soft) · **Roles:** Principal (internal tenant)
+**Inputs from Clarwiz:** the source; approval.
+**Preconditions:** the source is not already archived.
+
+<Warning>**Approval required (DESTRUCTIVE).** Stop here and get approval before clicking **Archive**. An archived source stops grounding HR Intel answers.</Warning>
+
+1. Click **Archive** on the row.
+   - Wait for: a **native browser confirm** `Archive {name}?`
+2. Accept (OK).
+
+**Done when:** toast `Source archived` and the row disappears from non-archived filters.
+
+## Controls reference
+
+### Data Health and CRM Hygiene controls
+
+| Visible text | Type | Locator | What it does | Risk |
+|---|---|---|---|---|
+| **Sync HubSpot** | button | `/data-health` header | Runs HubSpot sync, no confirm | EXTERNAL WRITE |
+| **Refresh** | button | `/data-health` header | Reloads | READ |
+| **Open unlinked queue →** | link | `CRM hygiene` card | Opens unlinked contacts | READ |
+| Tabs with counts | tabs | `/crm-hygiene` top | Switch queue | READ |
+| **Domain** | input | placeholder "e.g. acme.com" | Scope by domain | READ |
+| (X) | icon button | aria-label "Clear domain filter" | Clears domain | READ |
+| **Imported** | native select | scope strip | Scope by import date | READ |
+| **Clear scope** | button | scope strip | Clears scope | READ |
+| **Export CSV** (`Exporting...`) | button | queue card | Downloads CSV | READ |
+| Search | input | placeholder "Search unlinked contacts..." | Filters | READ |
+| **Lifecycle** | dropdown | queue card | Filters by stage | READ |
+| **Load more** (`Loading...`) | button | under table | Next page | READ |
+
+### Compare controls
+
+| Visible text | Type | Locator | What it does | Risk |
+|---|---|---|---|---|
+| **Document** | dropdown | placeholder "Select a document..." | Picks document | READ |
+| **From version**, **To version** | dropdowns | beside Document | Pick versions | READ |
+| **Show unchanged rows** | checkbox | above table | Shows unchanged | READ |
+| **Open document** | button | right of **Show unchanged rows**, above the table | Opens `/documents/{id}` | READ |
+
+### Trusted Sources controls
+
+| Visible text | Type | Locator | What it does | Risk |
+|---|---|---|---|---|
+| **Reload**, **Refresh** | buttons | header, catalog card | Reload | READ |
+| **Status**, **Freshness**, **Trust**, **Scope** | dropdowns | catalog card | Filter | READ |
+| **Country**, **Topic** | inputs | placeholders "US", "wage-hour" | Filter per keystroke | READ |
+| **Open source** ↗ | link, new tab | row | Opens source | READ |
+| **Edit** | button | row | Opens `Edit source` card | READ |
+| **Review** | button | row | Native prompt, records review | WRITE |
+| **Archive** | button | row (not archived) | Native confirm, archives | DESTRUCTIVE |
+| **Save source** (`Saving...`), **Cancel** | buttons | `Edit source` card | Save or discard | WRITE |
+
+## Waits and signals
+- Data Health: `Loading Data Health...`; a HubSpot sync spins the button icon and can run for minutes; the result arrives as a toast plus a result card.
+- CRM Hygiene: tab counts appear when loaded; search waits 250 ms after typing; **Load more** shows `Loading...`.
+- Compare: `Loading...` while versions load; selects are disabled until versions arrive.
+- Trusted Sources: `Loading trusted sources...`; every filter change reloads the table.
+
+## Gotchas
+- `/data-health` is the Admin profile's default landing page, but its data is Principal-only.
+- **Sync HubSpot** has no confirm dialog.
+- The `HubSpot CRM` card shows sub-section titles (`Live read preview`, `Dry-run audit record`, `Manual HubSpot sync`, `HubSpot review queue`, `HubSpot import readiness`) but their action buttons are not rendered on this page.
+- CRM Hygiene does no linking; it only shows and exports.
+- Trusted Sources uses native browser prompt and confirm dialogs; your automation must accept or dismiss them.
+- The `Edit source` card appears at the bottom of the page, not beside the row.
+- **Country** and **Topic** filters fire a request per keystroke.
+- These pages have no in-app guide of their own; **?** opens `How Ariya fits together`.
+
+## Related
+- [Intelligence](/intelligence/intelligence)
+- [Platform admin](/admin/platform-admin#check-integration-health)
+- [Roles and access](/start/roles-and-access)
+
+## Source files
+- `packages/web/src/app/(dashboard)/data-health/page.tsx`
+- `packages/web/src/app/(dashboard)/crm-hygiene/page.tsx`
+- `packages/web/src/app/(dashboard)/compare/page.tsx`
+- `packages/web/src/app/(dashboard)/admin/trusted-sources/page.tsx`
+- `packages/transport-api/src/server.ts`
+- `packages/transport-api/src/routes/contacts.ts`

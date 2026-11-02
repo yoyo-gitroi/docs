@@ -94,12 +94,17 @@
         "pages": [
           "sales/today-and-accounts",
           "sales/account-books",
-          "sales/campaigns"
+          "sales/campaigns",
+          "sales/hr-roadmap",
+          "sales/prospects-and-other"
         ]
       },
       {
         "group": "Intelligence",
-        "pages": []
+        "pages": [
+          "intelligence/intelligence",
+          "intelligence/data-and-sources"
+        ]
       },
       {
         "group": "Settings",
