@@ -1,0 +1,246 @@
+---
+title: "Account and platform feedback"
+sidebarTitle: "Account and feedback"
+description: "Manage your own Ariya account (profile, preferences, default landing page, sessions) and triage platform feedback reports, including ticket previews and fix packets."
+keywords: ["account", "my profile", "preferences", "timezone", "default landing page", "change password", "sessions", "revoke session", "sign out everywhere", "security events", "platform feedback", "bug reports", "feedback triage", "create linear issue", "create github issue", "fix packet"]
+---
+
+<Info>
+**URL:** `/account`, `/platform-feedback`, `/platform-feedback/{id}` · **Reach:** `/account`: initials or name at the bottom of the sidebar, or palette **Account**; feedback pages: URL only · **Roles:** Principal ✓ Operator ✓ · **Ready when:** h1 **Account** with the identity card, or h1 **Platform Feedback** with the report list, or the report title as h1.
+</Info>
+
+`/account` is the signed-in person's own settings. The feedback pages list and triage reports captured by the in-app feedback launcher (see [Send platform feedback](/start/global-ui#send-platform-feedback)).
+
+## Page map
+
+### Account on /account
+- h1 **Account**, description `Personal profile, preferences, password, and active sessions.`
+- Identity card: name, role badge (raw value such as `principal` or `operator`), email, tenant name, `Last login: {date}`.
+- Cards top to bottom: `Profile`, `Preferences`, `Password`, `Sessions`, `Sign-in Methods`, `Security Events`.
+- No tab bar.
+
+### Platform Feedback on /platform-feedback
+- h1 **Platform Feedback**, breadcrumb `Command Center › Platform Feedback`, description `Authenticated product feedback captured from Pilot pages before any external ticket handoff.`
+- Header **Refresh**. List columns `Report`, `Status`, `Severity`, `Route`, `Created` (header hidden on narrow screens). Each row is a link.
+
+### Feedback report detail page
+- h1 `{feedback title}`, description `Review captured context, link it to an internal request, then hand off only after operator confirmation.`
+- Header: **Link request** (or **Linked request** link when linked).
+- Cards: `Report` (status, severity and kind badges; status buttons), `Artifacts`, `Ticket handoff`, `Fix packet`, `Context` (`Created`, `Route`, `Page URL`, `Reporter`, `Viewport`, `App version`).
+
+## Recipes
+
+### Update your display name
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** new name.
+**Preconditions:** none.
+
+1. Open `/account`.
+   - Wait for: `Loading account...` to be replaced by the identity card.
+2. In `Profile`, click **Name** (input, id "account-name") and replace the text. **Email** (id "account-email") is disabled.
+3. Click **Save profile** (disabled while Name is empty).
+
+**Done when:** toast `Profile updated`. Failure: `Failed to update profile`.
+
+### Set your preferences and default landing page
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** the values to change.
+**Preconditions:** none. All preferences save together with one button.
+
+1. Open `/account` and scroll to `Preferences`.
+2. Change only what Clarwiz asked for:
+   - **Timezone** (dropdown, id "account-timezone"): `America/Los_Angeles`, `America/Denver`, `America/Chicago`, `America/New_York`, `America/Anchorage`, `Pacific/Honolulu`, `UTC`.
+   - **Default landing page** (dropdown, id "account-landing"): `Command Center`, `Platform Admin` (Principal only), `Clients`, `Action Queue`, `Documents`, `Generate`.
+   - Checkboxes **Email workflow notifications**, **Security emails**, **Product updates**.
+   - **Response detail** (id "account-response-detail"): `Concise`, `Balanced`, `Detailed`.
+   - **Draft mode** (id "account-draft-mode"): `Draft first`, `Ask first`.
+   - **Decision style** (id "account-recommendation-style"): `Recommendation first`, `Options first`.
+   - Checkbox **Keep approval state visible for external or irreversible work**.
+   - **Workflow notes for Ariya** (textarea, id "account-workflow-notes", max 1000 characters).
+   - **Remembered workflow notes** (textarea, id "account-learned-notes", one per line, at most 12 kept).
+3. Click **Save preferences** (submit; visual: bottom of the `Preferences` card).
+
+**Done when:** toast `Preferences saved`. Failure: `Failed to save preferences`.
+
+<Warning>Never put credentials, tokens or personal data into **Workflow notes for Ariya** or **Remembered workflow notes**. These notes are written for Ariya's assistant.</Warning>
+
+<Note>Choosing `Command Center` as landing page means "no explicit choice": sign-in then reopens the last page you used. See [Go to the right page after sign-in](/start/login-and-session#go-to-the-right-page-after-sign-in).</Note>
+
+### Change your password
+**Risk:** `WRITE` (signs out every other session) · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** none. This is a human step.
+**Preconditions:** not in proxy login.
+
+1. Open `/account` and scroll to `Password` (fields **Current password** id "current-password", **New password** id "new-password", **Confirm new password** id "confirm-password"; help `Use at least 12 characters. Other active sessions are signed out after a password change.`).
+
+<Warning>**Hand off to a human.** Stop here. Password entry is a human step. Do not type into these fields.</Warning>
+
+2. After the human clicks **Change password**, read the toast.
+
+**Done when:** toast `Password updated` or `Password updated. {n} other session(s) signed out.` If the agent's own browser was another session, it is now signed out; see [Recover from an expired session](/start/login-and-session#recover-from-an-expired-session).
+
+| If you see | Why | Do this |
+|---|---|---|
+| "New passwords do not match" | Confirmation differs | Human retypes. |
+| "Current password is incorrect" | Wrong current password | Human retries. |
+| "Password is not set for this account" | Google-only account | No password to change. |
+| "Password must be at least 12 characters." | Too short | Human retypes. |
+| `Not available during proxy login: changing this person's password or sessions.` | Proxy login | Exit proxy. |
+| "Failed to change password" | Server error | Report. |
+
+### Review active sessions and sign-in activity
+**Risk:** `READ` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** none.
+**Preconditions:** none.
+
+1. Open `/account` and scroll to `Sessions`.
+2. Read each session: device (`Desktop browser`, `Mobile browser`, `Tablet browser`, `Browser session` or `Unknown device`), badge `Current` on this browser, `Last seen {date} from {ip}`, `Expires {date}`.
+3. Read `Sign-in Methods` (label, identifier or `Last used {date}` / `Not used yet`, status badge such as `active`, `available`, `required`, `not configured`). There are no add or remove buttons.
+4. Read `Security Events` (up to 10: `{Event Type}`, `Failed` badge, date and IP) or `No recent security events.`
+
+**Done when:** you have the information.
+
+### Revoke sessions
+**Risk:** `DESTRUCTIVE` (signs devices out; no confirm) · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** which session, or all others; approval.
+**Preconditions:** not in proxy login.
+
+1. Open `/account` and scroll to `Sessions`.
+
+<Warning>**Approval required (DESTRUCTIVE).** Stop here and get approval before clicking. Both buttons act at once with no confirm dialog.</Warning>
+
+2. One session: click the X icon button on its row (title "Revoke session"; not shown on the `Current` row).
+3. All others: click **Revoke other sessions** (disabled when there are none).
+
+**Done when:** toast `Session revoked` or `{n} other session(s) revoked`, and the rows disappear.
+
+| If you see | Why | Do this |
+|---|---|---|
+| "Use sign out to end your current session" | Tried to revoke the current session | Use **Sign out** instead. |
+| "Failed to revoke session(s)" | Server error | Report. |
+| `Not available during proxy login: changing this person's password or sessions.` | Proxy login | Exit proxy. |
+
+### Sign out from the account page
+**Risk:** `WRITE` (ends the session) · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** none.
+**Preconditions:** the task requires it.
+
+1. Open `/account`, scroll to `Sessions`.
+2. Click **Sign out** (button, next to **Revoke other sessions**).
+
+**Done when:** the URL is `/login`.
+
+### Review platform feedback
+**Risk:** `READ` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** optional report title.
+**Preconditions:** none.
+
+1. Open `/platform-feedback` (no menu entry).
+   - Wait for: `Loading platform feedback...` to clear.
+2. Scan rows: title, one-line description, status badge, severity badge, route, created time (hover for the full timestamp). **Refresh** reloads.
+3. Click a row to open `/platform-feedback/{id}`.
+   - Wait for: `Loading feedback detail...` to be replaced by the report title.
+
+**Done when:** the report page shows the `Report` card. Empty list: `No platform feedback reports yet.` Error: `Unable to load platform feedback` or server text.
+
+### Change a feedback report status
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** new status.
+**Preconditions:** report open.
+
+1. In the `Report` card, click **Mark triaged**, **Mark in progress** or **Mark closed**. The current status button is filled and disabled.
+
+**Done when:** the status badge changes. Failure (red box): `Unable to update feedback status`.
+
+### Link feedback to a request
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** none.
+**Preconditions:** report not yet linked.
+
+1. Click **Link request** (header button).
+
+**Done when:** the header shows **Linked request**, a link to `/requests/{requestId}`. Failure: `Unable to link feedback request`.
+
+### Preview and create an external ticket
+**Risk:** `READ` (preview) / `EXTERNAL` (create) · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** which tracker; approval.
+**Preconditions:** report open.
+
+1. In `Ticket handoff` (`Preview the exact ticket text before any external Linear or GitHub write.`), click **Preview tickets**.
+   - Wait for: `Linear preview` and `GitHub preview` (title, labels, body).
+2. Report the preview text to Clarwiz.
+
+<Warning>**Approval required (EXTERNAL).** Stop here and get approval before clicking **Create Linear issue** or **Create GitHub issue**. There is no confirm dialog and the issue is created in an outside system.</Warning>
+
+3. Click **Create Linear issue** or **Create GitHub issue**. Each is shown only when enabled for the environment and disables once created.
+
+**Done when:** the button becomes disabled (created). Disabled environments show `Linear issue creation is disabled for this environment.` or `GitHub issue creation is disabled for this environment.` Failures: `Unable to preview ticket handoff`, `Unable to create Linear issue`, `Unable to create GitHub issue`.
+
+### Generate a fix packet
+**Risk:** `WRITE` (stores a Markdown packet) · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** none.
+**Preconditions:** report open.
+
+1. In `Fix packet`, click **Generate fix packet**. The packet notes `This does not launch Codex, Claude, or code mutation.`
+2. Click **Copy packet** (clipboard) or **Download packet** (file `platform-feedback-{id}-fix-packet.md`).
+
+**Done when:** the packet text is visible and copied or downloaded. Failure: `Unable to generate fix packet`.
+
+<Note>Unverified: whether **Generate fix packet** calls an AI model. Treat it as possibly slow.</Note>
+
+### Open a feedback screenshot
+**Risk:** `READ` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** none.
+**Preconditions:** report has artifacts.
+
+1. In `Artifacts`, click **Open artifact** (opens a new tab). Each artifact shows `{bytes} bytes` and a storage key.
+
+**Done when:** the image opens. No artifacts: `No screenshot artifacts are attached.`
+
+## Controls reference
+
+| Visible text | Type | Locator | What it does | Risk |
+|---|---|---|---|---|
+| **Name** | input | id "account-name" | Display name | — |
+| **Save profile** | submit | `Profile` card | Saves name | WRITE |
+| Preference dropdowns | dropdowns | ids "account-timezone", "account-landing", "account-response-detail", "account-draft-mode", "account-recommendation-style" | Preferences | — |
+| Preference checkboxes | checkboxes | `Preferences` card | Notifications, approval visibility | — |
+| **Workflow notes for Ariya**, **Remembered workflow notes** | textareas | ids "account-workflow-notes", "account-learned-notes" | Assistant notes | — |
+| **Save preferences** | submit | `Preferences` card | Saves all preferences | WRITE |
+| **Change password** | submit | `Password` card | Human only | WRITE |
+| (X) | icon button | title "Revoke session" | Revokes one session | DESTRUCTIVE |
+| **Revoke other sessions** | button | `Sessions` card | Revokes all others | DESTRUCTIVE |
+| **Sign out** | button | `Sessions` card | Ends session | WRITE |
+| **Refresh** | button | `/platform-feedback` header | Reload | READ |
+| **Link request** / **Linked request** | button / link | report header | Link or open request | WRITE / READ |
+| **Mark triaged**, **Mark in progress**, **Mark closed** | buttons | `Report` card | Status | WRITE |
+| **Open artifact** | link, new tab | `Artifacts` | Opens screenshot | READ |
+| **Preview tickets** | button | `Ticket handoff` | Shows previews | READ |
+| **Create Linear issue**, **Create GitHub issue** | buttons | `Ticket handoff` | External tickets | EXTERNAL |
+| **Generate fix packet** | button | `Fix packet` | Stores packet | WRITE |
+| **Copy packet**, **Download packet** | buttons | `Fix packet` | Clipboard, download | READ |
+
+## Waits and signals
+- `/account` loads with a `Loading account...` card. A load failure shows a red alert with the error or `Account not found`.
+- Account saves report through toasts only.
+- Feedback detail: every action button shares one busy state; all disable together while any action runs. Errors show in a red box.
+
+## Gotchas
+- Preferences save only through **Save preferences**; leaving the page discards changes.
+- The landing page list has no `/management` or `/data-health`; those are only role defaults.
+- Revoke buttons have no confirm.
+- A password change by anyone on the account signs out the agent's other sessions.
+- Feedback pages have no menu entry; use the URL.
+- Always run **Preview tickets** before any create; creation has no confirm.
+- During proxy login, password, session, sign-in and MFA changes are refused.
+
+## Related
+- [Sign in and session](/start/login-and-session)
+- [Global UI patterns](/start/global-ui#send-platform-feedback)
+
+## Source files
+- `packages/web/src/app/(dashboard)/account/page.tsx`
+- `packages/web/src/app/(dashboard)/platform-feedback/page.tsx`
+- `packages/web/src/app/(dashboard)/platform-feedback/platform-feedback-views.tsx`
+- `packages/web/src/app/(dashboard)/platform-feedback/[id]/page.tsx`
+- `packages/transport-api/src/middleware/proxy-guard.ts`

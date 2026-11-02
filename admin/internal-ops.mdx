@@ -1,0 +1,244 @@
+---
+title: "Internal ops (Ariya OS)"
+sidebarTitle: "Internal ops"
+description: "Review Ariya's own internal operations: the daily cockpit, people readiness, and internal approval requests you can draft, submit, approve, reject, cancel or comment on."
+keywords: ["internal ops", "ariya os", "internal request", "draft request", "tool access request", "approve internal request", "reject request", "people readiness", "staff onboarding", "contractor onboarding", "offboarding", "audit timeline", "1099"]
+---
+
+<Info>
+**URL:** `/internal-ops`, `/internal-ops/people`, `/internal-ops/people/{id}`, `/internal-ops/requests`, `/internal-ops/requests/new`, `/internal-ops/requests/{id}` · **Reach:** sidebar **Internal Ops**, then tabs **Today**, **Requests**, **People** · **Roles:** Principal ✓ (tenant `ariya` or `pilot` only) Operator ✗ · **Ready when:** the page h1 is visible and its loading text is gone.
+</Info>
+
+Ariya's own internal operations: staff and contractor readiness and internal approval requests for Ariya HR itself. Everything is review-only. Nothing here runs payroll, accounting, payments or external sends. Client-facing requests live in the Action Queue at `/requests`, not here.
+
+<Note>**Operator:** no menu entry. A typed URL renders the page frame but the data calls fail with `Ariya OS internal operations is only available to Ariya internal operators.` (cockpit and people) or `Ariya OS internal requests are only available to Ariya internal operators.` (requests). A Principal in a customer tenant gets the same errors.</Note>
+
+## Page map
+
+### Ariya OS Today on /internal-ops
+h1 **Ariya OS Today**, description `Run Ariya internal ops, requests, people readiness, and controls.` Tab bar `INTERNAL OPS` (**Today**, **Requests**, **People**). Top to bottom:
+1. Strip `Ariya OS boundary` (badges `Read-only`, `No external sends`) and collapsible `Safety details`.
+2. Lane tiles (links with counts): `Daily review`, `Requests`, `People`, `Controls`, `Readiness`.
+3. `Today needs judgment` (badge `Priority`): tiles `Review rows`, `Needs judgment`, `Due or blocked`, `Watchlist`, then grouped rows.
+4. `Control policy` (badge `External writes disabled`): `Available now`, `Draft-only`, `Approval-gated`, `Blocked`, `External writes`, action class cards.
+5. Collapsible `Roadmap and reference`.
+6. `Internal people & responsibilities` (badge `Read-only records`, link **Open people readiness**): tiles, `Lifecycle action summary`, 1099 action rows.
+7. `Internal request review` (badge `Audit timeline`, link **View all**): tiles `Local requests`, `Pending review`, `Execution routes`; request rows.
+8. Collapsible `Lifecycle queues`.
+9. Collapsible `Source rows and gates` (also holds the cockpit load error), with a resizable right rail.
+
+### People readiness on /internal-ops/people
+h1 **People readiness**, description `Check staff and contractor readiness by role and lifecycle.` Header **Back to cockpit**. Strip `Status-only` / `Readiness without sensitive values`. `Summary` tiles `Total people`, `Ready`, `Onboarding`, `Gaps`, `With open requests`. `Filter` card. `People` list.
+
+### Person detail page
+h1 `{display name}`, description `Review role, lifecycle, and readiness status.` Header **Back to people**. Strip `Values hidden` / `Readiness status only`. Sections `Overview`, `Lifecycle plan` (badge `Draft-only requests`), `Readiness by dimension`, `Linked open requests`.
+
+### Internal request review on /internal-ops/requests
+h1 **Internal request review**, description starts `Ariya's own internal operations — approvals and audit state for Ariya HR Inc. itself.` Header **Draft new request**. Strip `Review-only` / `Approval records only`. `Status summary` tiles `Total local requests`, `Drafts`, `Pending review`, `Approved`, `Rejected`. Filters and the request list.
+
+### Draft form on /internal-ops/requests/new
+h1 **Draft a new internal request**, description `Draft an internal request for approval review.` Strip `Draft only` / `Saved locally until submitted`. Card `Request details`. Header **Back to requests**.
+
+### Request detail page
+h1 `{request title}`, description `Review approval state, evidence, and audit history.` Strip `Review-only` / `Execution mode: {mode}`. Sections `Overview`, `Take action` (badge `Audit logged`), `Audit timeline` (badge `{n} event(s)`).
+
+## Recipes
+
+### Review internal ops for today
+**Risk:** `READ` · **Roles:** Principal (internal tenant)
+**Inputs from Clarwiz:** none.
+**Preconditions:** none.
+
+1. Open `/internal-ops` (sidebar **Internal Ops** or tab **Today**).
+   - Wait for: `Loading today's internal ops review...` and `Loading control policy...` to disappear and the lane tiles to show numbers.
+2. Read `Today needs judgment`. Empty: `No daily review groups are available yet.`
+3. To open a collapsible section, click its summary row (the section title; right side reads `Open`, then `Close`).
+4. Lane tiles jump: **Daily review** and **Controls** and **Readiness** scroll within the page; **Requests** and **People** open their pages.
+
+**Done when:** the sections you need are visible with rows or their empty texts.
+
+| If you see | Why | Do this |
+|---|---|---|
+| Every section shows empty texts | The cockpit may have failed to load | Open `Source rows and gates`; the error (`Unable to load Ariya OS cockpit` or server text) is shown only there. |
+| Error inside `Internal request review` | Request queue failed | Report the text. |
+
+### Check people readiness
+**Risk:** `READ` · **Roles:** Principal (internal tenant)
+**Inputs from Clarwiz:** optional worker type and readiness.
+**Preconditions:** none.
+
+1. Open `/internal-ops/people` (tab **People**, or **Open people readiness**).
+   - Wait for: `Loading people readiness...` to clear and `Summary` tiles.
+2. In `Filter`, click the worker type dropdown (`All worker types`) and pick `founder`, `staff`, `contractor`, `salesperson`, `finance operator`, `external accountant` or `platform admin`.
+3. Click the readiness dropdown (`All readiness`) and pick `ready`, `partial`, `gaps`, `onboarding`, `offboarding` or `inactive`.
+4. Read the badge `Showing {n} of {m}`. **Clear filters** resets.
+
+**Done when:** the `People` list shows rows (name, type badge, readiness badge, `sensitive`, `{n} open request(s)`, next action) or `No people match the current filter`. Error: red box `Unable to load people readiness`.
+
+### Open a person and draft a lifecycle request
+**Risk:** `READ` (opens a prefilled draft form; nothing is saved yet) · **Roles:** Principal (internal tenant)
+**Inputs from Clarwiz:** the person.
+**Preconditions:** none.
+
+1. On `/internal-ops/people`, click the person's row (link), or open `/internal-ops/people/{id}`.
+   - Wait for: `Loading person...` to be replaced by the person's name as h1.
+2. Read `Overview` (`Role`, `Work email` or `Not set`, `Next action`, red `Sensitive follow-up required` list) and `Lifecycle plan` (tiles `Onboarding`, `Offboarding`, `Responsibilities`, `Tool access`; `Next safe action`; `Missing or blocked items`; checklists).
+3. To start a request, click a draft button in `Lifecycle plan` (label varies by item). It opens `/internal-ops/requests/new` prefilled.
+4. Continue with [Draft an internal request](#draft-an-internal-request).
+
+**Done when:** the draft form is open with the prefilled fields. `Linked open requests` lists existing requests (empty `No linked requests yet. Use source object internal_people:{id}.`).
+
+### Find an internal request
+**Risk:** `READ` · **Roles:** Principal (internal tenant)
+**Inputs from Clarwiz:** optional status and type.
+**Preconditions:** none.
+
+1. Open `/internal-ops/requests` (tab **Requests**, or **View all** on the cockpit).
+   - Wait for: `Loading internal requests...` to clear.
+2. Status dropdown (`All statuses`): `draft`, `pending review`, `approved`, `rejected`, `canceled`.
+3. Type dropdown (`All types`): `tool access`, `policy exception`, `client escalation`, `hiring onboarding`, `staff onboarding`, `staff offboarding`, `contractor onboarding`, `contractor offboarding`, `vendor review`, `invoice review`, `commission review`, `sensitive action review`.
+4. Click the request row (link) to open `/internal-ops/requests/{id}`.
+
+**Done when:** the request detail h1 shows the title. Empty texts: `No internal requests yet` or `No requests match the current filter` (`Try clearing the filter or drafting a new request.`).
+
+### Draft an internal request
+**Risk:** `WRITE` (creates a draft only; nothing executes) · **Roles:** Principal (internal tenant)
+**Inputs from Clarwiz:** type, priority, title, reason, source object, evidence link, data classes.
+**Preconditions:** none.
+
+1. Open `/internal-ops/requests/new`. To prefill, add `?requestType={type}&title={title}&sourceObject={object}&evidenceHref={link}`. Alternatives: **Draft new request** on the list, **Draft first request** on an empty list or cockpit.
+   - Wait for: h1 **Draft a new internal request** and card `Request details`.
+2. **Request type** (dropdown, id "request-type"): pick one of the 12 types (default `tool access`).
+3. **Priority** (dropdown, id "priority"): `low`, `medium` (default), `high`.
+4. **Title** (input, id "title", placeholder "e.g. Grant Lina temporary admin access to compliance dashboard"): required.
+5. **Reason** (textarea, id "reason", placeholder "Why is this request needed? Cite the source object and current state.").
+6. **Source object** (input, id "source-object", placeholder "e.g. clients:acme-co or staff:lina-rivera").
+7. **Evidence link** (input, id "evidence-href", placeholder "/clients/acme-co or external link").
+8. **Data classes**: tick the square checkbox for each class: `Internal general` (on by default), `Internal confidential`, and restricted ones (badge `restricted`): `Employee PII`, `Contractor tax / payment`, `Commission`, `Accounting / payment`, `External tokens`. Click the square itself, then check the badge `{n} selected`.
+9. **Flag as sensitive action** (checkbox): tick to require approval. It is ticked and locked automatically when a restricted class is selected (`Auto-flagged because a restricted data class is selected.`).
+10. Click **Save draft** (button; visual: bottom of the card). **Cancel** returns to the list without saving.
+    - Wait for: `Saving draft...`.
+
+**Done when:** the URL becomes `/internal-ops/requests/{id}` and the status badge reads `draft`.
+
+| If you see | Why | Do this |
+|---|---|---|
+| "Title is required." | Title empty | Fill **Title**. |
+| "Unable to draft request" or server text | Save failed | Report. |
+
+### Submit an internal request for review
+**Risk:** `WRITE` · **Roles:** Principal (internal tenant; requester)
+**Inputs from Clarwiz:** optional note.
+**Preconditions:** status `draft`.
+
+1. Open `/internal-ops/requests/{id}`.
+   - Wait for: `Loading internal request...` to be replaced by the title.
+2. In `Take action`, click **Submit for review**.
+   - Wait for: an inline panel titled `Submit for review` with **Note (optional)** (textarea, id "action-note", placeholder "Optional note recorded on the audit event.").
+3. Optionally type a note.
+4. Click **Confirm Submit for review**.
+   - Wait for: `Saving...`.
+
+**Done when:** the panel closes, the status badge changes, and a new event appears in `Audit timeline`. There is no toast.
+
+### Approve or reject an internal request
+**Risk:** `DESTRUCTIVE` (final decision; no undo) · **Roles:** Principal (internal tenant; approver)
+**Inputs from Clarwiz:** decision; note (required for reject); approval.
+**Preconditions:** status pending review.
+
+1. Open `/internal-ops/requests/{id}` and wait for the title.
+2. Click **Approve** or **Reject** (red) in `Take action`.
+   - Wait for: an inline panel. Approve: **Note (optional)**. Reject: **Note (required)**, placeholder "Reason for rejection — visible in the audit timeline."
+3. Type the note.
+
+<Warning>**Approval required (DESTRUCTIVE).** Stop here and get approval before clicking **Confirm Approve** or **Confirm Reject**. The decision is final and recorded in the audit timeline.</Warning>
+
+4. Click **Confirm Approve** or **Confirm Reject**.
+   - Wait for: `Saving...`.
+
+**Done when:** the panel closes, the status badge shows the new state and `Audit timeline` has a new event. `Take action` then reads `Terminal state; no actions available.` if the request is closed.
+
+### Cancel an internal request
+**Risk:** `DESTRUCTIVE` (terminal) · **Roles:** Principal (internal tenant; requester or approver)
+**Inputs from Clarwiz:** reason; approval.
+**Preconditions:** status draft or pending review.
+
+1. Open `/internal-ops/requests/{id}`.
+2. Click **Cancel request** (red button in `Take action`). Do not confuse it with the plain **Cancel** button, which only closes a note panel.
+   - Wait for: panel with **Note (required)**, placeholder "Reason for canceling — visible in the audit timeline."
+3. Type the reason.
+
+<Warning>**Approval required (DESTRUCTIVE).** Stop here and get approval before clicking **Confirm Cancel request**. A canceled request cannot be reopened.</Warning>
+
+4. Click **Confirm Cancel request**.
+
+**Done when:** the status badge reads canceled and `Take action` reads `Terminal state; no actions available.`
+
+### Comment on an internal request
+**Risk:** `WRITE` · **Roles:** Principal (internal tenant)
+**Inputs from Clarwiz:** comment text.
+**Preconditions:** request not in a terminal state.
+
+1. Open `/internal-ops/requests/{id}`.
+2. Click **Add comment**.
+   - Wait for: panel with **Note (required)**, placeholder "Comment to record on the audit timeline."
+3. Type the comment.
+4. Click **Confirm Add comment**.
+
+**Done when:** the comment appears as a new event in `Audit timeline`.
+
+| If you see (any request action) | Why | Do this |
+|---|---|---|
+| "A note is required for this action." / "Comment requires a note" | Note empty | Type a note. |
+| "Admin access required" | Not an approver | Use the Principal account. |
+| `You do not have permission to act on this request.` | No actions for your role | Report. |
+| `Sign in to take action on this request.` | Session missing | Sign in again. |
+| "Action failed" or server text | Server error | Report. |
+
+## Controls reference
+
+| Visible text | Type | Locator | What it does | Risk |
+|---|---|---|---|---|
+| Lane tiles | links | cockpit top | Jump or open page | READ |
+| Section summaries | disclosure toggles | right side `Open` or `Close` | Expand or collapse | READ |
+| **Open people readiness**, **View all** | links | cockpit sections | Open pages | READ |
+| (separator) | drag handle | aria-label "Resize side panel", title "Drag to resize · double-click to reset" | Resize rail | READ |
+| **Back to cockpit**, **Back to people**, **Back to requests** | buttons | page headers | Navigate back | READ |
+| Worker type, readiness, status, type dropdowns | dropdowns | Filter cards | Filter lists | READ |
+| **Clear filters** | button | Filter cards | Reset | READ |
+| Lifecycle draft buttons | links | person `Lifecycle plan` | Open prefilled draft | READ |
+| **Draft new request**, **Draft first request** | links | list header, empty states | Open draft form | READ |
+| **Save draft** (`Saving draft...`) | button | draft form | Creates draft | WRITE |
+| **Cancel** | button | draft form | Leaves without saving | READ |
+| **Submit for review** | button | `Take action` | Opens note panel | WRITE |
+| **Approve**, **Reject** | buttons | `Take action` (Principal) | Open note panel | DESTRUCTIVE (final) |
+| **Cancel request** | red button | `Take action` | Opens note panel | DESTRUCTIVE |
+| **Add comment** | button | `Take action` | Opens note panel | WRITE |
+| **Note (required)** / **Note (optional)** | textarea | id "action-note" | Note text | — |
+| `Confirm {Action}` (`Saving...`) | button | note panel | Performs action | per action |
+| **Cancel** | button | note panel | Closes panel | READ |
+
+## Waits and signals
+- Each page shows a loading line (`Loading today's internal ops review...`, `Loading people readiness...`, `Loading person...`, `Loading internal requests...`, `Loading internal request...`).
+- Request actions give no toast. Success = the note panel closes, the status badge changes and the audit timeline grows.
+- **Save draft** redirects to the new request.
+
+## Gotchas
+- The cockpit hides its load error inside the collapsed `Source rows and gates` section; the top of the page only shows empty states.
+- Two different Cancel buttons on request detail: **Cancel request** (terminal) and **Cancel** (closes the panel).
+- Data-class checkboxes sit inside a larger clickable label. Click the square checkbox and confirm the `{n} selected` badge.
+- Person detail never shows sensitive values (pay, bank, tax IDs); do not look for them here.
+- The list's description points to `/requests` for client work; that is a different page (Action Queue).
+- These pages have no in-app guide of their own; **?** opens `How Ariya fits together`.
+
+## Related
+- [Roles and access](/start/roles-and-access)
+- [Platform admin](/admin/platform-admin)
+
+## Source files
+- `packages/web/src/app/(dashboard)/internal-ops/page.tsx`
+- `packages/web/src/app/(dashboard)/internal-ops/people/page.tsx`
+- `packages/web/src/app/(dashboard)/internal-ops/people/[id]/page.tsx`
+- `packages/web/src/app/(dashboard)/internal-ops/requests/page.tsx`
+- `packages/web/src/app/(dashboard)/internal-ops/requests/new/page.tsx`
+- `packages/web/src/app/(dashboard)/internal-ops/requests/[id]/page.tsx`

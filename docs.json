@@ -117,12 +117,17 @@
       {
         "group": "Admin and account",
         "pages": [
-          "admin/platform-admin"
+          "admin/platform-admin",
+          "admin/internal-ops",
+          "admin/account-and-feedback"
         ]
       },
       {
         "group": "Reference",
-        "pages": []
+        "pages": [
+          "reference/known-issues",
+          "reference/maintaining"
+        ]
       }
     ]
   },
