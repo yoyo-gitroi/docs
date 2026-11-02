@@ -1,0 +1,78 @@
+---
+title: "Create a client"
+sidebarTitle: "New client"
+description: "Add a new client organization in Ariya with name, slug, industry, phone, stage, address and an onboarding note."
+keywords: ["new client", "add a client", "create client", "add customer", "onboard client", "new customer", "set up client", "prospect"]
+---
+
+<Info>
+**URL:** `/clients/new` · **Reach:** `/clients` → **New Client**, or utility nav **Add Client** · **Roles:** Principal ✓ Operator ✗ (view-only notice, no form) · **Ready when:** H1 **Create Client** is visible and the **Client Name** field has focus.
+</Info>
+
+Creates a client record. The client then appears in the portfolio and gets its own profile page at `/clients/{slug}`.
+
+## Page map
+- Breadcrumbs **Clients › New Client**, H1 **Create Client**, description "Add a new client organization to the platform".
+- One form card: **Client Name**, **Slug** (optional), **Industry**, **Phone**, **Stage**, **Address**, **Notes** (optional).
+- Red error box above the form when a save fails.
+- Buttons at the bottom: **Cancel**, **Create Client**.
+
+## Recipes
+
+### Create a client
+**Risk:** `WRITE` · **Roles:** Principal, Admin. Operator and Member see H1 "New client" and the notice "View only. Your profile can see Clients and packets but not change it." with no form; stop and report.
+**Inputs from Clarwiz:** client name (required); optional slug, industry, phone, stage, address, onboarding note.
+**Preconditions:** search `/clients` first so you do not create a duplicate ([Find and open a client](/clients/clients-list#find-and-open-a-client)).
+
+1. Open `/clients/new`.
+   - Wait for: H1 **Create Client**.
+2. Type the name in **Client Name** (input, id "client-name", placeholder "Delta King Hotel"; visual: first field, already focused).
+3. Optional: type a slug in **Slug** (input, id "client-slug", placeholder "delta-king-hotel"). Use only lowercase letters, digits and hyphens. Leave blank to auto-generate from the name.
+4. Optional: click **Industry** (select, id "client-industry", placeholder "Select an industry...") and pick **Professional Services**, **Hospitality**, **Construction**, **Nonprofit**, **Healthcare** or **Retail**.
+5. Optional: type **Phone** (input, id "client-phone", placeholder "(916) 555-0100"). Free text.
+6. Optional: click **Stage** (select, id "client-lifecycle-stage", shows "No stage") and pick **No stage**, **Prospect**, **Customer**, **Opportunity** or **SQL**.
+7. Optional: type **Address** (input, id "client-address", placeholder "1000 Front Street, Sacramento, CA 95814"). Ending it with `, XX 12345` (state code and ZIP) lets a later Profile setup save create the first jurisdiction automatically.
+8. Optional: type **Notes** (textarea, id "client-notes", placeholder "Anything useful for onboarding this client..."). It is saved as a pinned client note, which drafts read.
+9. Click **Create Client** (button; disabled until **Client Name** has text; visual: bottom right of the form).
+   - Wait for: the button text **Creating...** to end and the page to navigate.
+
+**Done when:** toast "Client created successfully" and the URL is `/clients/{newSlug}` with the client name as H1.
+
+| If you see | Why | Do this |
+|---|---|---|
+| "Client name is required." | Name is blank | Fill **Client Name** |
+| "Slug must be lowercase alphanumeric with hyphens" | Slug has capitals, spaces or symbols | Fix the slug or clear it |
+| "Client created, but the stage could not be saved. Set it from the client list." (toast) | Client exists; the stage update failed | Do not create again. Report that the stage is not set. The client list has no stage editor despite the toast |
+| "View only. Your profile can see Clients and packets but not change it." | Operator or Member | Stop; a Principal or Admin must create clients |
+| Any other red box text | Server rejected the request | Report the exact text; the form keeps your input |
+
+## Controls reference
+| Visible text | Type | Locator | What it does | Risk |
+|---|---|---|---|---|
+| **Client Name** | input | id "client-name" | Required name | WRITE on submit |
+| **Slug** (optional) | input | id "client-slug" | URL key; lowercase letters, digits, hyphens; blank = auto | WRITE on submit |
+| **Industry** | select | id "client-industry" | Six fixed industries | WRITE on submit |
+| **Phone** | input | id "client-phone" | Free text | WRITE on submit |
+| **Stage** | select | id "client-lifecycle-stage" | **No stage**, **Prospect**, **Customer**, **Opportunity**, **SQL** | WRITE on submit |
+| **Address** | input | id "client-address" | Free text | WRITE on submit |
+| **Notes** (optional) | textarea | id "client-notes" | Becomes a pinned client note | WRITE on submit |
+| **Cancel** | button | bottom of form | Back to `/clients`, nothing saved | READ |
+| **Create Client** | button | bottom of form | Creates the client, then saves the stage | WRITE |
+
+## Waits and signals
+- **Create Client** reads **Creating...** while saving. Two calls run: create, then stage update.
+- Success navigates away from the form; a failure keeps the form with a red box above it.
+
+## Gotchas
+- A slug that is already taken is not an error: the server adds a suffix. Read the final slug from the URL after creation.
+- The partial-success toast says "Set it from the client list", but neither the list nor the client page has a visible stage editor. In-app help says there is no stage editor on the client yet; that matches the app.
+- Industry, service tier and other profile fields can be changed later in Overview › **Profile & setup** ([Client profile](/clients/client-profile#edit-company-details)).
+
+## Related
+- [Clients portfolio](/clients/clients-list)
+- [Client profile and tab map](/clients/client-profile)
+
+## Source files
+- `packages/web/src/app/(dashboard)/clients/new/page.tsx`
+- `packages/core/src/entities/client.ts`
+- `packages/transport-api/src/routes/clients.ts`

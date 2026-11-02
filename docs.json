@@ -72,7 +72,12 @@
       },
       {
         "group": "Clients",
-        "pages": []
+        "pages": [
+          "clients/clients-list",
+          "clients/new-client",
+          "clients/client-profile",
+          "clients/client-tabs-work"
+        ]
       },
       {
         "group": "Implementation",
