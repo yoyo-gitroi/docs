@@ -1,0 +1,396 @@
+---
+title: "Operations inbox"
+sidebarTitle: "Inbox"
+description: "Open Operations queues, search mail and cases, triage new email into cases or dismiss it, restore dismissed mail, view a teammate's work (Principal) and read the desk reports."
+keywords: ["operations", "service desk", "inbox", "triage", "make a case", "track email", "not a case", "dismiss email", "hide email", "suppress similar", "focus mode", "scan inbox", "cases", "follow-ups", "not assigned", "waiting on client", "waiting on vendor", "sent", "done", "everyone", "teammate's cases", "search mail", "keyboard shortcuts", "performance", "service mix"]
+---
+
+<Info>
+
+**URL:** `/service-desk` (parameters below) · **Reach:** sidebar **Operations** · **Roles:** Principal ✓ Operator ✓ (**Mine / Everyone** and the **Person** picker are Principal only) · **Ready when:** h1 **Operations**, the queue rail (nav aria-label "Operations queues") and the list header h2 `{Queue} {count} · {mine|everyone|person}` are visible and the list spinner is gone.
+
+</Info>
+
+The Operations desk: a queue rail on the left, a scrolling list in the middle and a reading pane on the right. Triage turns new email into cases; cases are worked in the pane (see [Work a case](/operations/case)). Replies and new emails are covered in [Email and replies](/operations/email-and-replies).
+
+<Warning>
+
+**Keyboard hazard.** This page acts on single keys **instantly, with no dialog**, whenever focus is not in a text field, menu or dialog: `e` marks a triage email done, `1` / `2` / `3` park the selected case with Us / Client / Vendor, `Enter` or `o` expands the case, `t` opens Focus mode. Do **not** press single-letter or number keys unless the recipe tells you to. Do not press `Enter` while a button has focus: it clicks that button (it could be **Send reply**). Type only after clicking into a text field. Full list: [Keyboard shortcuts](#keyboard-shortcuts).
+
+</Warning>
+
+<Note>
+
+**Principal vs Operator.** A Principal sees a **Whose work** switch (**Mine** / **Everyone**) and, under Everyone, a **Person** select. An Operator never sees them and always works on their own items ("mine"). Opening an email that sits in another operator's mailbox shows "This email is in another operator's mailbox".
+
+</Note>
+
+## Page map
+1. **Header** (top): h1 **Operations**; search box (aria-label "Search mail and cases", hint `/`); mailbox pill `{email} · scanned N min ago` (only on windows 1360 px and wider) or **Connect Gmail**; **Scan inbox**; **New email** (only when Gmail is connected); gear icon link (aria-label "Operations settings").
+2. **Queue rail** (left; nav aria-label "Operations queues"):
+   - Principal only: radiogroup "Whose work" with **Mine** and **Everyone**; under Everyone a **Person** select (aria-label "Show work for"; "All people" plus teammates).
+   - **Inbox** with count.
+   - Group **To work on**: **Cases**, **Triage**, **Follow-ups**, **Not assigned** (each with a count and a note line such as `{n} overdue`, "Due today", "Needs an owner").
+   - Group **Waiting on**: **Client** (note `Oldest {n} days`), **Vendor**, then one row per vendor name and **No vendor named**.
+   - Group **History**: **Sent**, **Done**.
+   - Footer buttons: **Recently dismissed**, **Performance, 30 days**, **Service mix**, **Shortcuts** (`?`).
+   - Each queue button has a title with its description; the active one has aria-current "page".
+3. **List** (middle; section aria-label = the queue title; rows in a listbox aria-label `{title} rows`): h2 header, **Sort** dropdown (aria-label "Sort"), density icon (title "Compact rows" or "Comfortable rows"), description line. In Triage: banner `{n} threads to triage.` and **Focus mode · t**. Rows (role "option", aria-selected). Footer hint "j k move · e done · r reply · / search · t focus". No pagination: one scrolling list.
+4. **Reading pane** (right): the selected triage email, case, or sent mail; "Select a row to read it here." when nothing is selected.
+
+The Operations tab bar (Inbox / Deliverables / AI Insights / Settings) is hidden on this page. Settings is the gear icon.
+
+## URL parameters
+| Parameter | Effect |
+|---|---|
+| `?queue=inbox` | Inbox (everything needing a look) |
+| `?queue=needs_action` | **Cases** |
+| `?queue=triage` | **Triage** |
+| `?queue=follow_ups` | **Follow-ups** |
+| `?queue=unassigned` | **Not assigned** |
+| `?queue=waiting_client` | **Waiting on client** |
+| `?queue=waiting_vendor` | **Waiting on vendor**; add `&vendor={name}` for one vendor or `&vendor=__none__` for "No vendor named" |
+| `?queue=sent` / `?queue=done` | **Sent** / **Done** |
+| `?case={caseId}` | Opens that case in the pane |
+| `?view=expanded` | Opens the case at full width (with `?case=`) |
+| `?stage={documentId}` | Stages an already-linked document on the reply |
+| `?chip=all`, `needsAction`, `waiting`, `followUps`, `done` | Old links; still work |
+
+With no `?queue=`, the page reopens the last queue you used. The page rewrites the URL as you click.
+
+## Recipes
+
+### Open a queue
+**Risk:** `READ` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** which queue
+
+1. Open `/service-desk?queue={key}` using the table above. Alternative: click the queue name in the rail (button; visual: left column).
+   - Wait for: the list spinner to go and the h2 to read `{Queue} {count} · …`.
+
+**Done when:** the h2 shows the queue name and the rows are listed.
+
+| If you see | Why | Do this |
+|---|---|---|
+| Card "Gmail not connected" with **Connect** | Gmail was never connected and the desk is empty | Hand off: see [Connect Gmail](/operations/settings#connect-gmail). |
+| "Service Desk Gmail is off" | Gmail is switched off for this workspace | Report it. |
+| "Operations couldn’t be loaded." with **Try again** | Load failed | Click **Try again** once, then report. |
+| "Nothing here for you. Switch to Everyone to see the whole desk." | Principal on Mine with an empty queue | Switch to **Everyone** if the user wants the whole desk. |
+| "Nothing here for you." / "Nothing here." / "Triage is clear." | Empty queue | Report it. |
+
+### Start the day in Operations
+**Risk:** `READ` · **Roles:** Principal, Operator
+
+1. Open `/service-desk?queue=inbox`. Each row shows which queue it belongs to.
+2. Work the queues in this order: **Triage** (see [Triage an email into a case](#triage-an-email-into-a-case)), then **Cases**, **Follow-ups**, **Not assigned**.
+
+**Done when:** you have reported or worked each queue the user asked about.
+
+### Switch between Mine and Everyone
+**Risk:** `READ` · **Roles:** Principal only
+
+1. Open `/service-desk`.
+2. In the rail click **Everyone** (radio in the group "Whose work"; visual: top of the rail). Click **Mine** to go back.
+
+**Done when:** the list h2 ends with "everyone" (or "mine").
+
+### See the work of a teammate
+**Risk:** `READ` · **Roles:** Principal only (Operators cannot; the Command Center cannot either)
+**Inputs from Clarwiz:** teammate name
+
+1. Open `/service-desk`.
+2. Click **Everyone** in "Whose work".
+3. Choose the teammate in **Person** (select, aria-label "Show work for"; under Everyone).
+4. Click a queue in the rail.
+
+**Done when:** the list h2 ends with the teammate's name.
+
+| If you see | Why | Do this |
+|---|---|---|
+| "This email is in another operator's mailbox" | Their mail is private to their mailbox | Report it; you can still see case fields. |
+
+### Search mail and cases
+**Risk:** `READ` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** search words
+
+1. Click the search box (input, aria-label "Search mail and cases"; visual: header, left of the mailbox pill).
+2. Type the words. Results update after a short pause and cover Inbox, Sent and Done.
+3. To clear, click the × (icon button, aria-label "Clear search").
+
+**Done when:** the matching rows are listed.
+
+| If you see | Why | Do this |
+|---|---|---|
+| "Nothing matches that search in the inbox, sent or done." | No match | Try other words or report. |
+
+### Sort the list and change density
+**Risk:** `READ` · **Roles:** Principal, Operator
+
+1. Click **Sort** (dropdown, aria-label "Sort"; visual: list header) and choose **Newest**, **Oldest first**, **Client A to Z** or **Priority**.
+2. Optional: click the density icon (title "Compact rows" or "Comfortable rows"). Prefer comfortable rows: compact rows have no quick actions.
+
+**Done when:** the list is re-ordered.
+
+<Note>Inbox always opens on **Newest**; a sort chosen on Inbox lasts only for this visit.</Note>
+
+### Open a row in the reading pane
+**Risk:** `READ` · **Roles:** Principal, Operator
+
+1. Click the row (option in the list; visual: middle column). For a known case open `/service-desk?case={caseId}` instead.
+   - Wait for: the pane spinner to go. For a triage email wait for "Loading the full email…" to go; for a case wait for "Loading the conversation…" to go.
+
+**Done when:** the pane shows the email subject (triage) or the case title h2 and **Conversation** (case). Case work continues in [Work a case](/operations/case).
+
+<Note>Email bodies render inside a frame titled "Email content". Read the text there. Click **Show quoted text** to see the quoted part.</Note>
+
+### Triage an email into a case
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** which email; client, case type, priority and owner if the user specified them
+**Preconditions:** Gmail connected
+
+1. Open `/service-desk?queue=triage`.
+2. Click the email row.
+   - Wait for: "Loading the full email…" to go and the card "Ariya suggests" to show its title (`Make this a {service|vendor|internal} case for {client}` or "This does not look like HR work") and `{n}% confidence`.
+3. If the card says "This does not look like HR work", click **Make a case anyway** (button) to show the form.
+4. Check or set **Client** (select, id "pane-triage-client"; "No client" or a client; "matched" shows when Ariya matched it).
+5. Check or set **Type** (radiogroup "Case type": **Service**, **Vendor**, **Internal**).
+6. Check or set **Priority** (select, P0 to P3).
+7. Check or set **Owner** (select; default is you).
+8. Click **Make a case** (button; visual: under the form).
+   - Wait for: the row to leave the list and a card at the top centre.
+
+**Done when:** the top-centre card reads `Tracked as a case → now in {Queue}` with **View**, or toast "Tracked as a case" with **Open**. "Already tracked by another recipient" means a teammate already made it a case; that is also done.
+
+| If you see | Why | Do this |
+|---|---|---|
+| Toast "Couldn’t save the decision" (row comes back) | Save failed | Retry once, then report. |
+| Toast "This thread has no mailbox link yet" | Email not linked to a mailbox | Report it. |
+
+<Note>Row quick action **Track** / **Track as case** and Focus-mode `Enter` make the case with the default values without showing the form. Use the pane form when the user specified a client, type, priority or owner.</Note>
+
+### Dismiss, hide or mark a triage email done
+**Risk:** `WRITE` (Gmail is not changed) · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** which email; dismiss, hide or done
+
+1. Open `/service-desk?queue=triage` and click the email row.
+2. Do one of:
+   - Dismiss: click **Not a case** (button), or **Dismiss** when Ariya says "This does not look like HR work".
+   - Hide for you only: click **More ▾** (menu button) → **Hide this email**.
+   - Mark done: click **More ▾** → **Mark done**.
+
+**Done when:**
+- Dismiss: toast "Dismissed" (or "Hidden from your inbox") with **Undo** for 10 seconds. **Undo** → "Dismissal undone".
+- Hide: toast "Hidden from your inbox".
+- Mark done: top-centre card `Marked done → now in Done`.
+
+| If you see | Why | Do this |
+|---|---|---|
+| Toast "Couldn’t save the decision" | Save failed; row returns | Retry once, then report. |
+| Toast "Couldn’t hide the thread" | Hide failed | Retry once, then report. |
+| Toast "Already restored by someone else" after **Undo** | A teammate restored it | Nothing to do. |
+| Toast "Couldn’t undo the dismissal" | Undo failed | Use [Restore a dismissed email](#restore-a-dismissed-email). |
+
+### Stop similar emails reaching Triage
+**Risk:** `WRITE` (creates a suppression rule; pause it in Settings) · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** the email and a reason
+
+1. Open the triage email in the pane.
+2. Click **More ▾** → **Hide similar emails from now on…** (menu item). From a row's ⋯ menu the item is **Suppress similar…**.
+   - Dialog "Don't triage similar emails" opens.
+3. Click a reason (button): **Payment receipt / confirmation**, **Newsletter / marketing**, **System notification**, **FYI only**, **Duplicate / low value** or **Other**.
+4. Optional: type in **Optional note**.
+5. Click **Save learning rule** (button). **Cancel** backs out.
+
+**Done when:** toast "Similar email will be suppressed from now on".
+
+| If you see | Why | Do this |
+|---|---|---|
+| Toast "Couldn’t save the suppression rule" | Save failed | Retry once, then report. |
+
+To pause the rule later see [Pause or reactivate a learned rule](/operations/settings#pause-or-reactivate-a-learned-rule).
+
+### Restore a dismissed email
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+
+1. Open `/service-desk`.
+2. Click **Recently dismissed** (button; visual: bottom of the rail).
+   - The dialog lists the last 7 days for the whole team; each row says `Dismissed by {name|AI|rule}`.
+3. Click **Restore** on the row (button, aria-label `Restore "{subject}" to triage`).
+
+**Done when:** the email is back in **Triage** (for every recipient).
+
+| If you see | Why | Do this |
+|---|---|---|
+| "Nothing dismissed recently" | Nothing in the last 7 days | Report it. |
+| Toast "Couldn’t load recently dismissed threads" | Load failed | Close and reopen the dialog once. |
+
+### Triage in Focus mode
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+
+Focus mode shows one triage email at a time, full screen. Its keys act instantly.
+
+1. Open `/service-desk?queue=triage`.
+2. Click **Focus mode · t** (button in the list banner).
+   - A full-screen dialog opens (aria-label "Focus mode"), with progress `{i} of {n} · {t} tracked · {s} skipped`.
+3. Read the email and the suggestion band. Set **Client** (select, id "focus-client"), type and priority with the mouse if needed.
+4. Click one of: **Track as case ↵**, **Dismiss ←**, **Skip s**, **Mark done**, **Suppress similar…**.
+5. Repeat for the next email.
+6. Leave with the close button (aria-label "Leave Focus mode").
+
+**Done when:** "Triage is clear" or "End of the stack" shows, or you left Focus mode. On the end screen `Review {n} skipped` reopens skipped items and **Back to the list** closes. Do not click **Scan inbox** there without approval (see [Scan the inbox](#scan-the-inbox)).
+
+<Warning>Inside Focus mode, `Enter` tracks, `←` dismisses, `s` skips, `1` / `2` / `3` set the case type, `p` cycles priority, `c` focuses Client. Use the buttons, not the keys. Toast "Nothing left to triage" means there is nothing to focus on.</Warning>
+
+### Act on a row without opening it
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+
+Quick actions appear only when the mouse is over a row or the row has keyboard focus, and only in comfortable density. Prefer opening the row and using the pane.
+
+1. Hover the row; the owner avatar is replaced by quick actions.
+2. Case rows: **Done**, **Ball with ▾** (**Us** / **Client** / **Vendor**), ⋯ (aria-label "More actions") → **Done**, **Ball with Us**, **Ball with Client**, **Ball with Vendor**, **Link client**, **Open full width**.
+3. Triage rows: **Track**, **Dismiss**, ⋯ → **Track as case**, **Dismiss**, **Mark done**, **Suppress similar…**, **Hide from my inbox**.
+4. Sent and Done rows have no quick actions.
+
+**Done when:** the matching toast or top-centre card appears (same signals as the pane actions in [Work a case](/operations/case)).
+
+### Make sent mail a case
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+
+1. Open `/service-desk?queue=sent`.
+2. Click a row that has no case. The pane reads `Not a case yet. It becomes one when {domain} replies.`
+3. Click **Make it a case now** (button).
+
+**Done when:** toast "Case created. It is in Cases."
+
+| If you see | Why | Do this |
+|---|---|---|
+| Toast "Couldn’t make it a case" or a server message | Save failed | Retry once, then report. |
+| "No sent mail recorded for you yet. …" | Nothing sent | Report it. |
+
+### Scan the inbox
+**Risk:** `EXTERNAL` (reads your Gmail) `AI` · **Roles:** Principal, Operator
+**Preconditions:** Gmail connected (the button is disabled otherwise)
+
+Scanning reads the signed-in user's own Gmail and has Ariya sort new mail into **Triage**. It sends nothing.
+
+<Warning>**Approval required (EXTERNAL).** Stop here and get approval before clicking **Scan inbox**, unless the user asked for a scan in this conversation.</Warning>
+
+1. Click **Scan inbox** (button; visual: header, right of the mailbox pill).
+   - Wait for: the list banner `Scanning {mailbox}. Only your own mailbox is scanned.` to go. This can take a minute or two.
+
+**Done when:** toast `{mailbox} — {n} threads processed`.
+
+| If you see | Why | Do this |
+|---|---|---|
+| Toast "Inbox scan failed" or a server message | Scan failed | Report it. |
+| **Scan inbox** disabled | Gmail not connected | See [Connect Gmail](/operations/settings#connect-gmail). |
+
+### Read the desk reports
+**Risk:** `READ` · **Roles:** Principal, Operator
+
+1. Click **Performance, 30 days** (button; bottom of the rail).
+   - Wait for: "Loading the scorecard…" to go. The h2 reads "Performance · last 30 days" with tiles Resolution, AI Assist, Close Quality, Guardrails.
+2. Or click **Service mix** (button; bottom of the rail). Choose a client (select, aria-label "Client") and a window (radiogroup "Window": **30d**, **90d**, **12 mo**). Stats: Cases, Done, Avg days to close, Emails per case. Click a sub-service row to list its cases; clicking a case opens it at full width.
+
+**Done when:** the figures are shown.
+
+| If you see | Why | Do this |
+|---|---|---|
+| "The scorecard could not be loaded." with **Retry** | Load failed | Click **Retry** once. |
+| "The service mix could not be loaded." | Load failed | Click **Service mix** again once, then report. |
+
+### Open the shortcuts and Gmail help
+**Risk:** `READ` · **Roles:** Principal, Operator
+
+1. Click **Shortcuts** (button; bottom of the rail).
+
+**Done when:** dialog "Keyboard Shortcuts & Gmail Setup" is open. Close it with Esc or its close button.
+
+### Open an old case link
+**Risk:** `READ` · **Roles:** Principal, Operator
+
+1. Old links `/service-desk/{caseId}` redirect to `/service-desk?case={caseId}&view=expanded` (keeping `stage`). Just open them and wait for the redirect.
+2. Old links `/service-desk/cases` redirect to `/service-desk` (or to `/service-desk?queue=done` when they carry `?status=closed` or `?status=completed`). They show nothing of their own.
+
+**Done when:** the URL is `/service-desk?…` and the desk is ready.
+
+## Keyboard shortcuts
+Shortcuts are ignored while focus is in an input, textarea, select or rich-text editor, inside a menu or dialog, while any dialog or Focus mode is open, and when Ctrl, Cmd or Alt is held. Everywhere else they fire at once.
+
+| Key | Effect | Hazard |
+|---|---|---|
+| `j` / `k` | Next / previous row (also in the expanded case) | Moves selection; a held reply still sends |
+| `/` | Focus the search box | — |
+| `?` | Shortcuts dialog | — |
+| `t` | Focus mode | Opens a full-screen dialog whose keys act instantly |
+| `Enter` / `o` | Case selected: expand to full width; nothing selected: select first row | `Enter` on a focused button clicks that button |
+| `Esc` | Collapse the expanded case, else clear search | — |
+| `e` | Triage row: **marks done immediately, no dialog**. Case: opens the Done dialog | **Instant write** |
+| `r` | Focus the reply editor | Next keys type into the reply |
+| `1` / `2` / `3` | Park the case with Us / Client / Vendor | **Instant write** |
+| Ctrl+J or ⌘J (in the reply editor) | Opens the Draft / Redraft popover | AI |
+| `1` to `4` (after a send) | Picks an option in "Where does the ball go now?" | Captures `1` to `3` from the desk while shown |
+
+Rule for the agent: press a single-letter or number key only when a recipe tells you to. Never press `Enter` to "open" something while a button has focus.
+
+## Controls reference
+| Visible text | Type | Locator | What it does | Risk |
+|---|---|---|---|---|
+| Search mail and cases | input | aria-label "Search mail and cases" | Searches Inbox, Sent, Done | `READ` |
+| (×) | icon button | aria-label "Clear search" | Clears search | `READ` |
+| Connect Gmail / Connect | button | header / empty-desk card | Google OAuth redirect | `EXTERNAL` |
+| Scan inbox | button | header | Reads Gmail, AI triage | `EXTERNAL` `AI` |
+| New email | button | header | Opens the compose drawer | `READ` |
+| (gear) | icon link | aria-label "Operations settings" | `/service-desk/settings` | `READ` |
+| Mine / Everyone | radios | group "Whose work" (Principal) | Scope | `READ` |
+| Person | select | aria-label "Show work for" (Principal) | Teammate filter | `READ` |
+| Queue names | buttons | rail | Open queue | `READ` |
+| Recently dismissed / Performance, 30 days / Service mix / Shortcuts | buttons | rail footer | Dialogs / reports | `READ` |
+| Sort | dropdown | aria-label "Sort" | Sort | `READ` |
+| (density icon) | button | title "Compact rows" / "Comfortable rows" | Density | `READ` |
+| Focus mode · t | button | Triage banner | Focus mode | `READ` |
+| Make a case / Make a case anyway | buttons | triage pane | Promote to case / show form | `WRITE` |
+| Not a case / Dismiss | buttons | triage pane | Dismiss (Undo 10 s) | `WRITE` |
+| More ▾ → Mark done | menu item | triage pane | Marks thread done | `WRITE` |
+| More ▾ → Hide this email | menu item | triage pane | Hides for you | `WRITE` |
+| More ▾ → Hide similar emails from now on… | menu item | triage pane | Suppression dialog | `WRITE` |
+| Track / Track as case / Dismiss / Suppress similar… / Hide from my inbox | row quick actions | hover | Same as pane | `WRITE` |
+| Make it a case now | button | sent mail pane | Creates a case | `WRITE` |
+| Restore | button | aria-label `Restore "{subject}" to triage` | Back to Triage | `WRITE` |
+| Show details: … | popover button | aria-label `Show details: {line}` | Recipient details | `READ` |
+| Show quoted text / Hide quoted text | button | email card | Toggles quote | `READ` |
+
+## Waits and signals
+- Loading: spinners in the list and pane; "Loading the full email…"; "Loading the conversation…".
+- Scanning: list banner `Scanning {mailbox}. Only your own mailbox is scanned.` (role "status").
+- After an action that moves a row, a card appears at the **top centre** (role "status"): `{action} → now in` and the queue name (optionally `· {vendor}` or `In {owner}'s queue`), with **Undo** (when offered), **View** and a close button (aria-label "Close"). It closes itself; hovering keeps it open. It can cover header controls; wait or close it.
+- Undo windows are 10 seconds and live only in that card or the toast.
+- The desk reloads when the browser tab becomes visible again; re-find rows by title.
+
+## Gotchas
+- Quick actions on rows appear only on hover or keyboard focus, and not at all in compact density.
+- After an action moves the selected row out of the list, the pane stays on it until you select another row.
+- Many controls are icon-only; use their aria-labels (listed above and in [Work a case](/operations/case#controls-reference)).
+- Triage decisions (Make a case, Not a case, Mark done, Hide, Suppress) change Ariya only, not Gmail.
+- In-app help presents **Mine / Everyone** to everyone; only Principals have it.
+- In-app help says the card after **Make a case** has **View** and **Undo**; it has **View** only.
+- In-app help omits that `e` on a triage email marks it done with no dialog.
+
+## Related
+- [Work a case](/operations/case)
+- [Email and replies](/operations/email-and-replies)
+- [Triage settings and Gmail connection](/operations/settings)
+- [Your day](/command-center/your-day)
+
+## Source files
+- `packages/web/src/app/(dashboard)/service-desk/page.tsx`
+- `packages/web/src/app/(dashboard)/service-desk/lib/queues.ts`
+- `packages/web/src/app/(dashboard)/service-desk/components/queue-rail.tsx`
+- `packages/web/src/app/(dashboard)/service-desk/components/ops-list.tsx`
+- `packages/web/src/app/(dashboard)/service-desk/components/ops-row.tsx`
+- `packages/web/src/app/(dashboard)/service-desk/components/triage-surface.tsx`
+- `packages/web/src/app/(dashboard)/service-desk/components/focus-mode.tsx`
+- `packages/web/src/app/(dashboard)/service-desk/components/suppression-dialog.tsx`
+- `packages/web/src/app/(dashboard)/service-desk/components/recently-dismissed-dialog.tsx`
+- `packages/web/src/app/(dashboard)/service-desk/components/help-modal.tsx`
+- `packages/web/src/app/(dashboard)/service-desk/[caseId]/page.tsx`
+- `packages/web/src/app/(dashboard)/service-desk/cases/page.tsx`

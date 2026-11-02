@@ -1,0 +1,403 @@
+---
+title: "Work a case"
+sidebarTitle: "Case"
+description: "Open an Operations case, read its brief and conversation, park it with the client or a vendor, assign it, edit its details, link or generate documents, add notes, merge, and mark it done."
+keywords: ["case", "open a case", "case brief", "waiting on client", "waiting on vendor", "ball with", "assign case", "take it", "reassign", "priority", "link client", "follow-up date", "SLA", "escalate", "blocked", "mark done", "close case", "reopen", "merge cases", "unmerge", "attach document to case", "generate from case", "case notes", "add a note"]
+---
+
+<Info>
+
+**URL:** `/service-desk?case={caseId}` (reading pane) or `/service-desk?case={caseId}&view=expanded` (full width, with tabs). Old links `/service-desk/{caseId}` redirect to the expanded URL · **Reach:** sidebar **Operations** → click a case row · **Roles:** Principal ✓ Operator ✓ (Unmerge: Principal or the case's owner only) · **Ready when:** the case title h2 and the section **Conversation** are visible and "Loading the conversation…" is gone.
+
+</Info>
+
+A case is one piece of client or vendor work tied to an email thread. This page covers everything on a case except writing and sending email, which is in [Email and replies](/operations/email-and-replies).
+
+<Warning>
+
+**Instant saves.** **With** (Us / Client / Vendor), **Owner**, **Priority**, **Service**, the client picker, flags and Details fields save the moment you choose an option. There is no Save button. Undo lives only in the toast or top-centre card for 10 seconds. Keyboard keys `1` / `2` / `3` / `e` also act at once: see [Keyboard shortcuts](/operations/inbox#keyboard-shortcuts).
+
+</Warning>
+
+## Page map
+Pane view (right of the list) and expanded view share the case surface. The expanded view hides the rail and list, adds breadcrumbs `Operations › {queue} › {case title}`, the hint "k previous · j next case", **Collapse to pane**, and a right side rail (aside aria-label "Case details") with tabs.
+
+1. **Header row 1:** client link (`/clients/{slug}`) and `· {sender}`, with a chevron (aria-label "Change client"); or a button "Link client" / `{sender} · Link client` when no client is linked. Then `{Service case|Vendor case|Internal case}, opened {Mon D}` and the service chip (aria-label "Service"; shows the service, "No service fits" or "Not sorted").
+2. **Header right:** **With** group (aria-label "Ball with"; hidden when the case is done): **Us**, **Client**, **Vendor ▾** (shows the vendor name when set). **Owner** dropdown (aria-label "Owner"; shows "No owner" or the owner). Expand or collapse icon (aria-label "Expand to full case" / "Collapse to pane").
+3. **Header row 2:** h2 case title, "Overdue" or "Done" chip, priority badge dropdown (aria-label "Priority"; P0 to P3).
+4. **Banner** (one at most): "Closed. Nothing more to do." + **Reopen** · "No one owns this yet." + **Take it** · `A follow-up you set is due today.` or `… was due {Mon D}.` + **Clear follow-up** · `Waiting on {the client|vendor} since {Mon D}. Ariya brings it back to Cases when they reply.` + **Draft a nudge**.
+5. **Brief strip:** **Next step**, **Waiting on**, **Done when** with `{n}% confidence`; ⋯ (aria-label "Brief actions") → **Looks right**, **Needs work**, **Refresh brief**. Optional "Case summary" list.
+6. **Notices:** load error, merge suggestion (pane only), send banner, post-send prompt.
+7. **Conversation** (section aria-label "Conversation"): `Conversation · {n} messages`, older messages collapsed.
+8. **Composer** (section aria-label "Reply"): see [Email and replies](/operations/email-and-replies).
+9. **Action bar** (pinned bottom): **Send reply** and "then" choice, or **Reply again** after a send; right side **Done** and ⋯ (aria-label "More case actions"; opens upward) → **Merge with another case**, **Change client**, **Open in Gmail**, **Mark escalated**, **Mark blocked**, `Clear {escalated|blocked}`, **Assign to Agentic AI** (when that owner exists), **Unmerge** (merged cases; Principal or owner).
+10. **Side rail tabs** (expanded only; role "tab"): **Details**, `Documents {n}`, `Activity {n}`, `Notes {n}`. The last tab used is remembered.
+
+## Recipes
+
+### Open a case
+**Risk:** `READ` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** case id, or client and subject
+
+1. Open `/service-desk?case={caseId}`. Without an id: open the queue (see [Open a queue](/operations/inbox#open-a-queue)) or search (see [Search mail and cases](/operations/inbox#search-mail-and-cases)) and click the row.
+   - Wait for: the h2 case title and **Conversation**; then "Loading the conversation…" to go.
+
+**Done when:** the case title h2 and the messages are visible.
+
+| If you see | Why | Do this |
+|---|---|---|
+| "Couldn’t load this case." with **Retry** | Load failed | Click **Retry** once. |
+| "This email is in another operator's mailbox" | The thread belongs to a teammate's mailbox | Report it; case fields still work. |
+| "Your Gmail account is not connected" with **Connect Gmail** | No Gmail link | Hand off: [Connect Gmail](/operations/settings#connect-gmail). The **Connect Gmail** link here goes to `/service-desk/settings`, which has no Gmail controls. |
+| "We could not reach Gmail for this case" with **Retry** and **Reconnect Gmail** | Gmail error | Click **Retry** once; reconnecting is a human hand-off. |
+| "No email on this case yet" | Case has no thread | Report it. |
+
+### Open the case at full width
+**Risk:** `READ` (may start `AI`) · **Roles:** Principal, Operator
+
+Needed for the **Details**, **Documents**, **Activity** and **Notes** tabs.
+
+1. Open `/service-desk?case={caseId}&view=expanded`. Alternative: click the expand icon (aria-label "Expand to full case"; visual: top right of the case header), or row ⋯ → **Open full width**.
+   - Wait for: the breadcrumbs and the tab list. If the case has no brief, Ariya writes one now: wait for "Ariya is reading the case…" to go.
+
+**Done when:** the tabs **Details**, **Documents**, **Activity**, **Notes** are visible on the right.
+
+To go back, click **Collapse to pane** (button) or the collapse icon (aria-label "Collapse to pane").
+
+### Read the brief and conversation
+**Risk:** `READ` · **Roles:** Principal, Operator
+
+1. Open the case.
+2. Read the brief strip: **Next step**, **Waiting on**, **Done when**. "No brief yet" means there is none; "Ariya is reading the case…" means it is being written.
+3. In **Conversation**, click a collapsed message (button) to open it. In the pane, click `Show {n} earlier` to see older messages (`Hide earlier` hides them). The expanded view shows "Fetched live from Gmail".
+4. Message bodies are inside frames titled "Email content".
+
+**Done when:** you have the brief and the messages you need.
+
+### Refresh or rate the brief
+**Risk:** `AI` (refresh) / `WRITE` (rating) · **Roles:** Principal, Operator
+
+1. Click ⋯ on the brief strip (icon button, aria-label "Brief actions").
+2. Click **Refresh brief** to rewrite it (slow; wait for "Ariya is reading the case…" to go), or **Looks right** / **Needs work** to rate it.
+
+**Done when:** toast "Brief refreshed", or "Thanks. Ariya will keep doing that." / "Noted. Ariya will do better."
+
+| If you see | Why | Do this |
+|---|---|---|
+| Toast "Couldn’t refresh the brief" | AI call failed | Retry once, then report. |
+| Toast "Couldn’t save the feedback" | Save failed | Retry once. |
+
+### Set waiting on the client
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+
+1. Open the case.
+2. Click **Client** in the **With** group (button, group aria-label "Ball with"; visual: header right). Alternative: row **Ball with ▾** → **Client**.
+
+**Done when:** top-centre card or toast `Waiting on client · follow-up {Mon D}`, and the case is in **Waiting on client**. The follow-up defaults to 3 days ahead; change it in **Details** → **Next follow-up** (see [Edit case details](#edit-case-details)).
+
+| If you see | Why | Do this |
+|---|---|---|
+| Toast "Ball is already with client" | Already parked there | Nothing to do. |
+| Toast "Couldn’t update the case" | Save failed | Retry once, then report. |
+
+Click **Undo** in the card within 10 seconds to reverse.
+
+### Set waiting on a vendor
+**Risk:** `WRITE` (adding a vendor with a domain also adds it to the shared vendor list) · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** vendor name; email domain if it is a new vendor
+
+1. Open the case.
+2. Click **Vendor ▾** in the **With** group (menu button; shows the vendor name when one is set).
+3. Under "Waiting on which vendor?" click the vendor (menu item).
+   - If the vendor is not listed (or the menu says "No vendors in Settings yet."), click **Add a vendor…** instead. Dialog "Waiting on a vendor" opens.
+   - Choose the vendor in the select (aria-label "Vendor this case is waiting on"; first option "— Choose a vendor —"). Choosing one assigns it at once.
+   - Or choose "+ Add a new vendor…", type **Vendor name** (placeholder "e.g. ADP") and optionally **Email domain (optional)** (placeholder "e.g. adp.com"), then click **Add vendor and assign** (when a domain is given) or **Assign to this case** (no domain). **Cancel** backs out.
+
+**Done when:** card or toast `Waiting on {vendor}`, and the case is in `Waiting on vendor · {vendor}`.
+
+| If you see | Why | Do this |
+|---|---|---|
+| "Enter a valid domain, like vendor.com." | Bad domain | Fix or clear the domain. |
+| Toast "Couldn’t add the vendor" or a server message | Save failed | Retry once, then report. |
+| Toast "Waiting on vendor · pick which vendor from the header" | Parked with no vendor named (key `3` or row menu) | Click **Vendor ▾** and pick the vendor. |
+
+### Keep the ball with us
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+
+1. Click **Us** in the **With** group.
+
+**Done when:** card or toast "Ball with us"; the case returns to **Cases**.
+
+### Take or reassign a case
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** the new owner (or "me")
+
+1. Open the case.
+2. To take an unowned case, click **Take it** in the banner "No one owns this yet." (button).
+3. To assign anyone, click the **Owner** dropdown (aria-label "Owner"; visual: header right) and pick the person. In the expanded view you can also use **Details** → pencil (aria-label "Edit Owner") → select.
+
+**Done when:** "Assigned to you. It is in Cases." (Take it), `Assigned to {name}` (Owner dropdown; the card may add `In {name}'s queue`), or "Owner updated" (Details).
+
+| If you see | Why | Do this |
+|---|---|---|
+| Toast "Couldn’t update the case" | Save failed | Retry once, then report. |
+
+### Assign a case to Agentic AI
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+
+1. Click ⋯ in the action bar (aria-label "More case actions"; visual: bottom right).
+2. Click **Assign to Agentic AI** (only listed when that owner exists).
+
+**Done when:** toast or card "Assigned to Agentic AI". The case shows as waiting on a support partner.
+
+### Change priority, service or type
+**Risk:** `WRITE` (`AI` for Let AI decide) · **Roles:** Principal, Operator
+
+1. Priority: click the priority badge (dropdown, aria-label "Priority"; next to the h2) → P0 to P3. Toast `Priority {P}`.
+2. Service: click the service chip (aria-label "Service"; header row 1) → pick a service, or **Let AI decide** / **Re-run AI**. Toast "Service updated", or after AI "Service sorted by AI", "AI found no matching service" or "AI left the service unchanged".
+3. Type (expanded only): **Details** → pencil (aria-label "Edit Type") → select "Service case", "Vendor case" or "Internal case". Toast "Type updated".
+
+**Done when:** the toast appears and the badge or chip shows the new value.
+
+| If you see | Why | Do this |
+|---|---|---|
+| "Couldn’t sort the case. Try again or pick a service." | AI failed | Pick the service by hand. |
+
+### Link or change the client
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** client name
+
+1. Unlinked case: click **Link client** (button in header row 1, or the **Link client** chip on the row). Linked case: click the chevron (aria-label "Change client"), or ⋯ **More case actions** → **Change client**.
+2. In the select (aria-label "Link this case to a client"; placeholder "Select a client…") choose the client. **Choosing links immediately.** A suggestion line `Suggested: {name} — confirm` may be offered.
+3. Other buttons in the picker: **Cancel**, **Change**, **Unlink**, **Link client**.
+
+**Done when:** toast "Client linked" (or "Client unlinked") and the header shows the client link.
+
+| If you see | Why | Do this |
+|---|---|---|
+| Toast "Failed to update client link" | Save failed | Retry once, then report. |
+
+### Edit case details
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+
+1. Open the case at full width and click the **Details** tab.
+2. Click the pencil next to the field (icon button, aria-label `Edit {Field}`): **Client**, **Type**, **Service**, **Priority**, **Owner**, **SLA due**, **Next follow-up**, **Vendor**, **Client impact**, **Resolution target**. **Ball with** and **Opened** are read-only.
+3. Enter the value:
+   - **SLA due** / **Next follow-up**: date input; **SLA due** also has **Clear** and **Cancel**.
+   - **Client impact**: textarea, then **Save** (**Cancel** backs out).
+   - Others: select; saves on change.
+
+**Done when:** toast "SLA date updated", "Follow-up updated", "Client impact updated", "Resolution target updated", "Type updated", "Service updated", `Priority {P}` or "Owner updated". The footer reads "Edits save on change · Undo stays available for 10s".
+
+The Details tab also lists "Related for this client" (case buttons that open those cases).
+
+### Clear a follow-up
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+
+1. On a case with the banner "A follow-up you set is due today." (or `… was due {Mon D}.`), click **Clear follow-up** (button).
+
+**Done when:** toast or card "Follow-up cleared".
+
+### Flag a case escalated or blocked
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+
+1. Click ⋯ **More case actions** (action bar, bottom right).
+2. Click **Mark escalated** or **Mark blocked**. To remove a flag click `Clear escalated` / `Clear blocked`.
+
+**Done when:** toast `Marked escalated` / `Marked blocked` (or "Flag cleared"), with **Undo**.
+
+### Mark a case done
+**Risk:** `WRITE` (Gmail is not changed) · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** optional resolution line
+
+1. Open the case.
+2. Click **Done** (button; action bar, bottom right). Alternative: row **Done**.
+   - Dialog "Done" opens: `Finish "{title}". Add a line on how it was resolved, or leave it blank.`
+3. Optional: type in the input (aria-label "Resolution summary (optional)"; placeholder "Optional: e.g. W-2c filed and copies sent to both employees"; max 500 characters).
+4. Click **Done** (button in the dialog). **Cancel** backs out. Enter in the input also submits.
+
+**Done when:** top-centre card `Marked done → now in Done` with **Undo** (10 seconds; Undo shows "Reopened").
+
+| If you see | Why | Do this |
+|---|---|---|
+| Toast "Couldn’t mark the case done" | Save failed | Retry once, then report. |
+
+### Reopen a case
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+
+1. Open `/service-desk?queue=done` and click the case.
+2. Click **Reopen** in the banner "Closed. Nothing more to do." (button).
+
+**Done when:** card or toast "Reopened".
+
+| If you see | Why | Do this |
+|---|---|---|
+| Toast "Couldn’t reopen the case" | Save failed | Retry once, then report. |
+
+### Merge two cases
+**Risk:** `WRITE` (no Undo on the toast; reversed only by Unmerge, which only a Principal or the owner can do) · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** the case to keep (title, client or owner)
+
+1. Open the case that should **move into** another case.
+2. Click ⋯ **More case actions** → **Merge with another case**.
+   - Dialog: `"{title}" moves into the case you pick, with its emails and history.`
+3. Type in the search box (placeholder "Find a case by title, client or owner").
+4. Click the target in the list (listbox aria-label "Cases").
+5. Click `Merge into "{title}"` (button; reads "Merge" and is disabled until a case is chosen). **Cancel** backs out.
+
+**Done when:** toast `Merged into "{title}"` and the desk opens the surviving case.
+
+| If you see | Why | Do this |
+|---|---|---|
+| "No open case matches." | No open case found | Try other words or report. |
+| Toast "Couldn’t merge the cases" or a server message | Merge failed | Report it. |
+
+### Answer a merge suggestion
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+
+1. When the pane shows `Likely the same work as "{title}"`, click **Merge** (pane) or **Merge into it** (Details tab), or **Not the same**.
+
+**Done when:** toast `Merged into "{title}"`, or "Kept as separate cases".
+
+### Unmerge a case
+**Risk:** `WRITE` · **Roles:** Principal, or the case's owner
+
+1. Open the merged case (or the surviving case).
+2. Click ⋯ **More case actions** → **Unmerge**, or in **Details** click **Unmerge** next to "Merged into the surviving case." or "A case was merged into this one."
+
+**Done when:** toast "Merge undone".
+
+| If you see | Why | Do this |
+|---|---|---|
+| No **Unmerge** | You are an Operator who does not own the case | Ask the owner or a Principal. |
+| Toast "Couldn’t update the merge" | Failed | Report it. |
+
+### Link an existing document to a case
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** document title
+
+1. Open the case at full width and click the `Documents {n}` tab.
+   - Wait for: "Loading documents" to go.
+2. Type part of the title in the search box (aria-label "Search documents to link"; placeholder "Search existing documents to link…"). It matches titles.
+3. Click **Link** on the result (button; becomes **Linked**).
+
+**Done when:** toast "Document linked" and the document is under **Linked documents**.
+
+| If you see | Why | Do this |
+|---|---|---|
+| "No documents match that title." | No match | Try other words or generate one. |
+| "Couldn’t load the documents" with **Retry** | Load failed | Click **Retry**. |
+| Toast "Couldn’t link the document" | Save failed | Retry once, then report. |
+
+### Generate a document from a case
+**Risk:** `READ` here; `AI` / `WRITE` on the next page · **Roles:** Principal, Operator
+
+1. Open the case at full width and click the `Documents {n}` tab.
+2. Click **Generate from case** (button next to **Linked documents**), or **Create** on the card `Suggested: {label}`.
+   - When the document assistant is on, this opens `/documents?case={caseId}` with the pill "Case attached — context loads on your first message". Otherwise it opens `/generate?…&source=service-case&case_id={caseId}` with the recommended template.
+3. Continue with [Create a document](/documents/create-a-document) and attach it back with [Attach to a case](/documents/create-a-document#attach-the-draft-to-a-case). That returns you to `/service-desk?case={caseId}&stage={documentId}` with the document staged on the reply.
+
+**Done when:** the document page is open with the case attached.
+
+### Stage a document for the reply
+**Risk:** `READ` (local to this browser tab; nothing is sent) · **Roles:** Principal, Operator
+**Preconditions:** the document is linked to the case (see [Link an existing document to a case](#link-an-existing-document-to-a-case))
+
+1. In the `Documents {n}` tab, click **Stage for reply** on the linked row (toggle; becomes **Staged**, aria-pressed "true").
+2. Optional: **Open** (link → `/documents/{id}`) to check it.
+
+**Done when:** the composer shows `{n} attachment(s)` with the document listed "· PDF". It goes out only with **Send reply**: see [Attach files to the reply](/operations/email-and-replies#attach-files-to-the-reply).
+
+### Add an internal note
+**Risk:** `WRITE` (internal; never emailed) · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** note text
+
+1. Open the case at full width and click the `Notes {n}` tab.
+2. Type in the box (textarea, placeholder "Add a note for the team…").
+3. Click **Add note** (button).
+
+**Done when:** toast "Note added" and the note is listed.
+
+| If you see | Why | Do this |
+|---|---|---|
+| Toast "Couldn’t add the note" | Save failed | Retry once, then report. |
+
+### Read case activity and correspondence history
+**Risk:** `READ` (reads the owner's Gmail history) · **Roles:** Principal, Operator
+
+1. Open the case at full width and click the `Activity {n}` tab.
+2. Read the timeline. Under "Recent correspondence" click **30 days** or **12 months** to widen the Gmail history.
+
+**Done when:** the timeline is shown. "Correspondence history is private to the inbox owner" means you are not the mailbox owner.
+
+### Reply on a case
+See [Draft a reply with Ariya](/operations/email-and-replies#draft-a-reply-with-ariya) and [Send the reply](/operations/email-and-replies#send-the-reply).
+
+## Controls reference
+| Visible text | Type | Locator | What it does | Risk |
+|---|---|---|---|---|
+| (client name) | link | header row 1 | `/clients/{slug}` | `READ` |
+| (chevron) | icon button | aria-label "Change client" | Client picker | `WRITE` |
+| Link client | button / row chip | header / row | Client picker | `WRITE` |
+| (service chip) | menu | aria-label "Service" | Service; **Let AI decide** / **Re-run AI** | `WRITE` `AI` |
+| Us / Client / Vendor ▾ | segmented buttons | group aria-label "Ball with" | Parks the case | `WRITE` |
+| Add a vendor… | menu item | Vendor ▾ menu | Vendor dialog | `WRITE` |
+| (owner) | dropdown | aria-label "Owner" | Reassigns | `WRITE` |
+| (expand / collapse) | icon button | aria-label "Expand to full case" / "Collapse to pane" | View | `READ` |
+| (priority badge) | dropdown | aria-label "Priority" | P0 to P3 | `WRITE` |
+| Reopen / Take it / Clear follow-up | banner buttons | under the title | As named | `WRITE` |
+| Draft a nudge | banner button | waiting banner | AI draft only | `AI` |
+| ⋯ | icon button | aria-label "Brief actions" | **Looks right**, **Needs work**, **Refresh brief** | `WRITE` `AI` |
+| Merge / Merge into it / Not the same | buttons | merge suggestion | Merge or dismiss | `WRITE` |
+| Retry | button | load errors | Retries | `READ` |
+| Done | button, then dialog | action bar | Closes the case | `WRITE` |
+| ⋯ | icon button | aria-label "More case actions" | Case menu | — |
+| Merge with another case | menu item | case menu | Merge dialog | `WRITE` |
+| Change client | menu item | case menu | Client picker | `WRITE` |
+| Open in Gmail | menu item | case menu | Opens Gmail in a **new tab**; do not use unless asked | `EXTERNAL` (read) |
+| Mark escalated / Mark blocked / `Clear {flag}` | menu items | case menu | Flags | `WRITE` |
+| Assign to Agentic AI | menu item | case menu | Owner = Agentic AI | `WRITE` |
+| Unmerge | menu item / button | case menu / Details | Reverses a merge | `WRITE` |
+| Details / Documents / Activity / Notes | tabs | side rail (expanded) | Switch tab | `READ` |
+| `Edit {Field}` | icon buttons | Details | Edit a field | `WRITE` |
+| Generate from case / Create | link buttons | Documents tab | Leaves for Documents | `READ` |
+| Link / Linked | button | Documents search results | Links a document | `WRITE` |
+| Stage for reply / Staged | toggle | linked row | Attaches on next send | `READ` |
+| Open | link | linked row | `/documents/{id}` | `READ` |
+| 30 days / 12 months | buttons | Activity tab | Gmail history window | `READ` |
+| Add note | button | Notes tab | Internal note | `WRITE` |
+
+## Waits and signals
+- "Loading the conversation…", "Loading documents", "Ariya is reading the case…" (AI brief; slow).
+- Field changes: top-centre card when the case changes queue (`{action} → now in {Queue}` with **Undo** and **View**), otherwise a toast with **Undo**. Undo lasts 10 seconds.
+- The card can cover header controls; close it (aria-label "Close") or wait.
+- After an action moves the case out of the current queue, the pane stays on it until you select another row.
+
+## Gotchas
+- Every header control saves instantly. Check the case title before clicking.
+- The client picker links on selection, not on a Save click.
+- **Open in Gmail** opens a new tab outside Ariya.
+- **Generate from case** leaves the desk. A reply being held for sending is sent at once if you navigate away (see [Undo a reply send](/operations/email-and-replies#undo-a-reply-send)).
+- In-app help says a merge can be undone with **Undo** on the confirmation; there is no Undo there. Use **Unmerge**.
+- In-app help says admins can unmerge; only a Principal or the case owner can.
+- In-app help says **Stage for reply** attaches an Ariya document; the document must be **Link**ed first.
+
+## Related
+- [Operations inbox](/operations/inbox)
+- [Email and replies](/operations/email-and-replies)
+- [Create a document](/documents/create-a-document)
+
+## Source files
+- `packages/web/src/app/(dashboard)/service-desk/page.tsx`
+- `packages/web/src/app/(dashboard)/service-desk/components/case-surface.tsx`
+- `packages/web/src/app/(dashboard)/service-desk/components/case-side-rail.tsx`
+- `packages/web/src/app/(dashboard)/service-desk/components/ball-with-control.tsx`
+- `packages/web/src/app/(dashboard)/service-desk/components/vendor-picker.tsx`
+- `packages/web/src/app/(dashboard)/service-desk/components/client-picker.tsx`
+- `packages/web/src/app/(dashboard)/service-desk/components/brief-strip.tsx`
+- `packages/web/src/app/(dashboard)/service-desk/components/conversation.tsx`
+- `packages/web/src/app/(dashboard)/service-desk/components/action-bar.tsx`
+- `packages/web/src/app/(dashboard)/service-desk/components/done-dialog.tsx`
+- `packages/web/src/app/(dashboard)/service-desk/components/merge-case-dialog.tsx`
+- `packages/web/src/app/(dashboard)/service-desk/components/pane-documents.tsx`
+- `packages/web/src/app/(dashboard)/service-desk/[caseId]/page.tsx`

@@ -63,7 +63,12 @@
       },
       {
         "group": "Operations",
-        "pages": []
+        "pages": [
+          "operations/inbox",
+          "operations/case",
+          "operations/email-and-replies",
+          "operations/settings"
+        ]
       },
       {
         "group": "Clients",
