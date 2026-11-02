@@ -15,7 +15,10 @@
         "pages": [
           "index",
           "start/operating-rules",
-          "start/task-router"
+          "start/task-router",
+          "start/login-and-session",
+          "start/global-ui",
+          "start/roles-and-access"
         ]
       },
       {
