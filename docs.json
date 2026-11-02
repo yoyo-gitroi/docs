@@ -85,12 +85,17 @@
       {
         "group": "Implementation",
         "pages": [
-          "implementation/portfolio"
+          "implementation/portfolio",
+          "implementation/workspace"
         ]
       },
       {
         "group": "Sales and HR Roadmap",
-        "pages": []
+        "pages": [
+          "sales/today-and-accounts",
+          "sales/account-books",
+          "sales/campaigns"
+        ]
       },
       {
         "group": "Intelligence",

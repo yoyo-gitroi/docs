@@ -1,0 +1,473 @@
+---
+title: "Sales Today and accounts"
+sidebarTitle: "Today and accounts"
+description: "Move around the Sales sidebar, read Today, filter HubSpot accounts, prep meetings and collect the prep kit, and work an account's next best action."
+keywords: ["sales", "sales today", "accounts", "hubspot accounts", "sync hubspot", "prep a meeting", "meeting prep", "prep kit", "check for result", "next best action", "follow-up email", "account workspace", "sales sidebar"]
+---
+
+<Info>
+**URL:** `/sales` (Today) · `/sales/accounts` · `/sales/accounts/{id}` · **Reach:** global sidebar **Sales**, then the Sales sidebar · **Roles:** Principal ✓ Operator ✓ (Member ✗) · **Ready when:** the page h1 reads **Today**, **Accounts** or the account name, and no `Loading…` text remains.
+</Info>
+
+Today lists what needs the salesperson now. Accounts lists HubSpot companies sorted by what needs attention. An account page holds meeting prep, prep kits and the AI next best action with its follow-up email.
+
+## Who can open Sales
+
+- Principal, Admin and Operator all have full (edit) access to every `/sales` page. No Sales control is hidden or disabled by role in the UI, so Principal and Operator see the same Today, Accounts and account pages.
+- Member: the global **Sales** entry is hidden. A Member who opens any `/sales` URL sees a page titled **Sales** with the text `Implementation, HR Assessment, Sales is not available on the Member profile.` Stop and report.
+- The link to change a template's category (from the next best action templates sheet) goes to Documents templates, which Operators cannot edit. Changing which templates are suggested needs a Principal or Admin.
+
+## The Sales sidebar
+
+Every Sales page has its own left sidebar (`nav`, aria-label `Sales`) next to the app's global sidebar. There is no top tab bar in Sales.
+
+| Visible text | Opens | Icon (visual) | Badge | Hidden when |
+|---|---|---|---|---|
+| Today | `/sales` | bar chart | count waiting | never |
+| Accounts | `/sales/accounts` | building | none | never |
+| Account books | `/sales/account-books` | target (bullseye) | count waiting | ABM switched off for the workspace |
+| Campaigns | `/sales/campaigns` | paper plane | none | ABM switched off for the workspace |
+| HR Roadmap | `/sales/hr-roadmap` | clipboard with a check | none | never |
+| Prospect Studio (under **More**) | `/sales/prospect-studio` | microscope | none | never |
+| Handoffs (under **More**) | `/sales/handoffs` | handshake | none | never |
+
+- Each item is a link with `title` equal to its label and `aria-current="page"` when it is the current section. **Today** is active only on exactly `/sales`; the others stay active on their child pages.
+- When **Account books** and **Campaigns** are missing from the sidebar, their URLs still exist; open them directly.
+- Badge counts refresh every 60 seconds and when the browser window regains focus. A failed refresh keeps the last counts.
+
+### Icon-only mode below 1536px
+
+When the browser window is narrower than 1536px, the sidebar shrinks to a 56px icon rail:
+
+- Item labels, the group labels **SALES** and **MORE**, and the count pills are hidden. Only the icons remain, plus a small amber dot on an item that has a count above 0.
+- The count pill's aria-label `{n} waiting` is not available in this mode.
+- **Find items by their `title` attribute or their `href`, not by visible text.** Visually, use the icon column in the table above. Hovering an icon shows its label as a browser tooltip.
+- At 1536px or wider the sidebar is 220px with labels and amber count pills.
+
+Other Sales pages (Prospects, Pipeline, Work queue, Documents, Manager) are not in the sidebar. See [Prospects and other Sales pages](/sales/prospects-and-other).
+
+## Page map
+
+### Today (`/sales`)
+- **Header** (top right): **Sync HubSpot** button with `synced {relative time}` under it.
+- **Attention bar** (amber strip, only when something waits): links `{n} review waiting` / `{n} reviews waiting`, `{n} meeting today` / `{n} meetings today`, `{n} prep failed`.
+- **Next meetings** card (`This week`): one row per meeting with time link, account link, a status pill (**Kit ready**, **Prep running**, **No prep yet**, **Prep failed**) and the matching button.
+- **Books waiting for review** card (only when at least one): pill `{n} book(s) waiting`, rows with book title, `{n} candidates`, and an amber `Review {n} accounts` button.
+- **Funnel** card (`HubSpot lifecycle stages`): one link row per stage; footnote `Click a stage to open Accounts filtered to it`.
+- **Deals** (`Open deals from HubSpot`) and **Recent activity** (`Synced from HubSpot`) cards side by side.
+
+### Accounts (`/sales/accounts`)
+- Header: **Sync HubSpot** + `synced {when}`.
+- KPI tiles: **Meeting this week**, **No next action**, **Prep ready**, **Prep failed**, **All accounts** (each with a count).
+- Filter bar: **List** / **Board** toggle, `Owner: …` chip, `Stage: …` chip, **In a book** toggle, text `Filters live in the URL · shareable`, search box `Search accounts`.
+- List view table: **Company**, **Stage**, **Owner**, **Next action**, **Meeting**, **Last touch**; pagination under it (25 per page). Board view: one column per lifecycle stage.
+
+### Account workspace (`/sales/accounts/{id}`)
+- Header: h1 account name, lifecycle pill, `Owner: {first name}`, domain link; buttons **Open in HubSpot** (new tab) and **Refresh**.
+- Left rail `This account`: **Now** (amber `1 waiting` when the account waits on you), **Meetings**, **Prep kits**, **Documents**, **History**, each with a count.
+- Centre, by section: **Now** = Next best action card, prep card, latest kit; **Meetings** = prep card, **Coming up**, **Earlier**; **Prep kits** = kit card and **Run history**; **Documents** = **Documents** card; **History** = **Context from HubSpot**.
+- Right rail (stacks under the centre below 1536px): **Company**, **HubSpot context**, **Deals**, `In {n} book(s)`, **Activity**. Read only.
+
+## Recipes
+
+### Open a Sales page from the sidebar
+**Risk:** `READ` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** which Sales page.
+
+1. Open the URL directly when you know it (table above). Otherwise continue.
+2. Click the sidebar item (link; `title` = the label, for example `title "Account books"`; visual: left Sales rail, icon from the table above).
+   - Below 1536px wide there is no visible text. Match on `title` or `href`.
+   - Wait for: the page h1 to match the item and `aria-current="page"` on the item.
+
+**Done when:** the h1 matches the target page.
+
+| If you see | Why | Do this |
+|---|---|---|
+| No **Account books** or **Campaigns** item | ABM is switched off for this workspace | Open `/sales/account-books` or `/sales/campaigns` by URL; if the page errors, report it |
+| Page titled **Sales** with `… is not available on the Member profile.` | Signed in as a Member | Stop; Sales needs Principal, Admin or Operator |
+
+### Pull the latest companies from HubSpot
+**Risk:** `WRITE` (reads HubSpot into Ariya; nothing is written to HubSpot) · **Roles:** Principal, Operator
+
+1. Open `/sales` or `/sales/accounts`.
+2. Click **Sync HubSpot** (button; visual: top right of the page header, above `synced {when}`).
+   - Wait for: the button spinner to stop and a toast at the bottom of the screen.
+
+**Done when:** toast `Synced {n} account(s) from HubSpot` and the page reloads with a fresh `synced …` time.
+
+| If you see | Why | Do this |
+|---|---|---|
+| Toast `Sync failed` or another server message | HubSpot sync failed | Retry once; then report the toast text |
+
+### Prep a meeting from Today
+**Risk:** `AI` `EXTERNAL` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** which meeting (account name and time).
+**Preconditions:** the meeting row in **Next meetings** shows **No prep yet** or **Prep failed**.
+
+1. Open `/sales`. Wait for the **Next meetings** card (list `testid "today-meetings"`).
+2. Find the row by account name.
+
+<Warning>**Approval required (EXTERNAL).** Stop here and get approval before clicking **Prep for …** or **Retry**. The click sends the meeting time, meeting link and contact email to the Clarwiz meeting-prep webhook outside Ariya. Nothing is emailed to the contact.</Warning>
+
+3. Click `Prep for {Day} {HH:MM}` (button; visual: right end of the meeting row; solid only on the soonest meeting, outline on the others) or **Retry** (ghost button, on a **Prep failed** row).
+   - The day part is a weekday such as `Tue` for meetings within about 6 days, otherwise the day of the month, for example `Prep for 21 15:00`.
+   - If the meeting has no contact email, the click does not start a prep: the browser loads `/sales/accounts/{id}?section=now` instead. Continue with [Prep a meeting from the account workspace](#prep-a-meeting-from-the-account-workspace).
+   - Wait for: the button spinner to stop and a toast.
+4. Continue with [Check whether a prep kit is ready](#check-whether-a-prep-kit-is-ready).
+
+**Done when:** toast `Preparing your meeting kit` and the row pill reads **Prep running**.
+
+| If you see | Why | Do this |
+|---|---|---|
+| Toast `Could not start the prep ({status})` or `Could not start the prep` | Request failed | Retry once; then report |
+| Toast `Sales Klarvis actions are disabled` | Clarwiz prep is switched off on the server | Stop and report |
+| Toast with another run error | Clarwiz rejected the run | Report the toast text |
+
+### Check whether a prep kit is ready
+**Risk:** `READ` (asks Clarwiz for the run status) · **Roles:** Principal, Operator
+**Preconditions:** a prep was started. The status never updates by itself.
+
+1. On Today (`/sales`): click **Refresh** (button; visual: on the meeting row that shows **Prep running**).
+   On the account page (`/sales/accounts/{id}?section=now` or `?section=prep-kits`): click **Check for result** (button; visual: inside the sky-blue `Preparing… your kit lands on this page.` box, or on a row of the **Run history** card).
+   - Wait for: a toast.
+2. If the toast is `Still preparing — check again shortly`, wait about a minute and repeat step 1. Stop after about 10 tries and report.
+
+**Done when:** toast `Prep kit is ready`; Today row pill **Kit ready** with an **Open kit** button; on the account page the kit renders (`testid "prep-kit"`).
+
+| If you see | Why | Do this |
+|---|---|---|
+| Toast `That prep failed`, `Run failed`, `Run escalated`, or a run error | The prep did not complete | Read the error; ask whether to retry (retry needs approval again) |
+| Red text `The last prep did not go through: {error} (Failed)` or `(Escalated)` | Earlier prep failed | Same as above |
+| Toast `Could not check the prep` (Today) or `Could not check the result` (account) | Status request failed | Try again in a minute |
+| `The prep kit came back empty. Check for the result again in a moment.` | Kit not populated yet | Click **Check for result** again |
+
+### Open a ready prep kit
+**Risk:** `READ` · **Roles:** Principal, Operator
+
+1. Open `/sales/accounts/{id}?section=prep-kits`. Alternative: on Today click **Open kit** (link button; visual: meeting row with **Kit ready**).
+2. Read the kit card (`testid "prep-kit"`; heading `Prep kit · {date}`): `Meeting {date}`, **Join link** (opens the meeting URL in a new tab), hook line quote, **What they told us**, **Why now**, **Top discovery questions** (numbered), **If it resonates**, **Watch-outs** (red).
+
+**Done when:** the kit sections are visible. Earlier runs are listed in **Run history**.
+
+### Review a staged book from Today
+**Risk:** `READ` · **Roles:** Principal, Operator
+
+1. Open `/sales`.
+2. Click `Review {n} accounts` (amber link button; visual: **Books waiting for review** card) or the `{n} review waiting` link in the amber attention bar.
+   - One waiting run opens `/sales/account-books/{batchId}?run={runId}&step=review`. Several open `/sales/account-books?kpi=needs_review`.
+
+**Done when:** the book's **Review results** view is open. Continue on [Account books](/sales/account-books#review-a-run-and-add-accounts).
+
+### Filter the accounts list
+**Risk:** `READ` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** owner, stage, KPI, search text, list or board.
+
+1. Open the filtered URL directly, for example `/sales/accounts?owner=me&kpi=meeting_this_week`. Parameters:
+   - `kpi`: `meeting_this_week`, `no_next_action`, `prep_ready`, `prep_failed`, `all` (default)
+   - `owner`: `all` (default), `me`, `unassigned`, or an owner email
+   - `stage`: lower-case HubSpot lifecycle stage, for example `lead`, `opportunity`, `customer`, `unknown`
+   - `inBook`: `1`
+   - `q`: search text
+   - `view`: `list` (default) or `board`
+   - `page`: page number, 25 accounts per page
+2. Or use the controls: click a KPI tile (link; visual: row of five tiles under the header). Click the active tile again to clear it.
+3. Click the `Owner: …` chip (dropdown button with a chevron) and choose **Anyone**, **Me**, **Unassigned** or an owner name.
+4. Click the `Stage: …` chip and choose **any** or a stage.
+5. Click **In a book** (toggle link, `aria-pressed`) to show only accounts in an account book.
+6. Type in the search box (placeholder and aria-label `Search accounts`). The URL updates 250 ms after you stop typing.
+
+**Done when:** the URL carries the parameters and the table or board refreshes.
+
+| If you see | Why | Do this |
+|---|---|---|
+| `No accounts match {filters}. Clear a filter, or pull the latest companies from HubSpot.` | Nothing matches | Click **Clear filters** or loosen a filter |
+| `No accounts yet` / `There are no HubSpot companies here yet.` | No sync has run | Run [Pull the latest companies from HubSpot](#pull-the-latest-companies-from-hubspot) |
+| `Could not load accounts. {error}` | Load failed | Reload once; then report |
+
+### Prep a meeting from the Accounts list
+**Risk:** `AI` `EXTERNAL` · **Roles:** Principal, Operator
+**Preconditions:** the row's **Next action** column shows `No prep yet` with a `Prep for …` button, or **Prep failed** with **Retry**.
+
+1. Open `/sales/accounts?kpi=meeting_this_week`.
+2. Find the row by company name.
+
+<Warning>**Approval required (EXTERNAL).** Stop here and get approval before clicking **Prep for …** or **Retry**. It sends meeting details and the contact email to the Clarwiz meeting-prep webhook. Nothing is emailed to the contact.</Warning>
+
+3. Click `Prep for {Day} {HH:MM}` or **Retry** (Next action column).
+   - If it is a link rather than a button (meeting time or contact email missing, or Clarwiz off), it only opens `/sales/accounts/{id}?section=now`. Continue with [Prep a meeting from the account workspace](#prep-a-meeting-from-the-account-workspace).
+   - Wait for: the row button spinner and a toast.
+
+**Done when:** toast `Preparing your meeting kit`, the list reloads, and the row shows **Prep running**. Then [check whether the kit is ready](#check-whether-a-prep-kit-is-ready).
+
+Failures: same toasts as [Prep a meeting from Today](#prep-a-meeting-from-today).
+
+### Prep a meeting from the account workspace
+**Risk:** `AI` `EXTERNAL` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** meeting date and time and contact email if HubSpot lacks them; optional meeting link, interest, timeline.
+
+1. Open `/sales/accounts/{id}?section=now` (or `?section=meetings`).
+2. Read the prep card (title `Prep for {Day}` or `Prep a meeting`).
+   - `Meeting {datetime} with {email}, both taken from HubSpot.` means one click is enough: go to step 4.
+   - `HubSpot did not give us …. Fill that in and start the prep.` means the form is open: go to step 3.
+   - `Connect Clarwiz to enable actions` means prep is unavailable: stop and report.
+   - To change HubSpot's details, click **Edit details** (ghost button) to show the form.
+3. Fill the form:
+   - **Meeting date and time** (required; `datetime-local` input, id `ae-meeting-date`)
+   - **Contact email** (required; email input, id `ae-client-email`)
+   - **Meeting link** (url input, id `ae-meeting-link`, placeholder `https://meet.google.com/…`)
+   - **Interest** (input, id `ae-interest`, placeholder `What they are shopping for`)
+   - **Timeline** (input, id `ae-timeline`, placeholder `e.g. Q4 go-live`)
+
+<Warning>**Approval required (EXTERNAL).** Stop here and get approval before clicking **Start prep**, **Prep for …** or **Try again**. The meeting details and contact email go to the Clarwiz meeting-prep webhook.</Warning>
+
+4. Click `Prep for {Day} {HH:MM}` or **Try again** (large button in the prep card), or **Start prep** (submit button under the form; disabled until date and email are filled).
+   - Wait for: a toast.
+
+**Done when:** toast `Preparing your meeting kit` and a sky-blue box `Preparing… your kit lands on this page.` with a status chip (**Queued**, **Preparing…** or **Not ready yet**). Then [check whether the kit is ready](#check-whether-a-prep-kit-is-ready).
+
+| If you see | Why | Do this |
+|---|---|---|
+| **Start prep** stays disabled | Date or email empty | Fill both required fields |
+| Toast `Could not start the prep` or a validation message | Server rejected the input | Fix the field named in the toast |
+| Toast `Sales Klarvis actions are disabled` | Clarwiz prep switched off | Stop and report |
+
+### Generate the next best action
+**Risk:** `AI` · **Roles:** Principal, Operator
+
+1. Open `/sales/accounts/{id}?section=now`. The **Next best action** card (`testid "nba-frame"`) is in the centre column. It is never generated on page load.
+2. Click **Generate next best action** (button, `testid "nba-generate"`) when the card is empty, or **Regenerate** (ghost button, `testid "nba-regenerate"`) when one exists, or **Regenerate now** (text button in the sky hint `New context — regenerate?`, `testid "nba-stale-hint"`).
+   - Wait for: the button spinner to stop. It can take many seconds.
+
+**Done when:** toast `Next best action ready` (or `Still the current recommendation`, which means nothing changed in the last 2 minutes) and the card shows a title (`testid "nba-title"`), rationale, kind chip, confidence chip, and the pill **Waiting on you**.
+
+| If you see | Why | Do this |
+|---|---|---|
+| Red box (`testid "nba-error"`) and toast `Could not generate a next best action` or a server message | Model call failed | Retry once; then report |
+
+### Accept a recommendation and open the draft
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+**Preconditions:** a recommendation with **Waiting on you**.
+
+1. Open `/sales/accounts/{id}?section=now`.
+2. Click **Accept and open draft** or **Accept** (primary button, `testid "nba-accepted"`; visual: button row under the rationale).
+
+**Done when:** toast `Accepted — the draft is open below`, pill **Accepted**, and the **Email to send** editor (`testid "nba-email"`) appears.
+
+| If you see | Why | Do this |
+|---|---|---|
+| Toast or red box `Could not save that decision` | Save failed | Retry once; then report |
+
+### Dismiss a recommendation
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** the reason.
+
+1. Open `/sales/accounts/{id}?section=now`.
+2. Click **Dismiss** (outline button, `testid "nba-dismissed"`). A popover opens next to the button titled `Dismiss this recommendation?`.
+3. Type the reason in the textarea (aria-label `Reason`, placeholder `Why? This is kept on the record.`, max 500 characters). The confirm button stays disabled until there is text.
+4. Click **Dismiss** (the confirm button inside the popover, not the original button).
+
+**Done when:** toast `Dismissed — the reason is kept on the account`.
+
+### Mark a recommendation done
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+
+1. Open `/sales/accounts/{id}?section=now`.
+2. Click **Mark done** (ghost button, `testid "nba-done"`).
+
+**Done when:** toast `Marked done`. Error: `Could not save that decision` or a server message.
+
+### Create the suggested document
+**Risk:** `AI` `WRITE` · **Roles:** Principal, Operator
+**Preconditions:** the card shows a box `Suggested document: {template title}` (`testid "nba-document"`).
+
+1. Open `/sales/accounts/{id}?section=now`.
+2. Click **Create document** (small button, `testid "nba-create-document"`; visual: inside the Suggested document box). The text changes to `Creating…`.
+   - Wait for: the AI to fill the template. This creates a full Ariya document, not a skeleton.
+
+**Done when:** toast `{title} created`, text `Created — review it before you send.`, and the button is replaced by **Open document** (link, `testid "nba-open-document"`) to `/documents/{documentId}`. The document is also listed at `/sales/accounts/{id}?section=documents`.
+
+| If you see | Why | Do this |
+|---|---|---|
+| Red text `That template is no longer available to Sales recommendations` | Template left the Sales category | Report; a Principal or Admin can fix the template category |
+| Red text `Could not create the document` or another server message | Generation failed | Retry once; then report |
+
+To review, edit or download the document, follow [Create a document](/documents/create-a-document).
+
+### Send the follow-up email
+**Risk:** `EXTERNAL` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** recipients, subject and body (or approval of the draft).
+**Preconditions:** the recommendation is accepted; no amber blocked line (`testid "nba-send-blocked"`) under the editor.
+
+1. Open `/sales/accounts/{id}?section=now`. Find the **Email to send** editor (`testid "nba-email"`).
+2. Fill **To** (input, aria-label `To`, placeholder `name@company.com`; separate addresses with commas, semicolons or spaces). Or click a contact chip `+ {contact name} · {title}` under the field to append that email.
+3. Fill **Cc** (input, aria-label `Cc`) if needed.
+4. Check **Subject** (input, aria-label `Subject`) and **Body** (textarea, aria-label `Body`).
+5. Click outside the last field you edited. Fields save on blur.
+6. Decide **Attach the document as a PDF** (checkbox; shown only when a document exists; ticked by default).
+
+<Warning>**Approval required (EXTERNAL).** Stop here and get approval before clicking **Send**. The email goes from the user's own Gmail to the recipients. Show the human the To, Cc, Subject, Body and whether the PDF is attached.</Warning>
+
+7. Click **Send** (button, `testid "nba-send"`).
+   - The button area shows `Sending in {n}s…` and **Undo** (button, `testid "nba-send-undo"`) for 5 seconds. Click **Undo** to cancel (toast `Send cancelled`). Do not navigate away during the hold: leaving the page cancels the send.
+   - Wait for: a toast after the hold.
+
+**Done when:** toast `Sent from {address}` or `Sent from your Gmail`.
+
+| If you see | Why | Do this |
+|---|---|---|
+| `Add at least one recipient.` (red, `testid "nba-email-error"`) | To is empty | Fill **To** |
+| `The email needs a subject and a body.` | Subject or body empty | Fill both |
+| Amber `Sending from Ariya is not enabled here — copy the email instead.` | Sending is off | Use [Copy the email instead](#copy-the-email-instead-of-sending) |
+| Amber `Connect your Gmail on the Operations page to send from here.` or `Reconnect Gmail on the Operations page and allow sending.` | Gmail not connected or missing send permission | Stop; a human must connect Gmail (link **Open Operations** → `/service-desk`; OAuth is a human step) |
+| Amber `Attachments are not enabled here — untick the document or copy the email.` | Attachments off | Untick the PDF box (get approval again) or copy |
+| `Sending email from Ariya is not enabled in this environment.` | Server sending off | Copy instead |
+| `Connect your Gmail before sending.` / `Reconnect Gmail and allow sending, then try again.` | Gmail auth | Hand to a human |
+| `Create the document before attaching it.` / `The document no longer exists.` | Attachment problem | Untick the PDF or create the document |
+| `Email attachments are not enabled in this environment. The email was not sent.` | Attachments off | Untick the PDF |
+| `PDF generation is unavailable. The email was not sent.` / `Could not render "{title}" to PDF. The email was not sent.` | PDF failed | Untick the PDF or report |
+| `The document is too large to attach (7MB limit). The email was not sent.` | Too large | Untick the PDF |
+| `Gmail did not accept the email: {reason}` | Gmail rejected it | Report the reason |
+
+### Copy the email instead of sending
+**Risk:** `READ` · **Roles:** Principal, Operator
+
+1. Open `/sales/accounts/{id}?section=now` with an accepted recommendation.
+2. Click **Copy** (button, `testid "nba-copy"`).
+
+**Done when:** toast `Email copied`. The clipboard holds `Subject: …` then the body.
+
+### See which templates the next best action can suggest
+**Risk:** `READ` · **Roles:** Principal, Operator (changing templates: Principal only)
+
+1. Open `/sales/accounts/{id}?section=now`.
+2. Click the gear icon (icon button, aria-label `Templates this can recommend`, `testid "nba-templates-button"`; visual: top right of the Next best action card).
+3. Read the sheet **Templates it can recommend**: `Can be recommended ({n})` and `In Sales but not recommendable ({n})` with amber reasons. Each title links to `/documents/templates/{templateId}`.
+4. Close with **Close** (icon button, sr-only text `Close`).
+
+**Done when:** the list was read. An empty list shows `None yet. Move a template into the Sales category to start.` Moving a template happens in Documents templates, which Operators cannot edit.
+
+### Read account history and context
+**Risk:** `READ` · **Roles:** Principal, Operator
+
+1. Open `/sales/accounts/{id}?section=history` for **Context from HubSpot** (`testid "account-context"`), or `?section=meetings` for **Coming up** and **Earlier** meetings, or `?section=documents` for documents created from a next best action.
+2. Expand older recommendations with `Previous recommendations ({n})` (`details` summary, `testid "nba-history"`) on **Now**.
+3. In long timelines click `Show {n} more` (button) to expand.
+4. Click **Refresh** (ghost button, page header) to reload local data and HubSpot context. This is not the prep-status check.
+
+**Done when:** the section is visible. The right rail shows `loading…` until HubSpot context returns.
+
+| If you see | Why | Do this |
+|---|---|---|
+| `Couldn’t load HubSpot context. {error}` | HubSpot read failed | Click **Refresh** once; then report |
+| Grey lines in `testid "context-errors"` | Part of the HubSpot read failed | Note them; the rest is usable |
+| `Could not load this account. {error}` | Wrong id or server error | Check the id from the Accounts list |
+
+## Controls reference
+
+### Today
+| Visible text | Type | Locator | What it does | Risk |
+|---|---|---|---|---|
+| Sync HubSpot | button | page header | Reads HubSpot companies into Ariya | WRITE |
+| `{n} reviews waiting` | link | amber attention bar | One run: book Review step; several: `/sales/account-books?kpi=needs_review` | READ |
+| `{n} meetings today` | link | amber attention bar | `/sales/accounts?kpi=meeting_this_week` (a week filter, not today) | READ |
+| `{n} prep failed` | link | amber attention bar | `/sales/accounts?kpi=prep_failed` | READ |
+| `{time}` | link | meeting row | `/sales/accounts/{id}?section=meetings` | READ |
+| `{account name}` | link | meeting row | `/sales/accounts/{id}` | READ |
+| Open kit | link button | row with **Kit ready** | `/sales/accounts/{id}?section=prep-kits` | READ |
+| Refresh | button | row with **Prep running** | Checks the prep run with Clarwiz | READ |
+| `Prep for {Day} {HH:MM}` | button | row with **No prep yet** | Starts prep, or opens the account if no contact email | AI, EXTERNAL |
+| Retry | ghost button | row with **Prep failed** | Starts prep again | AI, EXTERNAL |
+| `{n} books waiting` | pill link | Books waiting card | `/sales/account-books?kpi=needs_review` | READ |
+| `Review {n} accounts` | amber link button | Books waiting card | Book Review step | READ |
+| `{stage}` | link row | Funnel card | `/sales/accounts?stage={stage}` | READ |
+| `Show all {n} deals` / Show fewer | button | `testid "deals-show-all"` | Expands the deals list (more than 6) | READ |
+| `{subject} · {account}` | link | Recent activity | `/sales/accounts/{id}?section=history` | READ |
+| Open accounts | link button | empty states | `/sales/accounts` | READ |
+
+### Accounts
+| Visible text | Type | Locator | What it does | Risk |
+|---|---|---|---|---|
+| Meeting this week, No next action, Prep ready, Prep failed, All accounts | KPI tile links | `aria-current="true"` when active | Sets or clears `kpi` | READ |
+| List / Board | segmented links | filter bar | Sets `view` | READ |
+| `Owner: …` | dropdown chip | filter bar | Sets `owner` | READ |
+| `Stage: …` | dropdown chip | filter bar | Sets `stage` | READ |
+| In a book | toggle link | `aria-pressed` | Sets `inBook=1` | READ |
+| (search) | search input | aria-label `Search accounts` | Sets `q` after 250 ms | READ |
+| `{company name}` | link | Company column | Account workspace | READ |
+| Open | ghost link | Next action column, under the recommendation title | `?section=now` | READ |
+| `Prep for {Day} {HH:MM}` / Prep meeting | button or link | Next action column | Button starts prep; link opens `?section=now` | AI, EXTERNAL (button) |
+| Retry | ghost button or link | **Prep failed** state | Starts prep again | AI, EXTERNAL |
+| Generate | outline link | `Nothing next yet` state | Only opens `?section=now`; does not generate | READ |
+| `{meeting time}` | link | Meeting column, `title` = meeting subject | `?section=meetings` | READ |
+| `{relative time}` | link | Last touch column | `?section=history` | READ |
+| `Show all {n} in a list` | link | board column | `?view=list&stage={stage}` | READ |
+| Clear filters | link | empty state | `/sales/accounts` | READ |
+| Previous / Next | links | under the table | Changes page | READ |
+
+### Account workspace
+| Visible text | Type | Locator | What it does | Risk |
+|---|---|---|---|---|
+| Open in HubSpot | link, new tab | page header | Opens the HubSpot company record | READ |
+| Refresh | ghost button | page header | Reloads account and HubSpot context | READ |
+| Now / Meetings / Prep kits / Documents / History | links | `nav` aria-label `This account` | Sets `?section=` | READ |
+| (gear) | icon button | aria-label `Templates this can recommend` | Opens the templates sheet | READ |
+| Generate next best action | button | `testid "nba-generate"` | First recommendation | AI |
+| Regenerate / Regenerate now | button | `testid "nba-regenerate"` / `"nba-stale-hint"` | New recommendation | AI |
+| Accept and open draft / Accept | button | `testid "nba-accepted"` | Accepts; opens the email editor | WRITE |
+| Dismiss | button, then popover | `testid "nba-dismissed"` | Dismisses with a required reason | WRITE |
+| Mark done | ghost button | `testid "nba-done"` | Marks done | WRITE |
+| Create document | button | `testid "nba-create-document"` | AI fills the suggested template | AI, WRITE |
+| Open document | link | `testid "nba-open-document"` | `/documents/{documentId}` | READ |
+| To / Cc / Subject / Body | inputs | aria-labels `To`, `Cc`, `Subject`, `Body` | Draft fields, save on blur | WRITE |
+| Attach the document as a PDF | checkbox | email editor | Attaches the document | none |
+| Send | button | `testid "nba-send"` | Sends from Gmail after a 5-second hold | EXTERNAL |
+| Undo | button | `testid "nba-send-undo"` | Cancels during the hold | none |
+| Copy | button | `testid "nba-copy"` | Copies the email | READ |
+| Open Operations | link | amber blocked line | `/service-desk` | READ |
+| `Prep for {Day} {HH:MM}` / Try again / Start prep | buttons | prep card | Starts prep | AI, EXTERNAL |
+| Edit details / Cancel | ghost buttons | prep card | Show or hide the prep form | none |
+| Check for result | button | sky Preparing box, Run history rows | Checks the prep run | READ |
+| Join link | link, new tab | prep kit | Meeting URL | READ |
+| Go to Now | link | empty Meetings or Documents | `?section=now` | READ |
+| `{doc title}` | link | Documents card | `/documents/{id}` | READ |
+
+## Waits and signals
+- Prep kits never update on their own. Press **Refresh** (Today) or **Check for result** (account) about once a minute. Signals: toast `Prep kit is ready`, pill **Kit ready**, kit card with `testid "prep-kit"`.
+- Next best action and document creation run while the button spins; there is no polling.
+- Sales sidebar badges refresh every 60 seconds and on window focus.
+- Loading text: `Loading accounts…`, `Loading account…`, `Loading…` (Next best action, `testid "nba-loading"`). Today shows grey skeleton bars, no text.
+- Errors: `Could not load Today. {error}` (red banner), `Could not load accounts. {error}`, `Could not load this account. {error}`. Clarwiz off: sky banner `Connect Clarwiz to enable actions`.
+- Toasts appear at the bottom of the screen and disappear after a few seconds. Read them right after the click.
+
+## Gotchas
+- **Generate** in the Accounts list only opens the account; it does not generate anything.
+- A `Prep for …` control may be a link (missing time or contact, or Clarwiz off). It then opens the account page instead of starting a prep.
+- The Today attention link `{n} meetings today` filters to the whole week (`kpi=meeting_this_week`).
+- Email fields save on blur. Click outside a field before you send.
+- The real send happens 5 seconds after **Send**. Leaving the page in those 5 seconds cancels it.
+- **Open in HubSpot** and **Join link** open new tabs. Switch back to the Ariya tab afterwards.
+- Board view columns show only some accounts. Use `Show all {n} in a list`.
+- Switching account sections does not scroll the page.
+- Nothing in Sales writes to HubSpot. **Sync HubSpot** only reads.
+- In-app help (? panel) for Today says "Everything here is read from HubSpot; nothing is written back". True for HubSpot, but prep buttons call the Clarwiz webhook.
+- In-app help writes the prep button as "Prep for Day HH:MM". The app shows the weekday only within about 6 days, otherwise the day of the month (`Prep for 21 15:00`).
+
+## Related
+- [Account books](/sales/account-books)
+- [Campaigns](/sales/campaigns)
+- [HR Roadmap](/sales/hr-roadmap)
+- [Prospects and other Sales pages](/sales/prospects-and-other)
+- [Create a document](/documents/create-a-document)
+
+## Source files
+- `packages/web/src/app/(dashboard)/sales/layout.tsx`
+- `packages/web/src/app/(dashboard)/sales/_ui/sales-sidebar.tsx`
+- `packages/web/src/lib/navigation.ts`
+- `packages/web/src/app/(dashboard)/sales/page.tsx`
+- `packages/web/src/app/(dashboard)/sales/_overview/overview-ui.tsx`
+- `packages/web/src/app/(dashboard)/sales/accounts/page.tsx`
+- `packages/web/src/app/(dashboard)/sales/accounts/_components/accounts-list-presentation.ts`
+- `packages/web/src/app/(dashboard)/sales/accounts/[id]/page.tsx`
+- `packages/web/src/app/(dashboard)/sales/accounts/[id]/_parts.tsx`
+- `packages/web/src/app/(dashboard)/sales/accounts/_components/ae-ui.tsx`
+- `packages/transport-api/src/routes/sales-ae.ts`

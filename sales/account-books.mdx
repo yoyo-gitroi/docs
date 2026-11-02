@@ -1,0 +1,395 @@
+---
+title: "Account books"
+sidebarTitle: "Account books"
+description: "Create and fill account books from ICP filters or an intent signal, review research runs, research compliance, find contacts and emails, and start a campaign wave."
+keywords: ["account book", "abm", "target accounts", "icp filters", "intent signal", "fill a book", "review accounts", "compliance research", "find contacts", "find emails", "people search", "do not contact", "export contacts", "book settings", "archive book"]
+---
+
+<Info>
+**URL:** `/sales/account-books` · `/sales/account-books/{id}` · `/sales/account-books/{id}/accounts/{accountId}` · **Reach:** Sales sidebar **Account books** (target icon) · **Roles:** Principal ✓ Operator ✓ (Member ✗) · **Ready when:** the h1 reads **Account books**, the book title, or the company name, and no `Loading…` text remains.
+</Info>
+
+An account book is a target list that moves through five steps: **Accounts**, **Review**, **Contacts**, **Emails**, **Campaign**. The list page shows every book with its next step. The book page runs each step. The book account page holds one company's compliance research.
+
+Principal and Operator see the same controls here. **Account books** is missing from the sidebar when ABM is switched off for the workspace; the URL still exists.
+
+## Page map
+
+### Book list (`/sales/account-books`)
+- Header: **New account book** button.
+- KPI tiles: **Needs review**, **In progress**, **Ready to send**.
+- Filter bar: `Sort: …` chip, `Status: …` chip, text `Sort lives in the URL · shareable`, search `Search books`.
+- One row per book: title link, meta line (`{n} ICP · {n} intent · last run {when}` or `No runs yet · created {date}`), a five-step pipeline (`ol` aria-label `Book pipeline`, links **Accounts**, **Review**, **Contacts**, **Emails**, **Campaign** with counts), and the next-step action on the right with amber `waiting since {when}`.
+
+### Book page (`/sales/account-books/{id}`)
+- Header: h1 book title; links `{n} accounts` · `{n} contacts` · `{n} emails` (and `campaign running`); buttons **Add more accounts** and **Book settings**.
+- Banner when the book is not open: `This book is {status}. Research and contact searches are switched off.`
+- Left: `nav` aria-label `Pipeline`, heading **Pipeline**, five step links (`aria-current="step"` on the current one). Step number: green check (aria-label `done`), spinner (aria-label `running`), or amber (waiting).
+- Centre: the current step.
+- Right rail: **Book** (Owner, Created, Accounts, position pill, `Waiting on you`), **Sources**, **Runs**, **Cost** (Review only), **Contact runs** and **Do not contact** (Contacts and Emails), **Sender** and **Template** (Campaign), **Activity**.
+
+### Book account page (`/sales/account-books/{id}/accounts/{accountId}`)
+Hidden from nav; reached from a company name or Compliance chip in the book's Accounts table.
+- Breadcrumbs `Sales › Account books › {book title} › {company}`; h1 company name; description `{industry} · {city, state, country}`.
+- **Company** card: source chip, **In HubSpot** chip, domain link, **Industry**, **HQ**, **Employees**, **Revenue**, `Intent signal: {rationale}`.
+- **Compliance research** card: report tabs, **Re-run**, **Earlier reports**.
+
+## URL parameters
+- List: `kpi` = `needs_review`, `in_progress`, `ready_to_send`; `sort` = `needs_me` (default), `recent`, `name`; `status` = `open` (default), `locked`, `archived`, `all`; `q` = search.
+- Book: `step` = `accounts`, `review`, `contacts`, `emails`, `campaign` (absent = the book's current position); `run` = a run id (Review); `generate` = `icp` or `intent` (opens the Add-accounts sheet); `page` (Accounts table, 10 per page). `?step=emails` shows the Contacts screen scrolled to the **Step 4 · Emails** card.
+
+## Recipes
+
+### Find an account book
+**Risk:** `READ` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** book name, or what state it is in.
+
+1. Open `/sales/account-books`, or a filtered URL such as `/sales/account-books?status=all&q={text}`.
+2. Click a KPI tile to filter (**Needs review**, **In progress**, **Ready to send**). Click it again to clear.
+3. Click `Status: …` (dropdown chip) and choose **all** to include locked and archived books. The default shows open books only.
+4. Click `Sort: …` and choose **Needs me first**, **Most recent** or **Name**.
+5. Type in the search box (placeholder `Search books`).
+6. Click the book title (link) to open it at its current step, or click a step in its pipeline.
+
+**Done when:** the book page h1 shows the book title.
+
+| If you see | Why | Do this |
+|---|---|---|
+| `Nothing matches` / `No {status} books.` | Filters hide it | Click **Clear filters** or set Status to **all** |
+| `No account books yet` | None exist | [Create an account book](#create-an-account-book) |
+| `Could not load account books. ABM account books are disabled` | ABM switched off | Stop and report |
+
+### Create an account book
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** title; optional description.
+
+1. Open `/sales/account-books`.
+2. Click **New account book** (button; visual: top right of the header).
+3. In the dialog **New account book**, type the **Title** (input, id `batch-title`, placeholder `e.g. Q4 India Retail`).
+4. Optional: type **Description (optional)** (input, id `batch-description`, placeholder `Who this book targets and why.`).
+5. Click **Create account book** (button; disabled until a title is entered).
+
+**Done when:** toast `Created “{title}”` and the URL is `/sales/account-books/{id}?generate=icp&step=accounts` with the Add-accounts sheet open. Continue with [Fill a book from ICP filters](#fill-a-book-from-icp-filters) or [from an intent signal](#fill-a-book-from-an-intent-signal).
+
+| If you see | Why | Do this |
+|---|---|---|
+| Red box in the dialog, for example `An account book called … already exists` | Duplicate title or server error | Change the title |
+
+### Fill a book from ICP filters
+**Risk:** `WRITE` `AI` (paid Clarwiz company search, runs in the background) · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** industries, locations, employee range, revenue range, how many accounts.
+**Preconditions:** the book is open (not locked or archived).
+
+1. Open `/sales/account-books/{id}?generate=icp&step=accounts`. Alternative: click **Add more accounts** (header link) or **Fill this book** (empty-state link).
+2. In the sheet `Add accounts to {book title}`, make sure **ICP filters** is chosen (radio button in the group aria-label `Where to find accounts`).
+3. **Industries**: type in the search box (aria-label `Search industries`, placeholder `Search industries…`) and tick each industry checkbox. Selected industries appear as chips; remove one with its x (aria-label `Remove {industry}`).
+4. **Locations**: type a location (input, aria-label `Add a location`, placeholder `e.g. India, United States`) and press Enter or click **Add**.
+5. **Employees**: fill `Employees minimum` (placeholder `Min, e.g. 100`) and `Employees maximum` (placeholder `Max, e.g. 5,000`).
+6. **Annual revenue (USD)**: fill `Annual revenue (USD) minimum` and `Annual revenue (USD) maximum`.
+7. Read the ledger hint under the form. `These exact filters have already returned {n} account(s). This run fetches the next {n}…` is fine. `Clarwiz has already returned everything it has for these exact filters.` blocks the run: change a filter.
+8. Set **New accounts to find** (input, id `icp-count`, default 20).
+9. Click **Start research** (button; visual: bottom of the sheet).
+
+**Done when:** toast `Research started — you can leave this page`, the sheet closes, URL is `?step=accounts`, and a run card `ICP run · started {when}` appears on the Accounts step. Then [wait for the run](#wait-for-a-research-run-to-finish).
+
+| If you see | Why | Do this |
+|---|---|---|
+| `Minimum employees must be a whole number.` (or Maximum employees, Minimum revenue, Maximum revenue) | Non-integer input | Enter whole numbers |
+| `Minimum employees is above the maximum.` / `Minimum revenue is above the maximum.` | Range reversed | Fix the range |
+| Amber `No filters set — this will pull from everything Clarwiz has.` | No filters | Add at least one filter |
+| `Enter a number between 1 and {max}.` | Count out of range | Fix the count |
+| `This book is not open, so research is switched off.` | Book locked or archived | Reopen it in [Book settings](#change-book-settings) |
+| Toast `Could not start research` or a server message | Start failed | Report the text |
+
+### Fill a book from an intent signal
+**Risk:** `AI` (Claude web research plus a Clarwiz lookup per company) · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** the buying signal; number of companies; model if specified.
+
+1. Open `/sales/account-books/{id}?generate=intent&step=accounts`.
+2. In the sheet, choose **Intent signal** (radio button).
+3. Type in **Intent signal** (textarea, id `intent-query`, placeholder `Describe the buying signal: who is doing what, where, and how recently.`; at least 10 characters). Or click an example chip to fill it.
+4. Choose **Model** (select, id `intent-model`) if Clarwiz named one.
+5. Set **Companies to find** (input, id `intent-count`, default 10, 1 to 50).
+6. Click **Start research**.
+
+**Done when:** toast `Research started — you can leave this page` and a run card `Intent run · started {when}` with a progress bar and a live **Behind the scenes** trace. Then [wait for the run](#wait-for-a-research-run-to-finish).
+
+| If you see | Why | Do this |
+|---|---|---|
+| `Describe the signal in a little more detail.` | Under 10 characters | Write more |
+| `Enter a number between 1 and 50.` | Count out of range | Fix it |
+| `A run is already generating for this book. You can start another.` | Another run is active | Fine to continue |
+
+### Wait for a research run to finish
+**Risk:** `READ` · **Roles:** Principal, Operator
+
+1. Stay on `/sales/account-books/{id}?step=accounts`. The page polls every 3 seconds while a run is queued or running. A typical run takes 3 to 6 minutes.
+2. Watch the run card: progress bar (aria-label `Enrichment progress`, text `Enriched {done} of {total} companies…`).
+3. If you leave and come back, open `/sales/account-books/{id}?step=review` instead. The completion toast only fires if the page is open when the run ends.
+
+**Done when:** toast `Research finished — results are waiting in Review`, or run chip **Ready for review**, or the rail shows `Waiting on you` with `{n} run(s) in Review`.
+
+| If you see | Why | Do this |
+|---|---|---|
+| Run chip **Failed** | Run failed | See [Handle a failed run](#handle-a-failed-run) |
+| `Resumed after an interruption — attempt {n} of {m}.` | Server retried | Keep waiting |
+
+### Review a run and add accounts
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** which companies to add (default: all ticked).
+
+1. Open `/sales/account-books/{id}?step=review` (the newest staged run opens) or `?run={runId}&step=review`.
+2. Check the heading **Review results** and the pill **Waiting for you**.
+3. Open each group (toggle button on its header) and decide:
+   - **New** `{n} · ticked by default`
+   - **Already in your tenant** `{n} · unticked, add them to this book too? No re-enrichment needed.`
+   - **Already in this book** (read only) and **Could not enrich** (read only).
+4. Tick or untick rows (checkbox, id `review-{itemId}`), or use **Select all** / **Clear all** on a group, or **Select none** in the sticky bar.
+5. Click `Add {n} account(s) to this book` (primary button in the sticky bar at the bottom, `title "Add to {book}"`; disabled at 0).
+
+**Done when:** toast `Added {n} account(s)` (optionally `· {k} already there`) and URL changes to `?step=accounts`. The run card then reads **Added to book** or **Nothing new to add**.
+
+| If you see | Why | Do this |
+|---|---|---|
+| Toast `Could not add accounts` or a server message | Commit failed | Retry once; then report |
+| `Nothing to review` with **Add accounts** | No staged run | Fill the book first |
+
+### Handle a failed run
+**Risk:** `READ` · **Roles:** Principal, Operator
+
+There is no retry button on a failed run. Read the red banner on the Review step, then start a new run if the cause is fixable.
+
+| Banner text | Do this |
+|---|---|
+| `Clarwiz could not complete this search ({reason}). Check the filters and try again.` | Change filters; start a new ICP run |
+| `Clarwiz is not configured for this workspace. An administrator needs to set the webhook URL and token.` | Stop; report to an admin |
+| `Clarwiz could not be reached. Try again in a few minutes.` | Wait; start a new run |
+| `Intent research is not set up: the Anthropic API key on the server is missing or invalid. An administrator needs to update ANTHROPIC_API_KEY.` | Stop; report |
+| `The request to Claude failed. Try again in a few minutes.` | Wait; start a new run |
+| `The model declined this intent query. Rephrase it and try again.` | Rephrase the intent signal |
+| `The model ran out of room before finishing. Narrow the query or ask for fewer accounts.` | Narrow it or lower the count |
+| `The model did not return a usable account list. Try a more specific intent query.` | Make it more specific |
+| `The run was interrupted and ran out of retries. Start it again.` | Start a new run |
+| `The run failed without a recorded reason.` | Start a new run once; then report |
+
+### Run compliance research on several accounts
+**Risk:** `AI` (Claude web research; the dialog shows the cost estimate) · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** which companies; model.
+
+1. Open `/sales/account-books/{id}?step=accounts`.
+2. Tick rows (checkbox, aria-label `Select {name}`), or tick the header box (aria-label `Select the accounts on this page`). Maximum 25 selected; further checkboxes disable.
+3. Click `Research {n}` (button; shows **Research selected** before rows are ticked; visual: top right of the Accounts card).
+4. In the dialog `Research {n} company` / `companies`, choose **Model** (select, id `compliance-model`). Read the cost line (`Rough estimate: about $1.50 to $4 per company` or `about $3 to $8 per company`, `Each run takes several minutes.`) and tell Clarwiz the estimate.
+5. Click **Start research**.
+
+**Done when:** toast `Compliance research: {n} queued · {n} already researched · {n} already running · {n} skipped (no usable domain)`. The **Compliance** column chips move through **Queued** and **Researching** to a date (refreshes every 10 seconds).
+
+| If you see | Why | Do this |
+|---|---|---|
+| Toast `Could not start research` or a server message | Start failed | Report |
+| Chip **Failed** | Research failed for that company | Open the company and [re-run](#run-compliance-research-for-one-company) |
+
+### Remove an account from a book
+**Risk:** `DESTRUCTIVE` (book membership only) · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** company name.
+
+1. Open `/sales/account-books/{id}?step=accounts` and find the row (10 per page; use **Next** if needed).
+
+<Warning>**Approval required (DESTRUCTIVE).** Stop here and get approval before removing. The company leaves this book. It stays in HubSpot and in any other book.</Warning>
+
+2. Click **Remove** (ghost button with a trash icon, aria-label `Remove {name} from this book`; visual: last column of the row).
+3. In the popover `Remove {name}?` (text `It leaves this book only. It stays in HubSpot and in any other book that uses it.`), click **Remove**.
+
+**Done when:** toast `Removed {name} from this book`. Error toast: `Could not remove account`.
+
+### Find contacts at the accounts in a book
+**Risk:** `WRITE` (paid Clarwiz people search, runs in the background) · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** job titles; seniority levels.
+**Preconditions:** the book is open and has accounts.
+
+1. Open `/sales/account-books/{id}?step=contacts`.
+2. In the card **Find contacts** (pill **Step 3**), edit **Job titles** (input, id `people-titles`, placeholder `e.g. VP Operations, Head of People, CHRO`; separate with commas, semicolons or new lines; max 25).
+3. Toggle **Seniority** buttons (group aria-label `Seniority`, each `aria-pressed`): Founder, Owner, Partner, C-suite, VP, Director, Head, Manager, Senior, Mid-level, Entry, Intern. Defaults: C-suite, VP, Director.
+4. Click `Find people at {n} account(s)` (button).
+   - Wait for: the run line `Searching…`. The page refreshes every 3 seconds while it works.
+
+**Done when:** the run line shows its summary, the rail shows `People search · done {when}`, and the card `Contacts · {n}` lists people.
+
+| If you see | Why | Do this |
+|---|---|---|
+| Button disabled | Book not open, a people run is active, or 0 accounts | Wait for the active run, or fix the book |
+| `Clarwiz is not configured for people search or email finding.` | Not set up | Stop; report |
+| `Clarwiz could not be reached. Try again in a few minutes.` | Outage | Wait; retry |
+| `The run was interrupted and ran out of retries. Start it again.` | Failed | Start again |
+| Toast `Could not start` or a server message | Start failed | Report |
+
+### Find emails for contacts
+**Risk:** `WRITE` (paid Clarwiz email finder) · **Roles:** Principal, Operator
+
+1. Open `/sales/account-books/{id}?step=emails` (scrolls to the card **Step 4 · Emails**, id `emails`).
+2. Read `{n} of {m} contacts have an email. {k} still need one.`
+3. Click `Find emails for {n} contact(s)` (button; disabled with 0 candidates, a closed book, or an active run).
+   - Wait for: `Looking up emails — this can take a minute…`; the page refreshes every 3 seconds.
+
+**Done when:** the status pill reads **Done** and the progress bar (aria-label `Contacts with an email`) and `{pct} percent of this book is reachable today.` update. Failure: pill **Failed** with the same run-line messages as people search.
+
+### Filter and export contacts
+**Risk:** `READ` · **Roles:** Principal, Operator
+
+1. Open `/sales/account-books/{id}?step=contacts`.
+2. In the card `Contacts · {n}`, use `Seniority: …`, `Email: …` (any, Verified, Guessed, Not found), **Sendable only** (toggle, `aria-pressed`), and the search box (aria-label `Search`).
+3. If an amber banner says `{n} emails are at a different domain than the company. Check before sending.`, click **Show** to filter to those contacts (each has an amber **Domain mismatch** pill).
+4. Click `Show all {n}` at the bottom to see beyond 25 rows.
+5. Click **Export** (button; card header) to download `{book-title}-contacts.csv`.
+
+**Done when:** the list is filtered or the CSV downloaded. Status values: **Verified**, **Entered by hand**, **Guessed**, **Not found**, **Not looked up yet**, **No email**, **Do not contact**.
+
+### Edit a contact or mark do not contact
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** contact name; fields to change; reason if flagging.
+
+1. Open `/sales/account-books/{id}?step=contacts` and find the contact.
+2. Click the pencil (icon button, aria-label `Edit {name}`; visual: right end of the row).
+3. In the dialog `Edit {full name}`, change **First name** (id `c-first`), **Last name** (id `c-last`), **Job title** (id `c-title`), **Email** (id `c-email`) as needed.
+4. To stop all emails to this person, tick **Do not contact** (checkbox, id `c-dnc`) and fill **Why (kept on the contact)** (id `c-dnc-reason`, max 200).
+5. Click **Save**.
+
+**Done when:** toast `Contact updated`. Your edits are kept; later searches do not overwrite them. A flagged contact is never sendable.
+
+| If you see | Why | Do this |
+|---|---|---|
+| Red box such as `A contact needs a name` or `… is not an email address` | Validation | Fix the field |
+
+### Start a campaign wave from the book
+**Risk:** `EXTERNAL` · **Roles:** Principal, Operator
+**Preconditions:** the book has sendable contacts; an email template exists; the user's Gmail can send.
+
+1. Open `/sales/account-books/{id}?step=campaign`.
+2. If a campaign already exists and is **Completed** or **Cancelled**, click **Start the next wave** (button in the card **What this step is**). Otherwise the **Start a campaign** card is already showing (that text is a heading, not a button).
+3. Follow [Launch a campaign](/sales/campaigns#launch-a-campaign) from step 3. The book is fixed and the name is prefilled `{book} · wave {n}`. Only sendable contacts are used, never anyone an earlier wave emailed.
+
+**Done when:** toast `Launched — {n} emails queued` and the step reloads to `Campaign · {name}`.
+
+### Watch a running wave
+**Risk:** `READ` · **Roles:** Principal, Operator
+
+1. Open `/sales/account-books/{id}?step=campaign`. The step refreshes every 30 seconds while sending.
+2. Read the status link `{status} · {sent} of {total}`, the progress bar (aria-label `Wave progress`), tiles **Sent**, **Replies**, **Failed**, **Queued**, and the **Replies** card.
+3. Click **Open in Campaigns**, a tile, or **View all replies** to manage the campaign at `/sales/campaigns/{id}`.
+
+**Done when:** you have the counts. Pause, resume, cancel and reply handling are on [Campaigns](/sales/campaigns).
+
+### Change book settings
+**Risk:** `WRITE`; `DESTRUCTIVE` when archiving · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** new title, description or status.
+
+1. Open `/sales/account-books/{id}`.
+2. Click **Book settings** (button; page header).
+3. In the dialog **Book settings**, edit **Title** (id `book-title`) and **Description** (id `book-description`).
+4. To change status, choose **Open**, **Locked** or **Archived** (radio group aria-label `Status`). Locked and archived books keep their data but take no new research.
+
+<Warning>**Approval required (DESTRUCTIVE).** Stop here and get approval before saving a change to **Archived**. Archived books are hidden from the default list and take no new research. You can set it back to **Open** in this dialog.</Warning>
+
+5. Click **Save** (disabled with an empty title).
+
+**Done when:** toast `Book saved`. Error: red banner with the server message or `Could not save`.
+
+There is no delete-book action anywhere in the app.
+
+### Run compliance research for one company
+**Risk:** `AI` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** company; model.
+
+1. Open `/sales/account-books/{id}/accounts/{accountId}`. Alternative: click the company name or its Compliance chip in the book's Accounts table.
+2. If no report exists, click **Run compliance research** (button in the empty state; disabled until the model list loads). If a report exists, click **Re-run** (outline button).
+3. In the dialog (`Run compliance research` or `Re-run compliance research?`), choose **Model** and click **Start research** or **Re-run research**.
+   - Wait for: `Researching {name} with {model}. This usually takes several minutes; you can leave this page and come back.` with a live **Behind the scenes** trace. The page polls every 3 seconds.
+
+**Done when:** toast `Compliance research ready` and the report tabs appear.
+
+| If you see | Why | Do this |
+|---|---|---|
+| Toast `Already researched on {date}` | A report exists | Use it, or choose **Re-run** |
+| Toast `Research for this company is already running` | In progress | Wait |
+| Toast `Compliance research failed` / banner `The last research attempt ({date}) failed…` | Run failed | Re-run once; then report |
+| Toast `Could not start research` | Start failed | Report |
+
+A re-run replaces the report for every page that shows that domain, including HR Roadmap. The old report stays under **Earlier reports**.
+
+### Read a compliance report
+**Risk:** `READ` · **Roles:** Principal, Operator
+
+1. Open `/sales/account-books/{id}/accounts/{accountId}`.
+2. Click a report tab (role tab): **Profile**, `Compliance ({n})` (default), `What's new ({n})`, **Top risks**, **Value map**, **Call guide**, **Flags & unknowns**, `Sources ({n})`.
+3. For an older version, open **Earlier reports** (select; shown only with more than one report) and pick `{date} · {model}`.
+
+**Done when:** the tab content is visible. The card description shows `Researched on {date} with {model}`.
+
+## Controls reference
+
+| Visible text | Type | Locator | What it does | Risk |
+|---|---|---|---|---|
+| New account book | button | list header | Opens the create dialog | none |
+| Needs review / In progress / Ready to send | KPI links | list | Set `kpi` | READ |
+| `Sort: …` / `Status: …` | dropdown chips | list filter bar | Set `sort` / `status` | READ |
+| (search) | search input | placeholder `Search books` | Sets `q` | READ |
+| `{book title}`, pipeline step, next-step button | links | book row | Open the book | READ |
+| Add more accounts | link | book header | Opens the Add-accounts sheet (`?generate=icp`) | none |
+| Book settings | button | book header | Opens the settings dialog | none |
+| ICP filters / Intent signal | radio buttons | sheet, aria-label `Where to find accounts` | Choose source | none |
+| Start research | button | sheet or research dialog | Starts a run | WRITE, AI |
+| Open run | link | run card | `?run={id}&step=review` | READ |
+| `Research {n}` / Research selected | button | Accounts card | Opens the research dialog | none |
+| Remove | ghost button, popover | aria-label `Remove {name} from this book` | Removes from this book | DESTRUCTIVE |
+| `{company}` / compliance chip | links | Accounts table | Book account page | READ |
+| In HubSpot | chip link | Accounts table, `title "This domain is already a HubSpot company in the Accounts panel"` | `/sales/accounts/{aeAccountId}` | READ |
+| `Add {n} account(s) to this book` | button | Review sticky bar | Adds ticked accounts | WRITE |
+| Select all / Clear all / Select none | buttons | Review groups and bar | Change ticks | none |
+| `Find people at {n} account(s)` | button | Find contacts card | People search | WRITE |
+| `Find emails for {n} contact(s)` | button | Step 4 · Emails card | Email finder | WRITE |
+| Export | button | Contacts card header | Downloads CSV | READ |
+| Show | button | amber mismatch banner | Filters to mismatches | READ |
+| (pencil) | icon button | aria-label `Edit {name}` | Opens the contact dialog | none |
+| Save | button | contact or settings dialog | Saves | WRITE |
+| Start the next wave | button | Campaign step | Opens the launcher again | none |
+| Open in Campaigns / View all replies | links | Campaign step | `/sales/campaigns/{id}` | READ |
+| Run compliance research / Re-run | buttons | book account page | Opens the research dialog | AI |
+| Earlier reports | select | book account page | Loads an older report | READ |
+
+## Waits and signals
+- Book research runs: poll every 3 seconds; 3 to 6 minutes. Done: **Ready for review**. Failed: **Failed** plus a red banner on Review.
+- Compliance research: several minutes. Book Compliance column polls every 10 seconds; the company page every 3 seconds while running.
+- People search and email finder: poll every 3 seconds while a run is active.
+- Campaign step: polls every 30 seconds while sending.
+- Run status labels: **Queued**, **Generating**, **Ready for review**, **Added to book**, **Failed**, **Cancelled**.
+- Loading text: `Loading account books…`, `Loading account book…`, `Loading contacts…`, `Loading campaign…`, `Loading options…`, `Loading…`.
+
+## Gotchas
+- The list defaults to **open** books. Set Status to **all** to see locked or archived ones.
+- The "Research finished" toast only appears if the book page is open when the run ends. Check the Review step after coming back.
+- The Add-accounts sheet is driven by the URL. Back and Forward can reopen it; closing it removes `generate` from the URL.
+- Remove is a small popover next to the button, not a modal.
+- Bulk compliance research is capped at 25 selected accounts.
+- Failed runs have no retry button. Start a new run.
+- `?step=contacts` and `?step=emails` show the same screen.
+- In-app help says `"This book is locked"`; the app shows `This book is {status}. Research and contact searches are switched off.` on the page and `This book is not open, so research is switched off.` in the sheet.
+- In-app help calls the button **Research selected**; once rows are ticked it reads `Research {n}`.
+- In-app help lists next-step buttons as Review, Find contacts, Find emails, Start campaign. The list can also show `Fill this book`, `Research running` (plain text), `Finding contacts`, `Finding emails`, `{sent} sent · {n} replies` and `Archived` (plain text).
+
+## Related
+- [Campaigns](/sales/campaigns)
+- [Sales Today and accounts](/sales/today-and-accounts)
+- [HR Roadmap](/sales/hr-roadmap)
+
+## Source files
+- `packages/web/src/app/(dashboard)/sales/account-books/page.tsx`
+- `packages/web/src/app/(dashboard)/sales/account-books/_components/book-presentation.ts`
+- `packages/web/src/app/(dashboard)/sales/account-books/_components/create-book-dialog.tsx`
+- `packages/web/src/app/(dashboard)/sales/account-books/[id]/page.tsx`
+- `packages/web/src/app/(dashboard)/sales/account-books/[id]/_steps.tsx`
+- `packages/web/src/app/(dashboard)/sales/account-books/[id]/_add-accounts-sheet.tsx`
+- `packages/web/src/app/(dashboard)/sales/account-books/[id]/_contacts-step.tsx`
+- `packages/web/src/app/(dashboard)/sales/account-books/[id]/_campaign-step.tsx`
+- `packages/web/src/app/(dashboard)/sales/account-books/[id]/accounts/[accountId]/page.tsx`
+- `packages/web/src/components/compliance-research/research-dialog.tsx`
+- `packages/core/src/sales/abm/book-pipeline.ts`
