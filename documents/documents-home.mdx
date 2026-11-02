@@ -1,0 +1,194 @@
+---
+title: "Documents home"
+sidebarTitle: "Documents home"
+description: "Use the /documents landing: start a request, find, preview, download or delete a document, reopen a chat, and open the page with a client or case preselected."
+keywords: ["documents", "document library", "find a document", "preview document", "delete document", "your chats", "continue chat", "download PDF", "documents assistant"]
+---
+
+<Info>
+**URL:** `/documents` · **Reach:** sidebar **Documents** → top tab **Documents** · **Roles:** Principal ✓ Operator ✓ (Admin and Member too; no view-only state) · **Ready when:** heading **What do you need?** is visible and "Loading your documents…" has been replaced by the card grid or an empty-state line.
+</Info>
+
+The landing page of the Documents module. It holds the request box that starts every AI document chat, the library of documents and the list of your chats.
+
+## Page map
+
+- **Page header** "Documents" and the Documents top tabs (tab list "Documents navigation"): **Documents**, **Templates**, **Brand**, **Packets**.
+- **What do you need?** section: subtitle "Ask for any document, attach a file, or ask a question. Or open one of your documents below and change it."; the request box; **Select a client…**; **Attach files**; **Send**; a red error line when something fails; the link `Continue your last chat — {title} · {client}`.
+- **Library tabs** (tab list "Documents or chats"): `Your documents {n}` and `Your chats {n}`. The chats tab exists only while the document assistant is on.
+- **Search box** (right, above the list).
+- **Card grid** (12 per page) or **chat list** (15 per page).
+- **Pagination bar** (only with more than one page): `{first}–{last} of {total} documents` (or `chats`), **Previous**, `Page {p} of {n}`, **Next**.
+
+## Recipes
+
+### Ask for a new document
+**Risk:** `WRITE` `AI` · **Roles:** Principal, Operator
+
+Follow [Create a document](/documents/create-a-document#create-a-document-from-a-request). It starts here.
+
+If the request box is replaced by "The document assistant is turned off for this workspace. You can still open a template below and generate from it." the chat is off; use [Generate now](/documents/create-a-document#variant-from-a-template-with-generate-now).
+
+### Open the page with a client, case or view preselected
+**Risk:** `READ` · **Roles:** Principal, Operator
+
+Open one of these URLs directly:
+
+| URL | Effect |
+|---|---|
+| `/documents?client={clientSlug}` | Pre-selects the client in **Select a client…** (read once on load). Use the slug, not the name. |
+| `/documents?case={caseId}` | Binds the next chat to an Operations case. Shows the pill "Case attached — context loads on your first message". |
+| `/documents?client={clientSlug}&case={caseId}` | Both of the above. |
+| `/documents?view=chats` | Opens the **Your chats** tab. Switching tabs writes this back to the URL. Absent means the documents tab. |
+| `/documents?source=operations` | Same as `/documents`. The Operations **Deliverables** item links here; the page ignores the parameter. |
+| `/documents/assistant` | Old address. The server redirects to `/documents`, keeping only `client` and `case` (first value if repeated). Every other parameter is dropped. |
+
+**Done when:** the page is ready and the picker shows the client name (for `?client=`), the case pill shows (for `?case=`), or the **Your chats** tab is selected (for `?view=chats`).
+
+| If you see | Why | Do this |
+|---|---|---|
+| Picker still reads **Select a client…** after `?client={clientSlug}` | Slug not in the client list; the binding is still applied and **Send** will fail | Pick the client from the list, or reload `/documents` and pick it |
+| "That case is not available to you. The request was not sent." after **Send** | Bad `?case=` value | Confirm the case id with Clarwiz |
+| No **Your chats** tab with `?view=chats` | Assistant is off | Use the documents tab |
+
+### Find and preview a document
+**Risk:** `READ` · **Roles:** Principal, Operator
+
+1. Open `/documents`. Make sure `Your documents {n}` is the selected tab (tab; visual: left of the tab strip under the request area).
+2. Click the search box (input type search, aria-label "Find a document", placeholder "Find a document or a client"; visual: right side, above the cards) and type a word.
+   - It matches the document title, the client **slug** and the document type. It does not match the client display name: search "abc-dental", not "ABC Dental". If you only know the name, search a word from the title instead.
+   - The list resets to page 1.
+3. Find the card (button; visual: card with the title, a status badge and the line `{client} · v{n} · {time ago}`). Documents are listed newest first; use **Next** if needed.
+4. Click the card.
+   - Wait for: a drawer slides in from the right with the document title, a meta line (status badge, client or "No client", `v{n}`, time ago) and "Rendering the document…", then a framed preview titled `{title} preview`.
+5. Close with the "Close" icon button (top-right of the drawer) or Esc.
+
+**Done when:** the preview frame shows the document.
+
+| If you see | Why | Do this |
+|---|---|---|
+| "Nothing matches. Try another word, or ask Ariya above." | No match | Try the client slug or a different title word |
+| "No documents yet. Ask for one above and it shows up here." | Library empty | Create one |
+| `Preview failed ({status})` in the drawer | Render error | Click **Open in editor** instead |
+| "No preview available for this document." | Nothing to render | Click **Open in editor** |
+| Toast "Could not load your documents" | List failed to load | Reload the page once |
+
+### Download a PDF from the library
+**Risk:** `READ` · **Roles:** Principal, Operator
+
+1. Open the document's preview drawer (see [Find and preview a document](#find-and-preview-a-document)).
+2. Click **PDF** (button; visual: drawer footer) for the normal fillable PDF, or **One page (A4)** (button, title "The whole document scaled onto a single A4 page").
+   - Wait for: toast "Preparing PDF…" (or "Preparing one-page A4 PDF…"), about 5 to 10 s.
+3. Confirm: toast "PDF downloaded" (or "one-page A4 PDF downloaded") with the file name.
+
+**Done when:** the success toast shows and the file is downloaded.
+
+| If you see | Why | Do this |
+|---|---|---|
+| `PDF download failed ({status})` or `PDF download failed: {msg}` | Server error | Retry once, then use the editor's **Share** menu |
+| A message about the document being too long for one page, or "One-page export is not available for official PDF forms. Use the regular PDF download." | One-page export refused | Use **PDF** |
+
+For a flat (not editable) PDF, open the document in the editor and use **Share** → **Download PDF (not editable)**. See [Document editor](/documents/document-editor#download-or-print).
+
+### Open a document in the editor
+**Risk:** `READ` · **Roles:** Principal, Operator
+
+1. Open the preview drawer for the document.
+2. Click **Open in editor** (link; visual: drawer footer, left).
+   - Wait for: URL `/documents/{id}` and the editor toolbar with the document title.
+
+See [Document editor](/documents/document-editor).
+
+### Delete a document
+**Risk:** `DESTRUCTIVE` · **Roles:** Principal, Operator
+
+1. Find the document card (see [Find and preview a document](#find-and-preview-a-document)).
+2. Hover the card to reveal the bin icon (icon button, aria-label `Delete {title}`; visual: right edge of the card near the top, invisible until hover but still clickable by its label). Or open the drawer and use **Delete** in its footer.
+
+<Warning>**Approval required (DESTRUCTIVE).** Stop here and get approval before clicking the bin or **Delete**. The document and its whole version history are removed. There is no undo.</Warning>
+
+3. Click the bin (or the drawer's **Delete**).
+   - Wait for: dialog **Delete this document?** with the text `"{title}" and its version history will be removed.`
+4. Click **Delete** in the dialog (or **Cancel** to back out).
+
+**Done when:** toast "Document deleted" and the card is gone.
+
+| If you see | Why | Do this |
+|---|---|---|
+| `Could not delete: {msg}` | Server refused | Report the message |
+
+### Reopen a chat
+**Risk:** `READ` · **Roles:** Principal, Operator
+
+1. Open `/documents?view=chats` (or click the tab `Your chats {n}`).
+   - Wait for: "Loading your chats…" to be replaced by the list.
+2. Optional: type in the search box (input type search, aria-label "Find a chat", placeholder "Find a chat, client or document"). It matches chat title, last reply, client and document title.
+3. Click the chat row (link; visual: row with the title, the last reply or "No reply yet.", the client and the document title).
+   - Wait for: URL `/documents/chat/{sessionId}`.
+
+Shortcut: the link `Continue your last chat — {title} · {client}` under the request box opens your newest chat.
+
+**Done when:** the chat workspace is open. See [Chat workspace](/documents/chat-workspace).
+
+| If you see | Why | Do this |
+|---|---|---|
+| "No chats yet. Ask for a document above and the conversation shows up here." | No chats | Start one |
+| "Nothing matches. Try another word." | No match | Try another word |
+
+## Controls reference
+
+| Visible text | Type | Locator | What it does | Risk |
+|---|---|---|---|---|
+| (request box) | textarea | label "Your request", id `document-ask`, placeholder "For example: an offer letter for Dana at Brightwater Dental, starting 6 October, $46.50 an hour" | Request text; Enter sends, Shift+Enter new line | `READ` |
+| **Attach files** / **Add more** | button | opens a hidden multi-file input | Stages files for the first message | `READ` |
+| (file chip "×") | icon button | aria-label `Remove {filename}` | Unstages a file | `READ` |
+| **Select a client…** / client name | combobox button | `aria-haspopup="listbox"`; search aria-label "Search clients", placeholder "Search clients…"; options role `option` | Binds the next chat to a client | `READ` |
+| "Case attached — context loads on your first message" | pill | shown with `?case=` | Shows the case binding | none |
+| **Send** | button | disabled when the box is empty or busy; spinner while busy | Creates a chat and opens `/documents/chat/{sessionId}` | `WRITE` `AI` |
+| `Continue your last chat — {title}` | link | under the request box | Opens your newest chat | `READ` |
+| `Your documents {n}` / `Your chats {n}` | tabs | tab list "Documents or chats" | Switches list; chats sets `?view=chats` | `READ` |
+| (document search) | search input | aria-label "Find a document", placeholder "Find a document or a client" | Filters by title, client slug, document type | `READ` |
+| (chat search) | search input | aria-label "Find a chat", placeholder "Find a chat, client or document" | Filters chats | `READ` |
+| Document card | button | title, status badge, `{client} · v{n} · {time ago}` | Opens the preview drawer | `READ` |
+| (bin on card) | icon button, hover-only | aria-label `Delete {title}` | Opens the delete dialog | `DESTRUCTIVE` |
+| Chat row | link | title, last reply or "No reply yet." | Opens the chat | `READ` |
+| **Previous** / **Next** | buttons | only with more than one page | Pages the list | `READ` |
+| **Open in editor** | link | drawer footer | Opens `/documents/{id}` | `READ` |
+| **PDF** | button | drawer footer | Downloads the fillable PDF | `READ` |
+| **One page (A4)** | button | drawer footer, title "The whole document scaled onto a single A4 page" | Downloads a one-page PDF | `READ` |
+| **Delete** | button | drawer footer | Opens the delete dialog | `DESTRUCTIVE` |
+| **Delete** / **Cancel** | buttons | dialog **Delete this document?** | Confirms or cancels | `DESTRUCTIVE` / `READ` |
+
+## Waits and signals
+
+- Documents list: "Loading your documents…" then the grid. Chats list: "Loading your chats…".
+- Preview drawer: "Rendering the document…" then the frame.
+- PDF: "Preparing PDF…" toast, then "PDF downloaded" (5 to 10 s).
+- Delete: dialog, then toast "Document deleted".
+
+## Gotchas
+
+- The card bin is invisible until hover; locate it by aria-label `Delete {title}`.
+- Document search matches the client **slug**, not the display name.
+- The client picker cannot be cleared; reload to reset it.
+- The ask box disappears entirely when the assistant is off, and so does the **Your chats** tab.
+- Starter chips such as "Incident report" and "Offer letter" exist in code but are not shown on this page.
+- The drawer has no Google Docs button (it is not rendered).
+- In-app help says the drawer may show "Preview failed"; the actual text is `Preview failed ({status})`.
+
+## Related
+
+- [Create a document](/documents/create-a-document)
+- [Chat workspace](/documents/chat-workspace)
+- [Document editor](/documents/document-editor)
+- [Templates](/documents/templates)
+
+## Source files
+
+- `packages/web/src/app/(dashboard)/documents/page.tsx`
+- `packages/web/src/app/(dashboard)/documents/assistant/page.tsx`
+- `packages/web/src/components/documents/documents-landing-href.ts`
+- `packages/web/src/components/documents/_landing/ask-box.tsx`
+- `packages/web/src/components/documents/_landing/document-library.tsx`
+- `packages/web/src/components/documents/_landing/chat-library.tsx`
+- `packages/web/src/components/documents/_landing/document-preview-drawer.tsx`

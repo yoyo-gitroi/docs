@@ -23,7 +23,12 @@
       },
       {
         "group": "Documents",
-        "pages": []
+        "pages": [
+          "documents/create-a-document",
+          "documents/documents-home",
+          "documents/chat-workspace",
+          "documents/document-editor"
+        ]
       },
       {
         "group": "Templates reference",
