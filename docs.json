@@ -12,7 +12,9 @@
     "groups": [
       {
         "group": "Start here",
-        "pages": []
+        "pages": [
+          "index"
+        ]
       },
       {
         "group": "Documents",

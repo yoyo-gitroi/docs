@@ -1,0 +1,69 @@
+---
+title: "Ariya browser-agent playbook"
+sidebarTitle: "How to use this playbook"
+description: "Step-by-step recipes Clarwiz hands to a browser agent so it can operate the Ariya HR web app: where to click, what to type, what to wait for, and when to stop."
+keywords: ["clarwiz", "ariya", "browser agent", "playbook", "how to", "orchestrator", "recipes"]
+---
+
+<Info>
+**For:** Clarwiz (the orchestrator) and the browser agent it drives · **App:** Ariya HR web app · **Accounts:** Principal and Operator · **Start with:** [Operating rules](/start/operating-rules)
+</Info>
+
+Clarwiz turns a request like "create an incident report for Rachel at ABC Dental" into browser actions in Ariya. This playbook is the map. Every page covers one area of the app and lists **recipes**: numbered click paths with the exact labels on screen, the signal to wait for after each step, how to tell success from failure, and where a human must approve.
+
+## The task loop
+
+Run every task through these seven steps.
+
+1. **Parse the request.** Pull out the intent (create, find, update, send…), the object (document, client, case…) and the entities (client name, person, dates, amounts).
+2. **Find the recipe.** Look the intent up in the [Task router](/start/task-router). It points to a page and a recipe heading.
+3. **Check the account and the risk.** The recipe header gives its **Risk** tags and **Roles**. Use the Operator account unless the recipe needs the Principal. If any step is `EXTERNAL` or `DESTRUCTIVE`, plan the approval stop now. See [Operating rules](/start/operating-rules).
+4. **Collect the inputs first.** Each recipe lists **Inputs from Clarwiz**. For documents, [Choosing a template](/documents/choosing-a-template) and the [Template catalog](/documents/template-catalog) list the facts each document needs. Ask the user for anything missing before you open the browser.
+5. **Hand the recipe to the browser agent.** Pass the base URL, the recipe steps and the inputs.
+6. **Execute and verify step by step.** After each action, wait for the step's `Wait for` signal. When the recipe ends, check its **Done when** signal. On an error, use the recipe's failure table.
+7. **Report.** Return the outcome, the URLs of anything created, what changed, downloaded files, open items and screenshots, as listed in [Operating rules](/start/operating-rules#what-to-report-back).
+
+## How to read a recipe
+
+| You see | It means |
+|---|---|
+| **Send** | Exact visible text of a button, link, tab, heading or menu item. Match it literally. |
+| `{clientSlug}` | A value you fill in. In URLs it is the ID or slug, not the display name. |
+| (button, aria-label "Close") | The element type and the attribute to find it by when it has no visible text. |
+| visual: top-right of the preview | Where it sits on screen, for screenshot-based agents. |
+| Wait for: | What must appear or change before the next step. |
+| **Done when:** | The signal that the whole recipe succeeded. |
+| `READ` `WRITE` `AI` | Allowed without asking. |
+| `EXTERNAL` `DESTRUCTIVE` | Stop and get approval before that step. |
+
+## Example: "Create an incident report for Rachel at ABC Dental"
+
+1. Router → [Create a document](/documents/create-a-document). Risk `WRITE` `AI`, so no approval is needed. Operator account.
+2. Inputs: the [catalog entry](/documents/template-catalog) for **HR Incident Report** (`hr-incident-report`) lists the facts the assistant will otherwise ask for: incident date and time, location, employees involved, witnesses, what happened, action taken at the scene, injuries, police or emergency services, and who completed the report. Get them from the user first.
+3. Browser: open `/documents`, pick the client in **Select a client…**, type one message holding every fact, click **Send**.
+4. Wait until the message box is enabled again. Read the outcome: a draft in **Live preview**, a **Blockers** card to answer, or a red error.
+5. Click **PDF (editable)** and wait for the "editable PDF downloaded" toast.
+6. Report the chat URL, the document URL (from **Open in editor**), the file name and any gaps the assistant flagged.
+
+## Areas
+
+| Area | Pages |
+|---|---|
+| Start here | [Operating rules](/start/operating-rules) · [Sign in and session](/start/login-and-session) · [Global UI patterns](/start/global-ui) · [Roles and access](/start/roles-and-access) · [Task router](/start/task-router) |
+| Documents | [Create a document](/documents/create-a-document) · [Documents home](/documents/documents-home) · [Chat workspace](/documents/chat-workspace) · [Document editor](/documents/document-editor) · [Templates](/documents/templates) · [Brand and packets](/documents/brand-and-packets) · [Generate page](/documents/generate-page) |
+| Templates reference | [How templates work](/documents/how-templates-work) · [Choosing a template](/documents/choosing-a-template) · [Template catalog](/documents/template-catalog) |
+| Command Center | [Your day](/command-center/your-day) · [Action queue](/command-center/action-queue) · [Approvals and compliance](/command-center/approvals-and-compliance) · [Work queue and management](/command-center/work-queue-and-management) |
+| Operations | [Inbox](/operations/inbox) · [Case page](/operations/case) · [Email and replies](/operations/email-and-replies) · [Operations settings](/operations/settings) |
+| Clients | [Clients list](/clients/clients-list) · [New client](/clients/new-client) · [Client profile](/clients/client-profile) · [Work tabs](/clients/client-tabs-work) · [People and HR tabs](/clients/client-tabs-people-hr) · [Roadmap tabs](/clients/client-tabs-roadmap) · [People and contacts](/clients/people-and-contacts) |
+| Implementation | [Portfolio](/implementation/portfolio) · [Workspace](/implementation/workspace) |
+| Sales | [Today and accounts](/sales/today-and-accounts) · [Account books](/sales/account-books) · [Campaigns](/sales/campaigns) · [HR Roadmap](/sales/hr-roadmap) · [Prospects and other pages](/sales/prospects-and-other) |
+| Intelligence | [Intelligence, HR Intel, memory and usage](/intelligence/intelligence) · [Data health, CRM hygiene and sources](/intelligence/data-and-sources) |
+| Settings | [General and team](/settings/general-and-team) · [Integrations](/settings/integrations) · [Catalogs and defaults](/settings/catalogs-and-defaults) |
+| Admin | [Platform Admin](/admin/platform-admin) · [Internal Ops](/admin/internal-ops) · [Account and feedback](/admin/account-and-feedback) |
+| Reference | [Known issues](/reference/known-issues) · [Keeping this playbook current](/reference/maintaining) |
+
+## Scope and accuracy
+
+- Written from the Ariya source code (`packages/web`, `packages/transport-api`, `packages/core`, `packages/shared`), not from screenshots. Labels are copied from the code.
+- Templates, memory and settings live in Ariya's database and change without a code release. Template content can differ from the [catalog](/documents/template-catalog), so check **Documents → Templates** when it matters.
+- Where the in-app help (the **?** panel) disagrees with the app, these pages follow the app and note the difference under **Gotchas**.
