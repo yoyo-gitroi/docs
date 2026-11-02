@@ -1,0 +1,509 @@
+---
+title: "Platform admin"
+sidebarTitle: "Platform admin"
+description: "Run Ariya platform controls as a Principal: tenants and tenant memory, master skills, governance, profiles, the platform team, Ariya and platform memory, platform settings, integration health, the style guide, tenant switching and proxy login."
+keywords: ["platform admin", "admin", "tenants", "switch tenant", "view as tenant", "master skills", "new skill", "governance", "system prompt", "profiles", "change role", "assign profile", "platform team", "invite user", "deactivate user", "sso policy", "ariya memory", "platform memory", "promote memory", "personal email domains", "integration health", "style guide", "proxy login", "act as user"]
+---
+
+<Info>
+**URL:** `/admin` and `/admin/tenants`, `/admin/tenants/{id}`, `/admin/skills`, `/admin/skills/new`, `/admin/skills/{id}`, `/admin/governance`, `/admin/profiles`, `/admin/team`, `/admin/ariya-memory`, `/admin/platform-memory`, `/admin/platform-settings`, `/admin/integrations`, `/style-guide` · **Reach:** sidebar **Platform Admin** (under **Admin & Setup**), then the Platform Admin tab bar · **Roles:** Principal ✓ Operator ✗ · **Ready when:** the page h1 is visible and `Loading…` is gone.
+</Info>
+
+Platform-wide controls. Changes here can affect every tenant.
+
+<Note>**Principal of tenant `ariya` or `pilot` only.** Every `/admin/*` data call is refused for everyone else with `Principal access required`. A Principal in a customer tenant sees the menus but every page fails. **Operator:** no menu entry. Typing an admin URL shows either a blocked card (`Reply Voice, governance, skills and memory is not available on the Operator profile.` on Master Skills and Governance; `Only a Principal can open Profiles.` on Profiles) or a page that loads with `Principal access required` errors. `/style-guide` has no gate. Trusted Sources is on [Data and sources](/intelligence/data-and-sources#find-a-trusted-source).</Note>
+
+## Page map
+
+### Platform Admin tab bar
+Order: **Overview**, **Tenants**, **Master Skills**, **Governance**, **Profiles**, **Platform Team**, **Ariya Memory**, **Style Guide**, **Platform Memory**, **Platform Settings** (nav aria-label "Platform Admin navigation"). `/admin/integrations` has no tab bar.
+
+### Overview on /admin
+h1 **Platform Admin**, description `Ariya-level controls for tenant scope, platform gates, and changes that affect all tenants.` Section `Platform Control` with h2 `Admin health, gates, and platform-wide change lanes` and pill `Signed in as {email}`; tiles `Admin endpoint` (`Verified`, `Checking` or `Error`), `Role gate`, `Active tenant`, `Change scope` (`All tenants`); `Admin Attention` links; `Tenant Snapshot`; `Platform Changes` cards; `Gated Actions` list. Status badges such as `Live` and `Controlled` are fixed text.
+
+### Tenants list and tenant detail
+- List: h1 **Tenants**, description `All tenants on the platform. Read-only.` Table `Tenant` (link with building icon), `ID`, `Members`, `Created`.
+- Detail: h1 `{tenant name}`, description `tenant_id: {id}`; stat cards `Clients`, `Requests`, `Documents`; `Members ({n})` table (Email, Name, Role badge, `(inactive)`, Last login); section `Memory` with a memory inspector.
+
+### Master Skills list, new skill and skill detail
+- List: h1 **Master Skills**, description `Platform-default agent skills (tenant_id IS NULL). Edits propagate to all tenants on the next agent turn.` Button **New master skill**; filter chips **all**, **active**, **draft**, **archived**; table `Skill`, `Triggers`, `Status`, `v`, `Updated`, with per-row **Archive** or **Restore**.
+- New: h1 **New master skill**, description `Platform-default skill — applied across all tenants.`; card `Import skill manifest`; the skill form.
+- Detail: read-only. h1 `{skill name}`, notice `Defined in packages/core/src/skills/library/{name}.ts. Edit the source file and rebuild @ariya/core.`; sections `When to use`, `Triggers`, `Workflow`, `Example inputs`.
+
+### Governance on /admin/governance
+h1 **Governance**, description `The agent's system prompt, in markdown. Loaded into every conversation; tenant overlays (TENANT_*.md) extend the platform files additively.`; notice starting `Read-only catalog.` One tab per file; the selected file shows as preformatted text with `{sourcePath}` and `{n} chars · updated {date}`.
+
+### Profiles on /admin/profiles
+h1 **Profiles**, description `Four fixed profiles decide what each person can do. Assign one to every user in this workspace.` Card `What each profile can do` (matrix with `Yes`, `View`, `No`); card `People ({n})` with table `Person`, `Profile` (dropdown), `Last login`.
+
+### Platform Team on /admin/team
+Tab **Platform Team**, but h1 **Ariya Team** (breadcrumb `Team`), description `Members of the Ariya platform tenant. Principals manage invitations here and assign profiles on the Profiles page.` Card `Invite a member` (email, role, **Send invite**; sign-in policy for Principals); `Members ({n})` table; `Pending invitations ({n})` table when any exist.
+
+### Ariya Memory on /admin/ariya-memory
+h1 **Ariya Memory**, description `Internal company-memory RAG for Ariya. Source-backed, admin-gated, and blocked from the client portal.` Card `Backend Release Gates` (tiles `API enabled`, `Fixture mode`, `Sources`, `Approved records`; gates `Staging`, `Production`, `Client portal`; `Gate reasons`); `Retrieval Workbench`; `Answer`; `Audit Results`.
+
+### Platform Memory on /admin/platform-memory
+h1 **Platform Memory**, description `Anonymized cross-tenant heuristics. Read by all tenants matching the industry/jurisdiction filter.` Stat cards `Active`, `Archived`, `Promoted`, `Manual`, `Industries`; filters; buttons **Promote from tenant**, **Add manually**; card `{n} memories` with table Category, Content, Industry, Jurisdiction, Source, Applied, Status.
+
+### Platform Settings on /admin/platform-settings
+h1 **Platform Settings**, description `Global configuration that applies across all tenants, managed by Ariya platform admins.` Card `Personal email domains` with an add form and a list of domains.
+
+### Integration Health on /admin/integrations
+h1 **Integration Health**, description `HubSpot sync freshness, counts, and failures for the Ariya tenant.` Sections `HubSpot sync` and `HRIS bridge`. **Refresh** only.
+
+### Style Guide on /style-guide
+While loading: h1 **Style Guide** and `Loading brand kit...`; then the h1 becomes the brand kit name with its tagline. Static colour, typography and voice reference.
+
+## Recipes
+
+### Check the admin endpoint
+**Risk:** `READ` · **Roles:** Principal
+**Inputs from Clarwiz:** none.
+**Preconditions:** none.
+
+1. Open `/admin`.
+   - Wait for: h1 **Platform Admin** and the `Admin endpoint` tile to leave `Checking`.
+2. Read `Admin endpoint`: `Verified` means admin calls work. `Error` shows the API error in its detail line.
+3. In `Tenant Snapshot`, a warning `You are signed in as {role}, not principal. Platform admin requests will be rejected.` means you are on the wrong account.
+
+**Done when:** the tile reads `Verified`, or you have reported the error.
+
+### List tenants
+**Risk:** `READ` · **Roles:** Principal
+**Inputs from Clarwiz:** none.
+**Preconditions:** none.
+
+1. Open `/admin/tenants` (tab **Tenants**).
+   - Wait for: the table (`Loading…` gone).
+2. Read `Tenant`, `ID`, `Members` (`{active}` or `{active} / {total}`), `Created`.
+
+**Done when:** the table or `No tenants found.` is visible. Error: `Error: {error}`.
+
+### Inspect a tenant
+**Risk:** `READ` · **Roles:** Principal
+**Inputs from Clarwiz:** tenant name or ID.
+**Preconditions:** none.
+
+1. Open `/admin/tenants/{tenantId}`, or click the tenant name in `/admin/tenants`.
+   - Wait for: h1 `{tenant name}` and stat cards `Clients`, `Requests`, `Documents`.
+2. Read `Members ({n})` and the `Memory` section.
+3. In the memory inspector, filter with category buttons **All**, `Facts ({n})`, `Heuristics ({n})`, `Preferences ({n})`, `Corrections ({n})` and status buttons **live**, **archived**, **all**.
+
+**Done when:** the memory table (`Cat`, `Key`, `Content`, `Status`, `Source`, `Updated`, `Actions`) or `No memory rows match the current filter.` is visible. Loading `Loading memory…`; errors `Error: {error}`.
+
+### Edit a tenant memory row
+**Risk:** `WRITE` · **Roles:** Principal
+**Inputs from Clarwiz:** tenant, memory key, new content or status.
+**Preconditions:** tenant detail open.
+
+1. Find the row by `Key`.
+2. Click the pencil icon button (title "Edit"; visual: `Actions` column).
+   - Wait for: content becomes a text area and status becomes a native select (`active`, `core`, `proposed`, `superseded`, `archived`).
+3. Change the content or status.
+4. Click the save icon button (title "Save"). The X icon (title "Cancel") discards.
+
+**Done when:** toast `{key} updated` (or `No changes`). Failure: `Save failed: {error}`.
+
+### Archive or restore a tenant memory row
+**Risk:** `DESTRUCTIVE` (archive, soft) / `WRITE` (restore) · **Roles:** Principal
+**Inputs from Clarwiz:** tenant, memory key; approval for archive.
+**Preconditions:** tenant detail open.
+
+<Warning>**Approval required (DESTRUCTIVE).** Stop here and get approval before clicking **Archive**. It acts at once with no confirm.</Warning>
+
+1. On a non-archived row click the archive icon button (title "Archive"). On an archived row, the restore icon button (title "Restore") brings it back.
+
+**Done when:** toast `{key} archived` or `{key} restored`. Failure: `Archive failed: {error}` or `Restore failed: {error}`.
+
+### View another tenant
+**Risk:** `READ` (writes made while switched land in that tenant) · **Roles:** Principal of `ariya` or `pilot`
+**Inputs from Clarwiz:** tenant ID.
+**Preconditions:** none. There is no tenant switcher in the UI.
+
+1. Take the URL of the page you need and append `?tenant_id={tenantId}` (use `&tenant_id=` if the URL already has a query). Example: `/clients?tenant_id={tenantId}`.
+2. Open it.
+   - Wait for: the page to load. Every data call from this page now uses that tenant.
+3. Before every further step, check the URL still has `tenant_id`. Sidebar and tab links drop it, so after any link click you are back in your own tenant. Re-append it on each page.
+
+**Done when:** the page shows the other tenant's data.
+
+| If you see | Why | Do this |
+|---|---|---|
+| `Tenant access denied` | You are not a Principal of an internal tenant | Remove the parameter. |
+| Your own tenant's data after a click | The link dropped `tenant_id` | Re-append the parameter. |
+| `/usage` or Memory approvals ignore the switch | Those pages hard-code tenant `ariya` | Do not rely on switching there. |
+
+<Warning>Anything you create or change while switched is written to that tenant. Confirm the tenant ID with Clarwiz before any WRITE. Proxy login is not offered while the URL carries `tenant_id`.</Warning>
+
+### Browse master skills
+**Risk:** `READ` · **Roles:** Principal
+**Inputs from Clarwiz:** none.
+**Preconditions:** none.
+
+1. Open `/admin/skills` (tab **Master Skills**, or Quick Action **Skills** on `/intelligence`).
+   - Wait for: the table (`Loading…` gone).
+2. Click a filter chip: **all**, **active**, **draft**, **archived**.
+3. Click a skill name (code-style link) to open `/admin/skills/{id}`.
+   - Wait for: h1 `{skill name}` and badges `{status} · {n} triggers · {n} examples`.
+
+**Done when:** the detail page shows `When to use`, `Triggers`, `Workflow`, `Example inputs`. The detail page has no edit controls. Empty list: `No skills match the filter.`
+
+### Create a master skill
+**Risk:** `WRITE` (an active skill applies to every tenant's agent) · **Roles:** Principal
+**Inputs from Clarwiz:** name, description, status, triggers, example inputs, when to use, workflow; or a Markdown manifest.
+**Preconditions:** none.
+
+1. Open `/admin/skills/new` (or **New master skill** on `/admin/skills`).
+   - Wait for: h1 **New master skill** and card `Import skill manifest`.
+2. Optional, to import a manifest:
+   1. Paste the manifest into the manifest text area (7 rows; visual: inside `Import skill manifest`), or click **Upload .md**, or click a sample (**Draft checklist**, **Approval request**).
+   2. Click **Parse into form** (disabled while empty).
+   3. Read the result: red `Fix before import`, amber `Review before saving`, green `Import preview` (`Risk`, `Tools`, `Required inputs`, `Outputs`).
+   4. On success, toast `Manifest imported as draft`; the form below is filled and **Status** is draft. Failure: toast `Import failed: {error}`.
+3. Fill the form. Labels sit above fields but are not linked to them; find fields by label text or placeholder:
+   - **Name** (placeholder "check-compliance"): lowercase kebab-case; cannot change after creation.
+   - **Description** (placeholder starts "Evaluate compliance posture"): one line.
+   - **Status** (native select): `active — applied to agent runs` (default), `draft — saved but not applied`, `archived — hidden, not applied`. Choose draft unless Clarwiz says active.
+   - **Triggers**: one per line (counter `{n} trigger(s)`).
+   - **Example inputs**: one per line.
+   - **When to use** (required).
+   - **Workflow** (required; counter `{n} chars`).
+4. Click **Create skill** (submit; visual: bottom of the form).
+   - Wait for: `Saving…`.
+
+**Done when:** toast `Skill saved` and the URL becomes `/admin/skills/{id}`.
+
+| If you see | Why | Do this |
+|---|---|---|
+| Browser bubble on a required field | Field empty | Fill it. |
+| Toast `Save failed: {error}` and red card `Error: {error}` | Server refused (for example a duplicate name) | Fix and retry. |
+
+### Archive or restore a master skill
+**Risk:** `DESTRUCTIVE` (archive, soft) / `WRITE` (restore) · **Roles:** Principal
+**Inputs from Clarwiz:** skill name; approval for archive.
+**Preconditions:** `/admin/skills` open.
+
+<Warning>**Approval required (DESTRUCTIVE).** Stop here and get approval before clicking **Archive**. The skill stops applying to agent runs in every tenant.</Warning>
+
+1. On the row, click **Archive** (text button, title "Archive").
+   - Wait for: a **native browser confirm** `Archive this skill? It will stop being applied to agent runs.` Accept it.
+2. To undo, click **Restore** on an archived row (no confirm).
+
+**Done when:** the list reloads and the `Status` cell changes. There is no toast and failures are not shown; reload and check the status.
+
+### Read governance files
+**Risk:** `READ` · **Roles:** Principal
+**Inputs from Clarwiz:** file name.
+**Preconditions:** none.
+
+1. Open `/admin/governance` (tab **Governance**).
+   - Wait for: `Loading governance files…` to clear.
+2. Click the file's tab (label = file name, for example a `.md` file).
+
+**Done when:** the file content, `{sourcePath}` and `{n} chars · updated {date}` are visible. Empty: `No governance files found.` Governance cannot be edited here.
+
+### Assign a profile to a person
+**Risk:** `WRITE` (changes what the person can do; saves instantly) · **Roles:** Principal
+**Inputs from Clarwiz:** person, new profile.
+**Preconditions:** not in proxy login.
+
+1. Open `/admin/profiles` (tab **Profiles**, or the **Profile** link on a `/admin/team` row).
+   - Wait for: h1 **Profiles** and card `People ({n})`.
+2. Find the person's row (name and email).
+
+<Warning>Picking an option saves immediately, with no confirm and no undo button. Confirm the person and the profile with Clarwiz before you open the dropdown.</Warning>
+
+3. Click the row's **Profile** dropdown and click `Principal`, `Admin`, `Operator` or `Member` (`Principal` only where assignable; the dropdown is disabled while saving).
+
+**Done when:** toast `Profile set to {Profile}`. The change applies on the person's next request. Failure: red toast with server text; during proxy login `Not available during proxy login: managing Profiles.`
+
+### Invite a platform team member
+**Risk:** `EXTERNAL` `WRITE` (sends an invitation email) · **Roles:** Principal
+**Inputs from Clarwiz:** email, role; approval.
+**Preconditions:** none.
+
+1. Open `/admin/team` (tab **Platform Team**).
+   - Wait for: h1 **Ariya Team** and card `Invite a member`.
+2. Click the email input (no label, type email, placeholder "email@example.com") and type the email.
+3. Pick the role in the native select next to it: `Admin` (default), `Operator`, `Member` (`Principal` for Principals).
+
+<Warning>**Approval required (EXTERNAL).** Stop here and get approval before clicking **Send invite**. It emails the person.</Warning>
+
+4. Click **Send invite** (disabled while email is empty).
+   - Wait for: `Sending…`.
+
+**Done when:** green text `Invitation sent to {email}` under the form and a row in `Pending invitations ({n})`. Failure: red text with the server error.
+
+### Resend or revoke an invitation
+**Risk:** `EXTERNAL` (resend) / `DESTRUCTIVE` (revoke) · **Roles:** Principal
+**Inputs from Clarwiz:** invitation email; approval.
+**Preconditions:** `Pending invitations` table visible.
+
+<Warning>**Approval required (EXTERNAL or DESTRUCTIVE).** Stop here and get approval before clicking **Resend** (sends email) or **Revoke** (invalidates the invitation).</Warning>
+
+1. Resend: click **Resend** on the row. A **native alert** `Invitation resent.` appears; accept it.
+2. Revoke: click **Revoke** (disabled when already revoked). Accept the **native confirm** `Revoke this invitation?`
+
+**Done when:** the alert was shown (resend) or the row status changes (revoke). Errors arrive as native alerts.
+
+### Deactivate or reactivate a member
+**Risk:** `DESTRUCTIVE` (deactivate) / `WRITE` (reactivate) · **Roles:** Principal
+**Inputs from Clarwiz:** member email; approval for deactivate.
+**Preconditions:** `Members ({n})` table visible.
+
+<Warning>**Approval required (DESTRUCTIVE).** Stop here and get approval before clicking **Deactivate**. The person loses access.</Warning>
+
+1. Click **Deactivate** (or **Reactivate**) on the member row.
+2. Accept the **native confirm** `Deactivate this member?` (or `Reactivate this member?`).
+
+**Done when:** the row shows or loses `(inactive)`. Errors arrive as native alerts.
+
+### Change the platform sign-in policy
+**Risk:** `DESTRUCTIVE` (can lock out password sign-in for everyone, including the agent) · **Roles:** Principal
+**Inputs from Clarwiz:** allowed domains and flags; approval.
+**Preconditions:** `/admin/team` open.
+
+1. In `Invite a member`, find **Allowed email domains** (input, id "platformAllowedDomains", placeholder "ariyahr.com"; comma or space separated).
+2. Set the native checkboxes **Google SSO ready**, **Require SSO**, **Require MFA**, **Passkeys ready**.
+
+<Warning>**Approval required (DESTRUCTIVE).** Stop here and get approval before clicking **Save policy**. **Require SSO** or **Require MFA** blocks email-and-password sign-in, which the agent depends on.</Warning>
+
+3. Click **Save policy**.
+
+**Done when:** no error alert appears (there is no success message). Reload and re-read the checkboxes to confirm.
+
+### Query Ariya company memory
+**Risk:** `AI` `READ` · **Roles:** Principal
+**Inputs from Clarwiz:** the question.
+**Preconditions:** `API enabled` gate is on.
+
+1. Open `/admin/ariya-memory` (tab **Ariya Memory**).
+   - Wait for: `Backend Release Gates` tiles. An amber alert starting `Ariya company memory is visible here for admin planning, but query and audit calls are disabled` means queries cannot run; stop and report.
+2. Click the query text area (placeholder "Ask a source-backed Ariya company-memory question...") and type the question. Or click a prompt button (**What is blocking the Ariya memory MVP?**, **What did we decide about CentCom and Ariya memory?**, **What source supports the Ariya memory source inventory gate?**), which runs at once.
+3. Click **Search memory** (disabled unless enabled and non-empty).
+   - Wait for: `Searching` to finish.
+
+**Done when:** the `Answer` card shows badges, text, `Guardrails` and `Citations` (`Updated {date}`, **Open source** in a new tab) or `No citations returned.`
+
+| If you see | Why | Do this |
+|---|---|---|
+| `Enter a query before searching Ariya memory.` | Empty query | Type a question. |
+| `Query failed: {error}` or toast `Ariya memory query failed: {error}` | Server error | Report. |
+| `Health check failed: {error}` | Health load failed | Click **Refresh**; report. |
+
+### Run the Ariya memory audit
+**Risk:** `READ` (diagnostic) · **Roles:** Principal
+**Inputs from Clarwiz:** none.
+**Preconditions:** `API enabled`.
+
+1. On `/admin/ariya-memory`, click **Run audit** (disabled unless enabled).
+   - Wait for: `Auditing` to finish.
+
+**Done when:** toast `Ariya memory audit passed` or `Ariya memory audit found blockers`, and `Audit Results` shows `Audit passed` or `Audit blocked`, `{n}/{m} checks passing` and check cards. Error: toast `Ariya memory audit failed: {error}`.
+
+### Browse platform memory
+**Risk:** `READ` · **Roles:** Principal
+**Inputs from Clarwiz:** filters.
+**Preconditions:** none.
+
+1. Open `/admin/platform-memory` (tab **Platform Memory**).
+   - Wait for: stat cards (`Loading…` gone).
+2. Filter (each change reloads): **Industry** (input, placeholder "restaurant"), **Jurisdiction** (input, placeholder "CA"), **Category** (`All`, `Fact`, `Heuristic`, `Preference`, `Voice pattern`, `Correction`), **Status** (`Active` default, `Archived`, `Superseded`).
+
+**Done when:** the table or `No platform memories yet. Promote a tenant memory or add one manually.` is visible. Load failure: toast `Failed to load: {error}`.
+
+### Promote a tenant memory to platform
+**Risk:** `AI` `WRITE` (anonymizes with an LLM, then shares across tenants) · **Roles:** Principal
+**Inputs from Clarwiz:** tenant ID, source type, source memory UUID, optional industry and jurisdiction.
+**Preconditions:** none.
+
+1. On `/admin/platform-memory`, click **Promote from tenant**.
+   - Wait for: card `Promote a tenant memory to platform` above the table.
+2. Fill fields (placeholders only, no labels): "tenantId"; the source dropdown `client_memory` or `tenant_memory`; "sourceId (UUID)"; "industry (optional)"; "jurisdiction (optional)".
+3. Leave **Skip anonymizer (already curated)** unticked unless Clarwiz says otherwise.
+4. Click **Promote** (needs tenantId and sourceId).
+   - Wait for: `Promoting…`.
+
+**Done when:** toast `Promoted` and the row appears.
+
+| If you see | Why | Do this |
+|---|---|---|
+| Warning toast `Promotion rejected: {reason}` | The anonymizer or leak check refused it | Report the reason; do not skip the anonymizer to force it. |
+| `Promotion failed` or `{error}` | Server error | Report. |
+
+### Add platform memory manually
+**Risk:** `WRITE` (shared across tenants) · **Roles:** Principal
+**Inputs from Clarwiz:** category, industry, jurisdiction, domain, anonymized content.
+**Preconditions:** content contains no client or person identifiers.
+
+1. On `/admin/platform-memory`, click **Add manually**.
+   - Wait for: card `Add manually-curated platform memory`.
+2. Pick the category (`Fact`, `Heuristic` default, `Preference`, `Voice pattern`); fill "industry", "jurisdiction", "domain" and the text area "Anonymized content".
+3. Click **Add** (needs content).
+
+**Done when:** toast `Added` and the row appears. **Cancel** hides the card.
+
+### Archive a platform memory
+**Risk:** `DESTRUCTIVE` (soft; no confirm) · **Roles:** Principal
+**Inputs from Clarwiz:** which row; approval.
+**Preconditions:** row is active.
+
+<Warning>**Approval required (DESTRUCTIVE).** Stop here and get approval before clicking **Archive**. It acts at once for every tenant.</Warning>
+
+1. Click **Archive** on the row.
+
+**Done when:** toast `Archived`.
+
+### Add a personal email domain
+**Risk:** `WRITE` (global) · **Roles:** Principal
+**Inputs from Clarwiz:** domain, optional label.
+**Preconditions:** none.
+
+1. Open `/admin/platform-settings` (tab **Platform Settings**).
+   - Wait for: card `Personal email domains`.
+2. Type the domain in the input with placeholder "domain.com" (lower-cased on add) and an optional label in "Label (optional)".
+3. Click **Add** (needs a domain).
+   - Wait for: `Adding…`.
+
+**Done when:** toast `Added {domain}` and the domain is listed. Failure: red toast with server text.
+
+### Edit a personal email domain label
+**Risk:** `WRITE` · **Roles:** Principal
+**Inputs from Clarwiz:** domain, new label.
+**Preconditions:** domain listed.
+
+1. Click the label text on the domain row (`{label}` or `no label`; button, title "Edit label"). The pencil icon shows only on hover; the text itself is the button.
+2. Type the new label in the input that appears.
+3. Press Enter to save (Escape cancels). The check and X icon buttons next to it have no labels; prefer the keys.
+
+**Done when:** toast `Label updated`.
+
+### Remove a personal email domain
+**Risk:** `DESTRUCTIVE` · **Roles:** Principal
+**Inputs from Clarwiz:** domain; approval.
+**Preconditions:** domain listed.
+
+<Warning>**Approval required (DESTRUCTIVE).** Stop here and get approval before clicking **Remove**.</Warning>
+
+1. Click the trash icon button (title "Remove") on the row.
+2. Accept the **native confirm** `Remove {domain} from personal email domains?`
+
+**Done when:** toast `Removed {domain}`.
+
+### Check integration health
+**Risk:** `READ` · **Roles:** Principal
+**Inputs from Clarwiz:** none.
+**Preconditions:** none.
+
+1. Open `/admin/integrations` (no tab; also **HubSpot integration health** on `/crm-hygiene`).
+   - Wait for: `Loading HubSpot readiness...` to clear.
+2. Read `HubSpot sync` (`CRM import freshness, counts, and failures.`) and `HRIS bridge` (`iSolved and Rippling provider access gates for the Ariya tenant.`). **Refresh** reloads.
+
+**Done when:** both sections show content. States: `Failed to load HubSpot readiness: {error}`, `No HubSpot readiness status available.` This page has no action buttons.
+
+### View the style guide
+**Risk:** `READ` · **Roles:** Principal (any signed-in user by URL)
+**Inputs from Clarwiz:** none.
+**Preconditions:** none.
+
+1. Open `/style-guide` (tab **Style Guide**).
+   - Wait for: `Loading brand kit...` to be replaced by the brand kit name as h1.
+
+**Done when:** colour, typography and voice sections are visible. There are no controls.
+
+### Start a proxy login
+**Risk:** `WRITE` (you act as another person; every change is recorded as proxied by you) · **Roles:** Principal only
+**Inputs from Clarwiz:** the person to act as; explicit instruction to use proxy login.
+**Preconditions:** the URL has no `tenant_id`; the target is active, not you and not a Principal.
+
+1. Open `/settings/team`.
+2. Find the person's row and click the icon button with aria-label `Proxy login as {name}`.
+   - Wait for: a dialog titled `Proxy login as {name}?` with the description `You will use the whole app as this person for up to 1 hour. You cannot send email from their Gmail or change their password, sign-in or MFA. Everything you change is recorded as proxied by you.`
+3. Click **Start proxy login** (or **Cancel**).
+
+The same flow is described with the Team Access page in [Proxy login as a user](/settings/general-and-team#proxy-login-as-a-user).
+
+**Done when:** the violet `PROXY LOGIN` strip shows `Viewing as {name} ({Profile}) · {email}`. To end it see [Recognise and exit a proxy login](/start/login-and-session#recognise-and-exit-a-proxy-login).
+
+## Controls reference
+
+| Visible text | Type | Locator | What it does | Risk |
+|---|---|---|---|---|
+| `{tenant name}` | link | `/admin/tenants` table | Opens tenant detail | READ |
+| Category and status buttons | buttons | memory inspector | Filter | READ |
+| (pencil) / (save) / (X) | icon buttons | title "Edit", "Save", "Cancel" | Edit memory row | WRITE |
+| (archive) / (restore) | icon buttons | title "Archive", "Restore" | Archive or restore row | DESTRUCTIVE / WRITE |
+| **New master skill** | button link | `/admin/skills` header | Opens new form | READ |
+| **all**, **active**, **draft**, **archived** | chips | `/admin/skills` | Filter | READ |
+| **Archive** / **Restore** | text buttons | skill rows | Native confirm archive / restore | DESTRUCTIVE / WRITE |
+| **Draft checklist**, **Approval request** | buttons | import card | Fill sample manifest | READ |
+| **Upload .md** | file input | import card | Loads manifest | READ |
+| **Parse into form** | button | import card | Parses manifest | READ |
+| **Create skill** (`Saving…`) | submit | form bottom | Creates skill | WRITE |
+| File tabs | tabs | `/admin/governance` | Show file | READ |
+| **Profile** | dropdown | `/admin/profiles` rows | Saves profile instantly | WRITE |
+| Email, role | input, native select | `/admin/team` invite card | Invite fields | — |
+| **Send invite** (`Sending…`) | submit | invite card | Emails invitation | EXTERNAL |
+| **Allowed email domains** | input | id "platformAllowedDomains" | Policy | — |
+| **Google SSO ready**, **Require SSO**, **Require MFA**, **Passkeys ready** | native checkboxes | invite card | Policy flags | — |
+| **Save policy** | button | invite card | Saves policy | DESTRUCTIVE (lock-out risk) |
+| **Profile** | link | member row, title "Change profile on the Profiles page" | Opens `/admin/profiles` | READ |
+| **Deactivate** / **Reactivate** | text buttons | member row | Native confirm | DESTRUCTIVE / WRITE |
+| **Resend** | text button | invitation row | Native alert | EXTERNAL |
+| **Revoke** | text button | invitation row | Native confirm | DESTRUCTIVE |
+| **Refresh** | button | `/admin/ariya-memory`, `/admin/integrations` | Reload | READ |
+| **Run audit** (`Auditing`) | button | Ariya Memory | Audit | READ |
+| **Search memory** (`Searching`) | button | Retrieval Workbench | Query | AI |
+| **Promote from tenant**, **Add manually**, **Cancel** | buttons | Platform Memory | Show or hide forms | READ |
+| **Skip anonymizer (already curated)** | checkbox | promote card | Skips LLM anonymizer | — |
+| **Promote** (`Promoting…`) | button | promote card | Promotes | AI WRITE |
+| **Add** | button | add card | Adds memory | WRITE |
+| **Archive** | button | platform memory row | Archives, no confirm | DESTRUCTIVE |
+| **Add** (`Adding…`) | submit | Platform Settings | Adds domain | WRITE |
+| `{label}` / `no label` | button | title "Edit label" | Edit label | WRITE |
+| (trash) | icon button | title "Remove" | Native confirm, removes | DESTRUCTIVE |
+| `Proxy login as {name}` | icon button | aria-label; `/settings/team` rows | Opens proxy dialog | WRITE |
+| **Start proxy login** | button | proxy dialog | Starts proxy | WRITE |
+
+## Waits and signals
+- Most admin pages show `Loading…` then a table. Errors appear as `Error: {error}` cards or toasts.
+- `/admin/team` reports success as green text, and errors and resends as native browser alerts.
+- `/admin/skills` archive and restore give no toast; the list reloads.
+- Promotion can take several seconds (LLM anonymizer).
+
+## Gotchas
+- Native browser dialogs on `/admin/skills` (archive), `/admin/team` (deactivate, reactivate, revoke, resend alert, error alerts) and `/admin/platform-settings` (remove). Accept or dismiss them through your automation.
+- Profiles dropdown, memory archive buttons and platform memory archive save with no confirm.
+- `/admin/skills/{id}` is read-only and tells you to edit source code; you cannot edit an existing master skill in the UI.
+- Governance is read-only, although `/admin` cards say "edited with review gates" and "Review before save".
+- The tab says **Platform Team**; the page h1 says **Ariya Team**.
+- Platform Memory and the skill form use placeholders or unlinked labels; locate fields by placeholder or nearby label text.
+- Master skill archive and restore failures are not shown at all; always reload and verify.
+- Tenant switching is lost on every link click.
+- These pages have no in-app guide of their own; **?** opens `How Ariya fits together`.
+
+## Related
+- [Roles and access](/start/roles-and-access)
+- [Sign in and session](/start/login-and-session#recognise-and-exit-a-proxy-login)
+- [Data and sources](/intelligence/data-and-sources)
+- [Internal ops](/admin/internal-ops)
+
+## Source files
+- `packages/web/src/app/(dashboard)/admin/page.tsx`
+- `packages/web/src/app/(dashboard)/admin/tenants/page.tsx`
+- `packages/web/src/app/(dashboard)/admin/tenants/[id]/page.tsx`
+- `packages/web/src/components/memory/memory-inspector.tsx`
+- `packages/web/src/app/(dashboard)/admin/skills/page.tsx`
+- `packages/web/src/app/(dashboard)/admin/skills/new/page.tsx`
+- `packages/web/src/app/(dashboard)/admin/skills/_form.tsx`
+- `packages/web/src/app/(dashboard)/admin/skills/[id]/page.tsx`
+- `packages/web/src/app/(dashboard)/admin/governance/page.tsx`
+- `packages/web/src/app/(dashboard)/admin/profiles/page.tsx`
+- `packages/web/src/app/(dashboard)/admin/team/page.tsx`
+- `packages/web/src/app/(dashboard)/admin/ariya-memory/page.tsx`
+- `packages/web/src/app/(dashboard)/admin/platform-memory/page.tsx`
+- `packages/web/src/app/(dashboard)/admin/platform-settings/page.tsx`
+- `packages/web/src/app/(dashboard)/admin/integrations/page.tsx`
+- `packages/web/src/app/(dashboard)/style-guide/page.tsx`
+- `packages/web/src/lib/api.ts`
+- `packages/web/src/components/layout/proxy-banner.tsx`

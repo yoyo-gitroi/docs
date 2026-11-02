@@ -1,0 +1,285 @@
+---
+title: "General settings and team access"
+sidebarTitle: "General and team"
+description: "Change workspace name, timezone, lead consultant, brand and default AI model, and invite, deactivate, reactivate or remove team members."
+keywords: ["settings", "workspace settings", "tenant settings", "timezone", "lead consultant", "brand colors", "fonts", "default model", "invite user", "add team member", "add a user", "invite colleague", "resend invitation", "revoke invitation", "deactivate user", "remove user", "offboard staff", "access policy", "SSO", "MFA", "allowed domains", "proxy login"]
+---
+
+<Info>
+**URL:** `/settings` (General) · `/settings/team` (Team Access) · **Reach:** sidebar **Settings** → tab **General** or **Team Access** · **Roles:** Principal ✓ Operator ✗ (Admin ✓ with limits, Member ✗) · **Ready when:** h2 "General" (with "Tenant configuration, branding, and workspace preferences.") or h2 "Team Members" (with `{n} active member(s)`) is visible.
+</Info>
+
+Workspace-wide configuration and the team roster. Every change here affects the whole workspace.
+
+<Note>
+**Operator.** The sidebar **Settings** item and every Settings tab except **Integrations** are hidden from an Operator. Typing the URL still renders the page, but the server refuses:
+- `/settings`: the form loads, and **Save Changes** fails with the red alert "Your profile cannot change Workspace settings. Allowed: Principal, Admin."
+- `/settings/team`: a red alert "Admin access required".
+
+As an Operator, do not use these pages; report to Clarwiz that a Principal is needed. An **Admin** can use both pages but can only invite or deactivate Members and Operators, and cannot remove users or proxy-login.
+</Note>
+
+## Page map
+
+Settings shell (every `/settings` page):
+
+- **Header** (top): h1 "Settings", description "Configure tenant workspace defaults and operating controls.", breadcrumbs "Settings" or "Settings › `{tab label}`".
+- **Tab bar** (under the header): **General**, **Team Access**, **Templates**, **Brand Assets**, **Packets**, **HR Roadmaps**, **Compliance Defaults**, **Integrations**, **Implementation Catalog**, **Sub-services**, **Vendors**. An Operator or Member sees only **Integrations**.
+
+General, `/settings`:
+
+- **Save Changes** (button, top right of the content).
+- Card **Tenant Information**: Tenant Name, Timezone, Lead consultant, Credentials.
+- Card **Brand** (hidden on the platform tenant `ariya`): Company Name, Body Font, Heading Font, Footer Tagline, nine colour fields, Body Font Size.
+- Card **AI Configuration**: Default Model.
+
+Team Access, `/settings/team`:
+
+- **Header row**: h2 "Team Members", `{n} active member(s)`, **Invite User** (button, right).
+- Card **Access Policy**: allowed email domains, SSO and MFA checkboxes, **Save access policy**.
+- Card **Invitations** (only when any exist): Email (status badge pending / expired / revoked), Profile, Invited By, Expires, Actions.
+- **Users table**: User, Profile, Status (Active / Pending / Inactive), Last Login ("Never" if none), Actions.
+- Card **Proxy login history** (Principal with proxy rights only).
+
+Other Settings tabs: [Integrations](/settings/integrations), [Catalogs and defaults](/settings/catalogs-and-defaults). **Templates**, **Brand Assets** and **Packets** are covered at [Templates](/documents/templates) and [Brand assets and packets](/documents/brand-and-packets).
+
+## Recipes
+
+### Change workspace details
+
+**Risk:** `WRITE` · **Roles:** Principal (Admin also)
+**Inputs from Clarwiz:** any of tenant name, timezone, lead consultant name, credentials.
+
+1. Open `/settings`. Alternative: sidebar **Settings** → tab **General**.
+   - Wait for: "Loading settings..." to disappear.
+2. In **Tenant Information**, edit only the fields asked for:
+   - **Tenant Name** (input, id "tenantName", placeholder "Ariya HR")
+   - **Timezone** (select, id "timezone"; 10 time zones)
+   - **Lead consultant** (input, id "leadConsultantName", placeholder "Who signs documents and speaks in drafts")
+   - **Credentials** (input, id "leadConsultantCredentials", placeholder "e.g. SHRM-CP (shown after the name on Prepared by)")
+3. Click **Save Changes** (button; visual: top right of the General content).
+   - Wait for: "Saving..." to finish.
+
+**Done when:** toast "Settings saved".
+
+| If you see | Why | Do this |
+|---|---|---|
+| Red alert "Your profile cannot change Workspace settings. Allowed: Principal, Admin." | Signed in as Operator or Member | Stop; a Principal or Admin is needed |
+| Red alert "Save failed" / "Failed to save settings" or another message | Server error | Retry once; report |
+| "Loading settings..." never clears | The user has no tenant | Stop and report |
+
+### Change document branding
+
+**Risk:** `WRITE` (affects every generated document) · **Roles:** Principal (Admin also)
+**Inputs from Clarwiz:** colours as hex codes, fonts, tagline, company name, font size.
+**Preconditions:** not the platform tenant (the **Brand** card is hidden there).
+
+1. Open `/settings`.
+2. In **Brand**, edit only the fields asked for:
+   - **Company Name** (for documents; id "companyName")
+   - **Body Font** (id "fontFamily"), **Heading Font** (id "headingFontFamily")
+   - **Footer Tagline** (id "footerTagline")
+   - Colours: type the hex code in the text input (placeholder "#000000") next to each picker: Primary Color, Secondary Color, Accent Color, Text Color, Subtitle Color, Label Color, Callout Background, Emphasis Color, Emphasis Background.
+   - **Body Font Size** (8pt to 12pt)
+3. Click **Save Changes**.
+
+**Done when:** toast "Settings saved". Errors as in [Change workspace details](#change-workspace-details).
+
+### Change the default AI model
+
+**Risk:** `WRITE` · **Roles:** Principal (Admin also)
+
+1. Open `/settings`.
+2. In **AI Configuration**, pick **Default Model** (select, id "defaultModel"): Claude Sonnet 4.6 or Claude Haiku 4.5.
+3. Click **Save Changes**.
+
+**Done when:** toast "Settings saved".
+
+### Invite a team member
+
+**Risk:** `EXTERNAL` (emails an accept link) · **Roles:** Principal (Admin: Member and Operator only)
+**Inputs from Clarwiz:** email address, profile (Member, Operator, Admin).
+
+1. Open `/settings/team`.
+   - Wait for: "Loading team..." to disappear.
+2. Click **Invite User** (button; visual: right of the "Team Members" heading).
+   - Wait for: dialog "Invite Team Member".
+3. Type the address in **Email Address** (input, id "inviteEmail", placeholder "colleague@company.com").
+4. Pick **Profile** (select, id "inviteRole"): Member (default), Operator; Admin for Principals; Principal only on the platform tenant.
+
+<Warning>**Approval required (EXTERNAL).** Stop here and get approval before clicking **Send Invitation**. It emails an invitation link to the address. Report the email and profile to Clarwiz.</Warning>
+
+5. Click **Send Invitation** (dialog button; disabled until an email is typed).
+   - Wait for: "Sending..." to finish.
+
+**Done when:** toast "Invitation sent" and a pending row in **Invitations**. This does not prove delivery: delivery failures are only logged on the server.
+
+| If you see | Why | Do this |
+|---|---|---|
+| "Valid email is required" | Bad address | Fix the address |
+| "Only a Principal can invite Principals or Admins" | Admin inviting Admin | Use a Principal account |
+| "The Principal profile is only available in the platform tenant" | Wrong profile | Pick another profile |
+| `Invites are limited to: {domains}` | Domain not allowed by the access policy | Report; a Principal may change [the access policy](#change-the-access-policy) |
+| "User with this email already exists" | Already a user | Report |
+| "A pending invitation already exists for this email. Resend it from the team page." | Already invited | See [Resend an invitation](#resend-an-invitation) |
+| "Admin access required" | Operator or Member | Stop; a Principal is needed |
+
+### Resend an invitation
+
+**Risk:** `EXTERNAL` (re-sends the email with a new link) · **Roles:** Principal (Admin also)
+
+1. Open `/settings/team` and find the row in **Invitations**.
+
+<Warning>**Approval required (EXTERNAL).** Stop here and get approval before clicking the resend icon. It emails the person again.</Warning>
+
+2. Click the mail icon (icon button, title "Resend invitation"; visual: Actions column of the invitation row).
+
+**Done when:** toast `Invitation resent to {email}`.
+
+### Revoke an invitation
+
+**Risk:** `DESTRUCTIVE` · **Roles:** Principal (Admin also)
+
+1. Open `/settings/team` and find the row in **Invitations**.
+
+<Warning>**Approval required (DESTRUCTIVE).** Stop here and get approval before revoking. The person can no longer accept the invitation.</Warning>
+
+2. Click the × icon (icon button, title "Revoke invitation"; disabled when already revoked).
+3. In "Revoke invitation?" (`{email} will no longer be able to accept this invitation.`), click **Revoke**.
+
+**Done when:** toast "Invitation revoked" and the badge reads revoked.
+
+### Change the access policy
+
+**Risk:** `WRITE` (controls who can sign in) · **Roles:** Principal (Admin also)
+**Inputs from Clarwiz:** allowed domains and which checkboxes to set.
+
+1. Open `/settings/team`.
+2. In **Access Policy**, edit **Allowed email domains** (input, id "allowedDomains", placeholder "company.com, ariyahr.com").
+3. Tick or untick **Google SSO ready**, **Require SSO**, **Require MFA**, **Passkeys ready** as asked.
+4. Click **Save access policy**.
+
+**Done when:** toast "Access policy saved". Failure: "Failed to save access policy".
+
+### Deactivate a user
+
+**Risk:** `DESTRUCTIVE` (reversible with Activate) · **Roles:** Principal (Admin: Members and Operators only)
+**Inputs from Clarwiz:** user name.
+
+1. Open `/settings/team` and find the user's row in the users table.
+
+<Warning>**Approval required (DESTRUCTIVE).** Stop here and get approval before deactivating. The user loses access immediately.</Warning>
+
+2. Click the user-x icon (icon button with **no** label or title; visual: Actions column, after the proxy icon and before the trash icon).
+3. In "Deactivate user?" (`{name} will lose access immediately.`), click **Deactivate**.
+
+**Done when:** toast `{name} has been deactivated` and Status reads Inactive.
+
+| If you see | Why | Do this |
+|---|---|---|
+| "Cannot deactivate yourself" | Own row | Pick the right row |
+| "Only a Principal can deactivate Principals or Admins" | Admin account | Use a Principal |
+| "Failed to deactivate user" | Server error | Retry once; report |
+
+### Reactivate a user
+
+**Risk:** `WRITE` · **Roles:** Principal (Admin also)
+
+1. Open `/settings/team` and find the row with Status Inactive.
+2. Click the user-check icon (icon button with no label or title; only on inactive rows; visual: Actions column). It applies at once with no confirm.
+
+**Done when:** toast `{name} has been activated` and Status reads Active.
+
+### Remove a user from the workspace
+
+**Risk:** `DESTRUCTIVE` (irreversible) · **Roles:** Principal only
+**Inputs from Clarwiz:** user name.
+
+1. Open `/settings/team` and find the user's row.
+
+<Warning>**Approval required (DESTRUCTIVE).** Stop here and get approval before removing. Removal cannot be undone. Prefer [Deactivate a user](#deactivate-a-user) unless Clarwiz says remove.</Warning>
+
+2. Click the trash icon (icon button, aria-label and title `Remove {name} from the workspace`; not shown on your own row).
+3. In `Remove {name} from the workspace?`, type `REMOVE` (capitals) in the "Type REMOVE to confirm" field.
+4. Click **Remove user** (enabled only when the text matches).
+
+**Done when:** toast `{name} has been removed from the workspace` and the row is gone.
+
+| If you see | Why | Do this |
+|---|---|---|
+| "You cannot remove yourself. Ask another Principal." | Own account | Stop |
+| "This is the last active Principal in the workspace and cannot be removed." | Last Principal | Stop; report |
+| "Failed to remove user" | Server error | Report |
+
+### Change a user profile
+
+**Risk:** `READ` here (the change happens on another page) · **Roles:** Principal only
+
+1. Open `/settings/team`.
+2. Click **Change** (link next to the user's Profile badge). It opens `/admin/profiles`.
+
+**Done when:** the browser is on `/admin/profiles`. Continue there.
+
+### Proxy login as a user
+
+**Risk:** `WRITE` (session impersonation) · **Roles:** Principal only
+
+<Warning>**Never use this unless Clarwiz explicitly tells you to.** It reloads the app as the other user for 1 hour, and everything you change is recorded as proxied by you.</Warning>
+
+1. Open `/settings/team`.
+2. Click the person-gear icon (icon button, aria-label and title `Proxy login as {name}`).
+3. In `Proxy login as {name}?`, click **Start proxy login**.
+
+**Done when:** the app reloads as that user.
+
+## Controls reference
+
+| Visible text | Type | Locator | What it does | Risk |
+|---|---|---|---|---|
+| **Save Changes** | button | General, top right | Saves all General fields at once | `WRITE` |
+| Tenant Name / Timezone / Lead consultant / Credentials | inputs | ids "tenantName", "timezone", "leadConsultantName", "leadConsultantCredentials" | Workspace details | — |
+| Brand fields | inputs | ids "companyName", "fontFamily", "headingFontFamily", "footerTagline"; colours `{id}` and `{id}-picker` | Document branding | — |
+| Default Model | select | id "defaultModel" | AI model | — |
+| **Invite User** | button | Team header | Opens invite dialog | `READ` |
+| **Send Invitation** | button | invite dialog | Creates invite and emails it | `EXTERNAL` |
+| Allowed email domains | input | id "allowedDomains" | Access policy | — |
+| **Save access policy** | button | Access Policy card | Saves policy | `WRITE` |
+| (mail icon) | icon button | title "Resend invitation" | Re-sends the email | `EXTERNAL` |
+| (× icon) | icon button | title "Revoke invitation" | Revokes after confirm | `DESTRUCTIVE` |
+| **Change** | link | next to Profile badge | Goes to `/admin/profiles` | `READ` |
+| (person-gear icon) | icon button | aria-label `Proxy login as {name}` | Impersonates after confirm | `WRITE` |
+| (user-x icon) | icon button | no label; Actions column | Deactivates after confirm | `DESTRUCTIVE` |
+| (user-check icon) | icon button | no label; inactive rows | Activates at once | `WRITE` |
+| (trash icon) | icon button | aria-label `Remove {name} from the workspace` | Removes after typing REMOVE | `DESTRUCTIVE` |
+
+## Waits and signals
+
+- General: "Loading settings..." then the cards; "Saving..." on the button while saving.
+- Team: "Loading team..." then the table; "Sending..." on **Send Invitation**.
+- Confirm dialogs show "Processing..." on the confirm button while working, then close themselves.
+- Toasts are transient; read them right after the action.
+
+## Gotchas
+
+- General does not autosave. Leaving the page without **Save Changes** loses edits.
+- **Save Changes** saves every field on the page, including fields you did not touch.
+- Deactivate and Activate icons have no accessible name. Identify them by row and icon shape (user with ×, user with ✓). Deactivate also shows on your own row and fails on the server.
+- "Invitation sent" does not prove the email arrived.
+- Pressing Enter in the "Type REMOVE to confirm" field confirms the removal.
+
+## Related
+
+- [Integrations](/settings/integrations)
+- [Catalogs and defaults](/settings/catalogs-and-defaults)
+- [Templates](/documents/templates)
+- [Brand assets and packets](/documents/brand-and-packets)
+
+## Source files
+
+- `packages/web/src/app/(dashboard)/settings/layout.tsx`
+- `packages/web/src/app/(dashboard)/settings/page.tsx`
+- `packages/web/src/app/(dashboard)/settings/team/page.tsx`
+- `packages/web/src/components/confirm-dialog.tsx`
+- `packages/web/src/lib/navigation.ts`
+- `packages/transport-api/src/routes/tenants.ts`
+- `packages/transport-api/src/routes/team.ts`

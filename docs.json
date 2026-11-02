@@ -108,11 +108,17 @@
       },
       {
         "group": "Settings",
-        "pages": []
+        "pages": [
+          "settings/general-and-team",
+          "settings/integrations",
+          "settings/catalogs-and-defaults"
+        ]
       },
       {
         "group": "Admin and account",
-        "pages": []
+        "pages": [
+          "admin/platform-admin"
+        ]
       },
       {
         "group": "Reference",

@@ -1,0 +1,343 @@
+---
+title: "Integrations"
+sidebarTitle: "Integrations"
+description: "Check integration health, connect or disconnect Google Workspace and Google Drive, run HubSpot syncs and import plans, set Drive paths, and verify DocuSign."
+keywords: ["integrations", "connect Gmail", "connect Google", "Google Calendar", "Google Workspace", "Google Drive", "shared drive", "disconnect", "reconnect", "OAuth", "HubSpot sync", "sync HubSpot", "HubSpot import", "DocuSign", "DocuSign consent", "Granola", "my connections", "integration health", "Slack", "HRIS"]
+---
+
+<Info>
+**URL:** `/settings/integrations` · **Reach:** sidebar **Settings** → tab **Integrations** (Principal, Admin); command palette **Integrations** or **My Connections**, or the header alert menu item **Integration health** (any role) · **Roles:** Principal ✓ (all panels) Operator ✓ (own connections only) · **Ready when:** h2 "Provider controls" (Principal) or h2 "Your connections" (everyone else) is visible and each panel has replaced its "Loading … status..." text.
+</Info>
+
+Health and connection controls for every integration. Most buttons here reach outside Ariya.
+
+<Note>
+**Principal vs Operator.** A Principal sees h2 "Provider controls" ("Status and gates for tenant integrations.") and every panel. An Operator, Admin or Member sees h2 "Your connections" ("Connect your own Gmail, Calendar and Granola. Workspace integrations are managed by a Principal.") and only **Google Workspace signals** and **Granola meeting notes**. Only a Principal can run the HubSpot, Google Drive and DocuSign recipes.
+</Note>
+
+<Warning>
+**OAuth hand-off rule.** **Connect**, **Reconnect**, **Reconnect Google** and **Open consent** send the browser to a Google or DocuSign sign-in or consent screen. They need approval first, and when the consent screen appears you must stop and hand off to a human. Never type credentials, answer MFA, or click **Allow**.
+</Warning>
+
+## Page map
+
+Principal order (top to bottom):
+
+1. Strip "Tenant integrations" / "Provider writes stay gated".
+2. **Pre-live readiness** (read-only).
+3. **HubSpot CRM**: sub-sections "Live read preview", "Dry-run audit record", "Manual HubSpot sync", "HubSpot review queue", "HubSpot import readiness", "Bulk local import plan" (with plan rows).
+4. **HRIS bridge** (iSolved, Rippling; read-only).
+5. **HR Intel bridge** (read-only).
+6. **Google Workspace signals**: card "Google Workspace" (the signed-in user's own Gmail and Calendar).
+7. **Google Drive (Implementation)**: card "Google Drive" (one connection for the whole workspace).
+8. **Slack transport** (read-only).
+9. **Granola meeting notes**: card "Granola".
+10. **Other integrations**: Microsoft 365, Brave Search, DocuSign.
+
+Operator, Admin and Member see only items 6 and 9.
+
+OAuth callback pages (Google redirects here; never open them yourself):
+
+- `/settings/integrations/google/callback` (Google Workspace)
+- `/settings/integrations/google-drive/callback` (Google Drive)
+
+## Recipes
+
+### Check integration health
+
+**Risk:** `READ` · **Roles:** Principal, Operator
+
+1. Open `/settings/integrations`.
+   - Wait for: each panel's "Loading `{X}` status..." (or "Loading HubSpot readiness..." / "Loading deployment readiness...") to be replaced.
+2. Read each panel's status badge and metrics. In **Other integrations**, badges read Ready, Setup Needed, Disabled, Unavailable or Not Connected.
+
+**Done when:** every panel shows a status.
+
+| If you see | Why | Do this |
+|---|---|---|
+| `Failed to load {X} status: {error}` | That integration's health check failed | Report the text |
+| `Slack health is not reachable: {error}` | Slack health failed | Report |
+| `No {X} status available.` | No data | Report |
+
+### Connect your Google Workspace account
+
+**Risk:** `EXTERNAL` (OAuth) · **Roles:** Principal, Operator (each user connects their own Gmail and Calendar)
+**Preconditions:** the card shows **Connect** (only when Google is configured and you are not connected).
+
+1. Open `/settings/integrations` in the tab you will finish in. The OAuth state is stored per tab.
+2. Find the card "Google Workspace" (section **Google Workspace signals**).
+
+<Warning>**Approval required (EXTERNAL).** Stop here and get approval before clicking **Connect**. It navigates this tab to Google's consent screen. When the Google screen appears, stop and hand off to a human.</Warning>
+
+3. Click **Connect** (button in the "Google Workspace" card).
+4. Stop. Hand off to a human at the Google sign-in or consent screen.
+5. When the human hands back, you are on `/settings/integrations/google/callback`. Follow [Finish an OAuth callback](#finish-an-oauth-callback).
+
+**Done when:** the card's status badge reads "Connected" and metrics (Gmail metadata, Body import, Gmail send, Calendar read, Calendar write, Last sync) show values.
+
+### Reconnect Google after a permission block
+
+**Risk:** `EXTERNAL` (OAuth) · **Roles:** Principal, Operator
+
+1. Open `/settings/integrations` and find the "Manual read-only preview" box in the "Google Workspace" card.
+
+<Warning>**Approval required (EXTERNAL).** Stop here and get approval before clicking **Reconnect Google**. It opens Google's consent screen; then hand off to a human.</Warning>
+
+2. Click **Reconnect Google** (appears only when permissions are blocked).
+3. Stop and hand off to a human at the Google screen. Afterwards follow [Finish an OAuth callback](#finish-an-oauth-callback).
+
+**Done when:** the preview works again.
+
+### Preview Google Workspace metadata
+
+**Risk:** `READ` · **Roles:** Principal, Operator
+
+1. Open `/settings/integrations`. In the "Google Workspace" card, find "Manual read-only preview".
+2. Click **Preview metadata**.
+   - Wait for: "Previewing..." to finish.
+
+**Done when:** toast "Google Workspace metadata preview loaded. No import or writes ran."
+
+### Sync Gmail metadata into Ariya
+
+**Risk:** `WRITE` (imports Gmail metadata into Ariya timelines; no Gmail write) · **Roles:** Principal, Operator
+
+1. Open `/settings/integrations`. In the "Google Workspace" card, find "Manual Gmail metadata sync".
+2. Click **Sync Gmail metadata**.
+   - Wait for: "Syncing..." to finish.
+
+**Done when:** toast `Gmail metadata sync completed: {i} imported, {u} unmatched.`
+
+### Disconnect your Google Workspace account
+
+**Risk:** `EXTERNAL` `DESTRUCTIVE` (no confirm dialog) · **Roles:** Principal, Operator
+
+<Warning>**Approval required (EXTERNAL, DESTRUCTIVE).** Stop here and get approval before clicking **Disconnect**. It disconnects at once with no confirm; nudges and Gmail features stop working for this user until a human reconnects through Google.</Warning>
+
+1. Open `/settings/integrations` and find the "Google Workspace" card.
+2. Click **Disconnect** (shown only when connected).
+
+**Done when:** toast "Google Workspace disconnected."
+
+### Finish an OAuth callback
+
+**Risk:** `READ` · **Roles:** Principal, Operator
+**Preconditions:** a human finished the Google consent and handed the browser back.
+
+1. Do not reload this page and do not open the callback URL yourself. The code exchange runs once on load and codes are single-use.
+2. Wait for "Connecting Google Workspace..." or "Connecting Google Drive..." to be replaced.
+3. Read the message in the card ("Google Workspace" or "Google Drive").
+4. Click **Back to integrations** (link to `/settings/integrations`).
+
+**Done when:** you see `Connected {email}.`, "Google Workspace connected." or "Google Drive connected.", and the integrations page shows the new status.
+
+| If you see | Why | Do this |
+|---|---|---|
+| "Google did not return an authorization code." | Consent cancelled or failed | Report; a human must retry from the start |
+| "Google Workspace connection state could not be verified." | State missing, or consent finished in another tab | Report; retry from the start in one tab |
+| "Google did not return a state parameter." | Bad redirect | Report |
+| Another message (scope or outside-organisation error) | Wrong Google account or scopes | Report the exact text |
+
+### Connect or reconnect Google Drive
+
+**Risk:** `EXTERNAL` (OAuth; one connection for the whole workspace) · **Roles:** Principal only
+
+1. Open `/settings/integrations` and find the card "Google Drive" (section **Google Drive (Implementation)**).
+2. If a banner reads "Access was revoked on the Google account. Reconnect to restore folder provisioning and attachment access for this tenant.", the button is **Reconnect**; otherwise **Connect**.
+
+<Warning>**Approval required (EXTERNAL).** Stop here and get approval before clicking **Connect** or **Reconnect**. It navigates this tab to Google's consent screen; Google rejects accounts outside the organisation. Hand off to a human at the Google screen.</Warning>
+
+3. Click **Connect** (or **Reconnect**).
+4. Stop and hand off to a human. Afterwards follow [Finish an OAuth callback](#finish-an-oauth-callback).
+
+**Done when:** the callback page reads "Google Drive connected." (or `Connected {email}.`), and back on `/settings/integrations` the Drive fields no longer read "Connect first to set this".
+
+### Disconnect Google Drive
+
+**Risk:** `EXTERNAL` `DESTRUCTIVE` (no confirm; breaks folder provisioning for the whole workspace) · **Roles:** Principal only
+
+<Warning>**Approval required (EXTERNAL, DESTRUCTIVE).** Stop here and get approval before clicking **Disconnect**. It disconnects at once with no confirm. Every client's Drive setup and Drive attachments stop working until a human reconnects.</Warning>
+
+1. Open `/settings/integrations` and find the "Google Drive" card.
+2. Click **Disconnect**.
+
+**Done when:** toast "Google Drive disconnected."
+
+### Set Google Drive paths and IDs
+
+**Risk:** `WRITE` (workspace-wide, immediate) · **Roles:** Principal only
+**Inputs from Clarwiz:** the value for one or more fields.
+**Preconditions:** Google Drive is connected (otherwise each field reads "Connect first to set this").
+
+1. Open `/settings/integrations` and find the "Google Drive" card.
+2. Type the new value in the field. Each field has its own save icon button with **no** label or title, immediately to its right:
+   - "Active clients path" (placeholder "Ariya/05_Clients/Active")
+   - "Shared drive ID" (placeholder "Not set — folder/file operations will fail")
+   - "External documents path" (placeholder "Ariya/External Documents")
+   - "External documents folder ID (no shared drive)" (placeholder "Not set — the path above is used instead")
+3. Click the save icon right of that field (disabled while the input is empty or unchanged).
+
+**Done when:** toast "Active clients path saved.", "Shared Drive ID saved.", "External documents path saved." or "External documents folder saved."
+
+Fields cannot be cleared through the UI: an empty value disables save.
+
+### Preview HubSpot data
+
+**Risk:** `READ` (capped HubSpot read) · **Roles:** Principal only
+**Preconditions:** HubSpot readiness is green. Otherwise each sub-section is disabled with a message starting "HubSpot readiness must be green before …".
+
+1. Open `/settings/integrations` and find **HubSpot CRM** → "Live read preview".
+2. Click **Refresh**.
+   - Wait for: "Loading" to finish.
+
+**Done when:** Companies and Contacts previews show rows.
+
+### Run a manual HubSpot sync
+
+**Risk:** `WRITE` (pulls HubSpot companies and contacts into Ariya; never writes to HubSpot) · **Roles:** Principal only
+
+1. Open `/settings/integrations` and find **HubSpot CRM** → "Manual HubSpot sync".
+2. Click **Sync now**.
+   - Wait for: "Syncing" to finish.
+
+**Done when:** toast `HubSpot sync completed: {c} company rows and {k} contact rows changed.` or `HubSpot sync finished with issues: {n} blocker(s).`
+
+| If you see | Why | Do this |
+|---|---|---|
+| `HubSpot manual sync failed: {error}` | Sync error | Report the text |
+
+This sync does not unlock **New implementation** on the portfolio. Use **Sync HubSpot** there ([Sync HubSpot](/implementation/portfolio#sync-hubspot)).
+
+### Record a HubSpot dry-run
+
+**Risk:** `WRITE` (local audit row only) · **Roles:** Principal only
+
+1. In **HubSpot CRM** → "Dry-run audit record", click **Record dry-run**.
+   - Wait for: "Recording" to finish.
+2. Click **Refresh runs** to see the list.
+
+**Done when:** toast "HubSpot dry-run audit recorded."
+
+### Stage a HubSpot contact for review
+
+**Risk:** `WRITE` (creates a local approval request) · **Roles:** Principal only
+**Inputs from Clarwiz:** the Ariya client to match.
+
+1. In **HubSpot CRM** → "HubSpot review queue", click **Refresh queue** to load the queue.
+2. In "HubSpot import readiness", click **Refresh readiness**.
+3. Pick the client in "Ariya client match" (select; placeholder "Select client").
+4. Click **Stage for review**.
+   - Wait for: "Staging" to finish.
+
+**Done when:** toast "HubSpot contact staged for approval review."
+
+### Create and work a bulk HubSpot import plan
+
+**Risk:** `WRITE` (local plan only; "Not applied") · **Roles:** Principal only
+
+1. In **HubSpot CRM** → "Bulk local import plan", click **Create bulk plan**.
+   - Wait for: "Planning" to finish. Toast `HubSpot bulk plan created with {n} candidate rows. Not applied.`
+2. Click **Refresh plans** to reload.
+3. Filter rows with `Active {n}`, `Needs review {n}`, `Planned {n}`, `Archived {n}`, `All {n}`, and kind `All kinds {n}`, `Companies {n}`, `Contacts {n}`.
+4. On a row, click **Match client** (toast "HubSpot import row matched locally. Not applied.") or **Stage for approval** (toast "HubSpot import row staged for local approval review. Not applied.").
+
+**Done when:** the toasts above appear. Nothing is applied to HubSpot or to client records.
+
+### Archive a HubSpot plan row
+
+**Risk:** `DESTRUCTIVE` (archives a local plan row) · **Roles:** Principal only
+
+<Warning>**Approval required (DESTRUCTIVE).** Stop here and get approval before clicking **Archive row**.</Warning>
+
+1. In "Bulk local import plan", on the row, click **Archive row**.
+   - Wait for: "Archiving" to finish.
+
+**Done when:** toast "HubSpot import row archived locally. Not applied."
+
+### Grant DocuSign consent
+
+**Risk:** `EXTERNAL` (OAuth in a new tab) · **Roles:** Principal only
+
+1. Open `/settings/integrations` and find **Other integrations** → the DocuSign box (Environment, Envelope mode, Private key, "Missing: …").
+
+<Warning>**Approval required (EXTERNAL).** Stop here and get approval before clicking **Open consent**. It opens DocuSign's consent page in a new tab. Hand off to a human there.</Warning>
+
+2. Click **Open consent** (link, opens a new tab).
+3. Stop and hand off to a human in the DocuSign tab.
+
+**Done when:** the human confirms consent; then run [Verify DocuSign credentials](#verify-docusign-credentials).
+
+### Verify DocuSign credentials
+
+**Risk:** `READ` (external read) · **Roles:** Principal only
+
+1. In the DocuSign box, click **Verify credentials**.
+
+**Done when:** toast "DocuSign credentials verified". Failure: "DocuSign verification failed"; report the "Missing: …" line.
+
+### Open Granola
+
+**Risk:** `READ` · **Roles:** Principal, Operator
+
+1. Find the card "Granola" (badge "Per-user connection").
+2. Click **Open Granola** (link to `/granola`).
+
+**Done when:** the URL is `/granola`.
+
+## Controls reference
+
+| Visible text | Type | Locator | What it does | Risk |
+|---|---|---|---|---|
+| **Connect** (Google Workspace) | button | "Google Workspace" card | Google OAuth in this tab | `EXTERNAL` |
+| **Disconnect** (Google Workspace) | button | "Google Workspace" card | Disconnects, no confirm | `EXTERNAL` `DESTRUCTIVE` |
+| **Preview metadata** | button | "Manual read-only preview" | Read-only preview | `READ` |
+| **Reconnect Google** | button | "Manual read-only preview" | Google OAuth | `EXTERNAL` |
+| **Sync Gmail metadata** | button | "Manual Gmail metadata sync" | Imports metadata | `WRITE` |
+| **Connect** / **Reconnect** (Drive) | button | "Google Drive" card | Google OAuth in this tab | `EXTERNAL` |
+| **Disconnect** (Drive) | button | "Google Drive" card | Disconnects, no confirm | `EXTERNAL` `DESTRUCTIVE` |
+| (save icon) | icon button, no label | right of each Drive field | Saves that field | `WRITE` |
+| **Refresh** | button | "Live read preview" | HubSpot read | `READ` |
+| **Record dry-run** / **Refresh runs** | buttons | "Dry-run audit record" | Local audit row | `WRITE` |
+| **Sync now** | button | "Manual HubSpot sync" | HubSpot to Ariya sync | `WRITE` |
+| **Refresh queue** | button | "HubSpot review queue" | Read | `READ` |
+| **Refresh readiness** / **Stage for review** | buttons | "HubSpot import readiness" | Stages approval | `WRITE` |
+| **Refresh plans** / **Create bulk plan** | buttons | "Bulk local import plan" | Local plan | `WRITE` |
+| **Match client** / **Stage for approval** | buttons | plan row | Local only | `WRITE` |
+| **Archive row** | button | plan row | Local archive | `DESTRUCTIVE` |
+| **Open consent** | link, new tab | DocuSign box | DocuSign OAuth | `EXTERNAL` |
+| **Verify credentials** | button | DocuSign box | External check | `READ` |
+| **Open Granola** | link | "Granola" card | Goes to `/granola` | `READ` |
+| **Back to integrations** | link | callback page | Returns to `/settings/integrations` | `READ` |
+
+## Waits and signals
+
+- Each panel loads on its own: "Loading `{X}` status...", "Loading HubSpot readiness...", "Loading deployment readiness...".
+- Button busy texts: "Previewing...", "Syncing...", "Loading", "Recording", "Syncing", "Staging", "Planning", "Matching", "Archiving".
+- Callback pages: "Connecting Google Workspace..." / "Connecting Google Drive..." then the outcome.
+
+## Gotchas
+
+- Google OAuth state is per tab. Start and finish the consent in the same tab.
+- Never reload a callback URL; codes are single-use.
+- Both **Disconnect** buttons act immediately with no confirm.
+- Drive field save icons have no accessible name; target the icon button right of the field.
+- Pre-live readiness, HRIS bridge, HR Intel bridge and Slack transport have no controls.
+- In-app help (? panel) lists **HubSpot CRM** and **Google Drive (Implementation)** with no role note; both are Principal-only.
+- In-app help says to "set **Shared drive ID** … and press the save icon"; the save icon has no label to find it by.
+- In-app help omits the Pre-live, HRIS, HR Intel, Slack and Other integrations (DocuSign) sections.
+
+## Related
+
+- [Implementation workspace](/implementation/workspace) (Drive setup, DocuSign envelopes)
+- [Implementation portfolio](/implementation/portfolio) (Sync HubSpot, nudges need Gmail)
+- [General settings and team access](/settings/general-and-team)
+
+## Source files
+
+- `packages/web/src/app/(dashboard)/settings/integrations/page.tsx`
+- `packages/web/src/app/(dashboard)/settings/integrations/google/callback/page.tsx`
+- `packages/web/src/app/(dashboard)/settings/integrations/google-drive/callback/page.tsx`
+- `packages/web/src/components/integrations/hubspot-health-panel.tsx`
+- `packages/web/src/components/integrations/google-workspace-health-panel.tsx`
+- `packages/web/src/components/integrations/google-drive-health-panel.tsx`
+- `packages/web/src/components/layout/page-header.tsx`
