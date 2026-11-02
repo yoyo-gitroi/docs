@@ -54,7 +54,12 @@
       },
       {
         "group": "Command Center",
-        "pages": []
+        "pages": [
+          "command-center/your-day",
+          "command-center/action-queue",
+          "command-center/approvals-and-compliance",
+          "command-center/work-queue-and-management"
+        ]
       },
       {
         "group": "Operations",
