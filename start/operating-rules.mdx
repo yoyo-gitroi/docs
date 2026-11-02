@@ -1,0 +1,146 @@
+---
+title: "Operating rules for the browser agent"
+sidebarTitle: "Operating rules"
+description: "Which account to use, what needs human approval, when to stop, and how to wait, retry and report on every Ariya task."
+keywords: ["rules", "guardrails", "approval", "safety", "permissions", "principal", "operator", "stop", "retry"]
+---
+
+<Info>
+**Applies to:** every recipe in this playbook · **Read before:** the first task of every session · **Owner:** whoever configures Clarwiz
+</Info>
+
+Every recipe in this playbook assumes these rules. A recipe can be stricter than this page, never looser.
+
+## Environments
+
+The Ariya base URL comes from Clarwiz configuration (`ARIYA_BASE_URL`). All paths in this playbook are relative to it, for example `ARIYA_BASE_URL` + `/documents`.
+
+| Environment | Host named in the Ariya repo | Data |
+|---|---|---|
+| Production | `https://app.ariyahr.com` | Real clients, real mailboxes |
+| Pilot / test | `https://pilot.ariyahr.com` | Shared test tenant |
+| Staging | `https://staging.ariyahr.com` | Shared, may hold real copies |
+
+<Warning>Confirm the target environment with the person who set up Clarwiz before the first run. Treat every environment as if it holds real client data and real email.</Warning>
+
+## Pick the account
+
+Clarwiz has two Ariya accounts: a **Principal** and an **Operator**. Use the **Operator** account by default. Switch to the **Principal** only when the task needs a capability the Operator lacks.
+
+| Capability (from the Ariya permission matrix) | Principal | Operator |
+|---|---|---|
+| Command Center | edit | edit |
+| Command Center approvals | edit | edit |
+| Operations: own inbox and assigned cases | edit | edit |
+| Operations: everyone's cases | edit | none |
+| Documents: create and generate | edit | edit |
+| Templates: upload, edit, version, publish | edit | none |
+| Clients and packets | edit | view only |
+| Implementation, HR Assessment, Sales | edit | edit |
+| Contacts, employees, compliance, client Road Map | edit | edit |
+| Intelligence: overview, HR Intel, usage, AI Insights | edit | none |
+| Workspace settings | edit | none |
+| Reply Voice, governance, skills, memory | edit | none |
+| Platform Admin, integrations, tenant switching | edit (internal tenants only) | none |
+| Profiles page and assigning profiles | edit | none |
+| Proxy login (act as another person) | edit | none |
+
+Practical consequences:
+
+- **Creating or editing a client, a packet or a template:** use the Principal. The Operator sees these as view only.
+- **Packets:** both accounts can run a packet for a client. Only the Principal can create, change or delete a packet (the server answers an Operator with "Forbidden"). See [Brand and packets](/documents/brand-and-packets).
+- **Settings, Intelligence, Platform Admin:** Principal only. The Operator does not see them in the sidebar.
+- Some pages show an enabled control to an Operator that the server then refuses. Each such place is marked on its page. When the server refuses, do not retry with the same account; switch to the Principal only if the task allows it.
+
+See [Roles and access](/start/roles-and-access) for exactly which sidebar items each role sees.
+
+## Risk classes and the approval policy
+
+Every recipe step that changes something carries one of these tags.
+
+| Tag | Meaning | Approval |
+|---|---|---|
+| `READ` | Opens, filters, searches or downloads. Changes nothing. | Not needed |
+| `WRITE` | Saves to Ariya's own database: drafts a document, edits a field, adds a note, creates a client or case. | Not needed |
+| `AI` | Runs Ariya's assistant or research. Slow, and it writes its results back as a `WRITE`. | Not needed |
+| `EXTERNAL` | Leaves Ariya: sends an email, a campaign or a nudge, writes to HubSpot, Google, Drive or Slack, or connects or disconnects an integration. | **Required, before the click** |
+| `DESTRUCTIVE` | Deletes, archives, removes, cancels, deactivates, marks lost, or anything with no undo. | **Required, before the click** |
+
+How approval works:
+
+1. When a recipe reaches a step marked `EXTERNAL` or `DESTRUCTIVE`, the browser agent stops **before** the click.
+2. Clarwiz shows the human what is about to happen: the page, the button, and the exact content (recipients, subject and body for email; the record name for a delete).
+3. Only an explicit yes for that specific action counts. Approval for one action does not carry over to the next one, even inside the same task.
+
+<Danger>Ariya never sends an email by itself, but several send buttons have no confirm dialog, only a short undo window. Some single keys (for example `e` in the Operations inbox) act instantly. Do not press single-letter keys unless focus is inside a text field or the recipe tells you to.</Danger>
+
+## Hard stops: hand off to a human
+
+Stop the task and return control to a human when you see any of these:
+
+- A Google, Microsoft, HubSpot or other OAuth consent screen, or any third-party sign-in page.
+- A password, MFA code, CAPTCHA or "verify it's you" prompt, except the Ariya sign-in itself when Clarwiz supplied credentials for it.
+- A cookie or consent banner from a third-party site.
+- A confirm dialog whose wording mentions delete, remove, archive, cancel, send, disconnect or "cannot be undone", when the task did not ask for that.
+- An email composer that already holds recipients you were not given.
+- A red error that the recipe's failure table does not list, after one retry.
+- Anything that suggests you are in the wrong tenant or acting as the wrong person (a proxy banner you did not expect, or a tenant name in the top bar you did not expect).
+
+## How to act on a page
+
+- **Prefer direct URLs.** Every recipe gives the URL to open. Use the click path only when there is no URL or the URL needs an ID you do not have yet.
+- **Always pass the tab.** Client pages without `?tab=` reopen the tab this user last used. Open `/clients/{slug}?tab=documents`, not `/clients/{slug}`.
+- **One action, then verify.** After every click, check the step's `Wait for` signal before you move on.
+- **Match text exactly.** Labels in **bold** are the literal visible text. When a control has no visible text, use its `aria-label` or `title`, given in parentheses.
+- **Do not reload during AI work.** A document chat turn, a research run or a report generation keeps running on the server. Reloading can lose questions the assistant is asking you. Wait for the finished signal.
+- **Do not open extra tabs** unless the recipe says so. Some flows (OAuth, packets) depend on staying in the same tab.
+- **Keep focus where you typed.** In several forms, pressing Enter in a single-line field submits the whole form.
+
+## Waiting budgets
+
+| Kind of action | Typical | Give up after |
+|---|---|---|
+| Page navigation and lists (`READ`) | 1–3 s | 20 s |
+| Save, create, update (`WRITE`) | 1–5 s, toast or "Saved" | 30 s |
+| PDF download | 5–10 s, "Preparing…" toast | 60 s |
+| Document assistant turn (`AI`) | 30 s – several minutes | 11 min (the server stops at 10) |
+| Research, prep kits, reports (`AI`) | 1–5 min, often needs **Refresh** or **Check for result** | 15 min |
+
+When you hit a limit: take a screenshot, record the visible text, and stop. Do not repeat a `WRITE` you are not sure failed: check whether the record exists first, so you do not create duplicates.
+
+## Retry policy
+
+- `READ`: retry once after a reload.
+- `WRITE`: check first. If the record is not there, retry once.
+- `AI`: follow the page's outcome table. Re-send a shorter, clearer request at most once.
+- `EXTERNAL` and `DESTRUCTIVE`: never retry without fresh approval.
+
+## Data rules
+
+- Never type credentials, API keys or tokens into any Ariya field, chat or note.
+- Use only the people, clients and facts Clarwiz gives you. Do not invent names, dates, amounts or witnesses to get past a question. Answer the assistant's question with "Unknown, leave it flagged" instead.
+- On non-production environments, name test records `ZZTEST-{thing}-{timestamp}` so they are easy to find and clean up.
+- Pick the owner or advisor Clarwiz names. If none is named, leave the default and report it.
+
+## What to report back
+
+At the end of every task, return:
+
+1. **Outcome:** done, blocked (waiting on approval or a human), or failed.
+2. **Where:** the final URL, plus the URL of every record created (for example `/documents/{id}`, `/clients/{slug}`).
+3. **What changed:** each `WRITE`, `EXTERNAL` or `DESTRUCTIVE` action taken, in order.
+4. **Files:** names of any downloaded files.
+5. **Open items:** gaps the assistant flagged, questions it asked, fields left blank.
+6. **Evidence:** a screenshot of the final state and of any error.
+
+## Related
+
+- [How to use this playbook](/index)
+- [Global UI patterns](/start/global-ui)
+- [Roles and access](/start/roles-and-access)
+- [Task router](/start/task-router)
+
+## Source files
+
+- `packages/shared/src/roles.ts` (permission matrix)
+- `packages/web/src/lib/navigation.ts` (who sees which navigation item)
