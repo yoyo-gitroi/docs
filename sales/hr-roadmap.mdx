@@ -1,0 +1,339 @@
+---
+title: "HR Roadmap assessment"
+sidebarTitle: "HR Roadmap"
+description: "Take a client through Elevated HR assessment: compliance research, questionnaire, discovery call notes, roadmap draft, acceptance and approval."
+keywords: ["hr roadmap", "elevated hr", "hr assessment", "questionnaire", "assessment questionnaire", "discovery call", "granola", "compliance research", "roadmap draft", "accept draft", "approve roadmap", "mark lost", "mark presented"]
+---
+
+<Info>
+**URL:** `/sales/hr-roadmap` · `/sales/hr-roadmap/{clientId}?tab=research` (also `assessment`, `discovery-call`, `roadmap`) · **Reach:** Sales sidebar **HR Roadmap** (clipboard-with-check icon) · **Roles:** Principal ✓ Operator ✓ (Member ✗) · **Ready when:** the h1 reads **HR Roadmap** or the client name, the tabs **Research**, **Assessment**, **Discovery Call**, **Roadmap** are visible, and no `Loading…` text remains.
+</Info>
+
+The worklist lists clients being assessed for Elevated HR. Each client workspace runs four stages in order: **Research** (compliance brief), **Assessment** (questionnaire), **Discovery Call** (call notes, lock, extract answers), **Roadmap** (draft, accept, approve). Nothing in HR Roadmap writes to HubSpot.
+
+Principal and Operator see the same controls on these pages.
+
+<Note>Unverified: the Discovery Call and Roadmap panels request data with a fixed `tenant_id=ariya`. In any other workspace these two panels may show nothing. If they stay empty while Research and Assessment work, report it.</Note>
+
+## Page map
+
+### Worklist (`/sales/hr-roadmap`)
+- Filter bar: **List** / **Board**, `Stage: …` chip, `Relationship: …` chip, search box (placeholder `Search by client name or domain…`), hint `Filters live in the URL · shareable`.
+- List: table **Client**, **Domain**, **Relationship**, **Last discovery call**, **Stage** (badges Not started, In Progress, Draft, Approved, Lost), pagination (25 per page). Board: one column per stage with cards.
+- URL parameters: `stage` = `not_started`, `in_progress`, `draft` (default), `approved`, `lost`, `all`; `relationship` = HubSpot lifecycle value; `q`; `view` = `list` or `board`; `page`.
+
+### Client workspace (`/sales/hr-roadmap/{clientId}`)
+- h1 client name, description `{industry} · {domain}`.
+- Tabs (role tab): **Research**, **Assessment**, **Discovery Call**, **Roadmap**.
+- `?tab=` picks the tab. Without it the page opens on the tab this user last chose (fallback **Research**). Clicking a tab does not change the URL.
+
+## Recipes
+
+### Find a client in the worklist
+**Risk:** `READ` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** client name or domain.
+
+1. Open `/sales/hr-roadmap?stage=all&q={name}`. The default stage is **Draft**, which hides most clients.
+2. Or use the controls: click `Stage: …` (dropdown chip) and choose **All**; type in the search box (placeholder `Search by client name or domain…`).
+3. Click the client-name cell of the row. Rows are clickable table rows, not links. In Board view, cards are links.
+   - Rows whose roadmap is approved, active, completed or paused for an existing client open `/clients/{slug}?tab=roadmap` (the Clients page road map). All others open `/sales/hr-roadmap/{clientId}`.
+
+**Done when:** the client workspace (or the client's road map tab) is open.
+
+| If you see | Why | Do this |
+|---|---|---|
+| `No clients match Stage: Draft and “…”. Try a different stage or clear a filter.` | Hidden by the stage filter | Set Stage to **All** or click **Clear filters** |
+| `No clients here yet` | No clients in this stage | Set Stage to **All** |
+| `Could not load the worklist. {error}` | Load failed | Reload once; then report |
+
+### Open a client on a specific tab
+**Risk:** `READ` · **Roles:** Principal, Operator
+
+1. Open `/sales/hr-roadmap/{clientId}?tab={tab}` where `tab` is `research`, `assessment`, `discovery-call` or `roadmap`.
+2. Or click the tab (role tab; visual: row under the page header).
+
+**Done when:** the tab's panel is visible. Always pass `?tab=` when sharing a link; the remembered tab differs per user.
+
+### Run compliance research on a client
+**Risk:** `AI` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** domain (required); company name, industry, state, city, country, extra context; model.
+
+1. Open `/sales/hr-roadmap/{clientId}?tab=research`.
+2. If you see `{name} has not been researched yet. Confirm these details…`, fill the form. Labels are not linked to inputs; target each input by its placeholder or by the label text above it:
+   - **Domain** (required; input, placeholder `acme.com`)
+   - **Company name** (marked required)
+   - **Industry**, **State**, **City**, **Country**
+   - **Additional context (optional)** (textarea, placeholder `LinkedIn URL, known headcount, or anything else useful — never personal data.`, max 2000)
+3. Click **Run compliance research** (button; disabled until Domain is filled and the model list loads).
+4. In the dialog, choose **Model** and click **Start research**.
+   - Wait for: `Researching {name} with {model}. This usually takes several minutes; you can leave this page and come back.` with a live **Behind the scenes** trace. The page polls every 3 seconds.
+
+**Done when:** toast `Compliance research ready`, text `Researched on {date} with {model}`, and report tabs **Profile**, `Compliance ({n})`, `What's new ({n})`, **Top risks**, **Value map**, **Call guide**, **Flags & unknowns**, `Sources ({n})`.
+
+| If you see | Why | Do this |
+|---|---|---|
+| Toast `A valid domain is required` or another server message | Bad domain | Fix **Domain** |
+| Toast `Already researched on {date}` | A report exists | Use it, or re-run |
+| Toast `Research for this client is already running` | In progress | Wait |
+| Toast `Compliance research failed` | Run failed | Re-run once; then report |
+| Toast `Could not start research` | Start failed | Report |
+
+### Re-run compliance research
+**Risk:** `AI` · **Roles:** Principal, Operator
+
+1. Open `/sales/hr-roadmap/{clientId}?tab=research`.
+2. Click **Re-run** (outline button next to `Researched on {date} with {model}`).
+3. In the dialog `Re-run compliance research?`, choose **Model** and click **Re-run research**.
+
+**Done when:** toast `Compliance research ready`. The new report replaces the one shown everywhere for that domain, including account books; the old one stays in history.
+
+### Generate the questionnaire
+**Risk:** `AI` `WRITE` · **Roles:** Principal, Operator
+**Preconditions:** ideally research is complete; generation uses the latest research run if there is one.
+
+1. Open `/sales/hr-roadmap/{clientId}?tab=assessment`.
+2. If you see `No questionnaire has been generated for this client yet.`, click **Generate questionnaire** (button).
+   - Wait for: the button spinner to stop.
+
+**Done when:** toast `Questionnaire generated` and the line `Version {n} · {k} gap(s) remaining` with questions grouped under section headings.
+
+| If you see | Why | Do this |
+|---|---|---|
+| Toast `Could not generate the questionnaire` or a server message | Generation failed | Retry once; then report |
+| `Could not load the questionnaire. {error}` | Load failed | Reload once; then report |
+
+### Record questionnaire answers
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** answers per question.
+
+1. Open `/sales/hr-roadmap/{clientId}?tab=assessment`.
+2. Find the question under its section heading (h3).
+3. Tick the option checkboxes (option text is the label) and type in the notes box (textarea, placeholder `Notes…`).
+4. Click **Save** (button; appears under that question only after you change its answer).
+
+**Done when:** the **Save** button disappears. There is no success toast. An empty answer is saved as a gap (red **Gap** badge). Error toast: `Could not save the answer`.
+
+Answers can be recorded on locked questionnaires too.
+
+### Edit, add or remove questions
+**Risk:** `WRITE`; `DESTRUCTIVE` for remove · **Roles:** Principal, Operator
+**Preconditions:** the questionnaire is not locked (no **Locked** badge).
+
+1. Open `/sales/hr-roadmap/{clientId}?tab=assessment`.
+2. To edit, click the question text (it is a textarea when unlocked), change it, then click outside. It saves on blur. Error toast: `Could not save the question`.
+3. To add, click **Add Question** (button; section footer), type in the input (placeholder `New question text`), and press Enter or click **Add**. The new question has the badge **Added**. Error toast: `Could not add the question`.
+
+<Warning>**Approval required (DESTRUCTIVE).** Stop here and get approval before removing a question. The × deletes it at once with no confirmation.</Warning>
+
+4. To remove, click the × (text button, `title "Remove question"`; visual: right of the question).
+
+**Done when:** the question text, new question, or removal shows in the list. Remove error toast: `Could not remove the question`.
+
+### Download the questionnaire
+**Risk:** `READ` (Markdown); `WRITE` (PDF) · **Roles:** Principal, Operator
+
+1. Open `/sales/hr-roadmap/{clientId}?tab=assessment`.
+2. Click **Download Markdown** to save `hr-assessment-questionnaire-v{n}.md`, or **Download PDF**.
+   - **Download PDF** first creates or refreshes the client's Elevated HR assessment document in Documents, then downloads `hr-assessment-v{n}.pdf`. Loading toast `Preparing PDF…`.
+
+**Done when:** toast `PDF downloaded` (or the Markdown file saves). Error: `Could not generate the PDF`. The created document can be opened and edited from Documents; see [Create a document](/documents/create-a-document).
+
+### Regenerate the questionnaire
+**Risk:** `AI` `WRITE` · **Roles:** Principal, Operator
+
+1. Open `/sales/hr-roadmap/{clientId}?tab=assessment`.
+2. Click **Regenerate** (button next to the downloads).
+3. If the questionnaire is locked, a dialog `Regenerate this locked questionnaire?` opens (`This starts a new, unlocked version. …`). Click **Regenerate**, or **Cancel** to back out.
+
+**Done when:** toast `Questionnaire generated` and the version number goes up.
+
+### Import discovery call notes from Granola
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** meeting title, notes; optional date, Granola link, meeting ID.
+
+1. Open `/sales/hr-roadmap/{clientId}?tab=discovery-call`. Scroll to the card **Granola Import**.
+2. Fill **Meeting title** (required; input, placeholder `{client} HR assessment`). Labels are not linked to inputs; use placeholders.
+3. Optional: **Meeting date** (date input), **Granola link** (placeholder `https://...`), **Meeting ID**.
+4. Paste **Granola notes** (required; monospace textarea; placeholder lines `Fact:`, `Action item:`, `Open question:`, `Industry:`).
+5. Click **Import** (button; disabled until title and notes are filled; shows `Importing...`).
+
+**Done when:** toast `Granola meeting imported` and a card for the meeting appears with its candidates. Errors show as text in the tab, for example `Unable to import Granola meeting.`
+
+To refresh the list, click **Refresh** (outline button in the card header). **Inbox** opens `/granola`.
+
+### Review and apply call-note candidates
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** which candidates to approve.
+
+1. Open `/sales/hr-roadmap/{clientId}?tab=discovery-call` and find the imported meeting card.
+2. For each candidate (type badge, status badge, target, `conf {x}`, summary, rationale), click the check icon to approve or the X icon to reject. Both are icon-only buttons with no label or aria-label; visual: right end of the candidate row, check first.
+   - Toast `Candidate approved` or `Candidate rejected`.
+3. Click `Apply to Assessment {n}` or `Apply {n}` (button; meeting card header; disabled until at least one candidate is approved).
+
+**Done when:** toast `Approved Granola updates applied` and the **Applied** count goes up.
+
+### Lock the questionnaire to the latest call
+**Risk:** `WRITE` `DESTRUCTIVE` (no unlock) · **Roles:** Principal, Operator
+**Preconditions:** a call is imported and a questionnaire exists.
+
+1. Open `/sales/hr-roadmap/{clientId}?tab=discovery-call`.
+2. Read the status text: `Questionnaire v{n} is still editable`.
+
+<Warning>**Approval required (DESTRUCTIVE).** Stop here and get approval before clicking **Lock to latest call**. There is no unlock: questions can no longer be added, edited or removed in this version. Answers can still be recorded, and regenerating starts a new version.</Warning>
+
+3. Click **Lock to latest call** (button; top bar of the tab; disabled with no call, no questionnaire, or already locked).
+
+**Done when:** toast `Questionnaire locked to this call` and the status reads `Questionnaire v{n} is locked`. Error toast: `Could not lock the questionnaire` or a server message.
+
+### Extract assessment answers from a call
+**Risk:** `AI` `WRITE` · **Roles:** Principal, Operator
+**Preconditions:** the questionnaire is locked.
+
+1. Open `/sales/hr-roadmap/{clientId}?tab=discovery-call`.
+2. Choose the call (select, placeholder `Select a call`; items `{title} — {date}`).
+3. Click **Extract assessment answers** (button; disabled until a call is chosen and the questionnaire is locked).
+
+**Done when:** toast `Proposed {n} assessment answer(s) — review below`. Review them as in [Review and apply call-note candidates](#review-and-apply-call-note-candidates).
+
+| If you see | Why | Do this |
+|---|---|---|
+| `No questionnaire exists for this client yet.` | No questionnaire | [Generate the questionnaire](#generate-the-questionnaire) |
+| `This discovery call has no notes to extract from.` | Empty notes | Import the call with notes |
+| `Lock the questionnaire before extracting assessment answers.` | Not locked | [Lock it](#lock-the-questionnaire-to-the-latest-call) |
+
+### Generate a roadmap draft
+**Risk:** `AI` · **Roles:** Principal, Operator
+**Preconditions:** the questionnaire is locked and the client has no roadmap other than a lost one. If the questionnaire is not locked, the Roadmap panel shows nothing.
+
+1. Open `/sales/hr-roadmap/{clientId}?tab=roadmap`.
+2. In the card **Generate roadmap from assessment**, click **Generate draft** (or **Regenerate draft**).
+   - Wait for: the spinner to stop. There is no success toast.
+
+**Done when:** the draft editor appears with a **Roadmap name** field. Error toast: `Could not generate a roadmap draft` or a server message.
+
+### Edit and accept the roadmap draft
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+**Preconditions:** a draft is showing. It exists only in the browser until accepted; leaving the tab or page loses it.
+
+1. Edit **Roadmap name** and **Start date** (date input).
+2. Per phase: quarter select (placeholder `Qtr`, Q1 to Q4), phase name input, start and end date inputs, description (placeholder `Phase description…`). Remove a phase with the trash icon (`title "Remove phase"`).
+3. Per task: name input, description (placeholder `Task description…`), linked document select (default `No linked document`). Gap tasks are amber with a warning icon. Remove with the trash icon (`title "Remove task"`). Add with **Add Task**.
+4. Add phases with **Add Phase**. Trash, add and field edits are local until you accept.
+5. Click **Accept draft** (button; bottom of the editor).
+
+**Done when:** toast `Roadmap draft accepted` and the bar `Current roadmap status: draft` appears.
+
+| If you see | Why | Do this |
+|---|---|---|
+| `This client already has an active roadmap… Mark it lost before creating a new one.` | One non-lost roadmap allowed | Report; marking lost needs approval |
+| `Could not accept the roadmap draft` | Save failed | Retry once without leaving the page; then report |
+
+### Mark the roadmap presented
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+**Preconditions:** status `draft` or `revised`.
+
+1. Open `/sales/hr-roadmap/{clientId}?tab=roadmap`.
+2. Click **Mark presented** (or **Mark re-presented** when the status is `revised`) (outline button; status bar at the top of the tab).
+
+**Done when:** toast `Marked as presented`. Error: `Could not update the roadmap`.
+
+### Approve the roadmap
+**Risk:** `WRITE` `DESTRUCTIVE` (no confirm, no undo) · **Roles:** Principal, Operator
+**Preconditions:** status is not `approved`.
+
+1. Open `/sales/hr-roadmap/{clientId}?tab=roadmap`.
+
+<Warning>**Approval required (DESTRUCTIVE).** Stop here and get approval before clicking **Approve**. It acts on one click with no confirmation, and there is no control to undo it.</Warning>
+
+2. Click **Approve** (outline button with a shield icon; status bar).
+
+**Done when:** toast `Roadmap approved` and the status badge reads `approved`. From then on the worklist row opens `/clients/{slug}?tab=roadmap` for existing clients. Error: `Could not approve the roadmap`.
+
+### Mark the roadmap lost
+**Risk:** `DESTRUCTIVE` · **Roles:** Principal, Operator
+
+1. Open `/sales/hr-roadmap/{clientId}?tab=roadmap`.
+
+<Warning>**Approval required (DESTRUCTIVE).** Stop here and get approval before clicking **Mark lost**. It acts on one click with no confirmation and no undo; it is shown even on approved roadmaps.</Warning>
+
+2. Click **Mark lost** (outline button; status bar, rightmost).
+
+**Done when:** toast `Marked as lost`; the status bar disappears. Error: `Could not update the roadmap`.
+
+### Draft a roadmap deliverable document
+**Risk:** `AI` `WRITE` (on the generate page) · **Roles:** Principal, Operator
+**Preconditions:** a roadmap exists.
+
+1. Open `/sales/hr-roadmap/{clientId}?tab=roadmap`. Below the status bar is the shared client road map (the same one as on the client page), with controls such as **Draft**, **Draft deliverable** and **Draft next deliverable**.
+2. Click one of: **Draft** (outline button on a row of the deliverables list), **Draft next deliverable**, the icon link with `title "Draft deliverable"` next to the next task, or **Draft deliverable** (outline button under an advisor suggestion, next to **Apply to Road Map**).
+   - The browser opens `/generate?template={templateId}&client={slug}&source=hr-roadmap` (without `template=` when the task has no linked document type).
+3. Continue on [Generate page](/documents/generate-page).
+
+**Done when:** the generate page is open with the template and client prefilled. The rest of the shared road map (**Edit Road Map**, **Export PDF**, **Add initiative**, **Ask advisor**, **Complete**, **Reopen**) is covered with the client road map.
+
+## Controls reference
+
+| Visible text | Type | Locator | What it does | Risk |
+|---|---|---|---|---|
+| List / Board | segmented links | worklist filter bar | Sets `view` | READ |
+| `Stage: …` / `Relationship: …` | dropdown chips | worklist filter bar | Set filters | READ |
+| (search) | search input | placeholder `Search by client name or domain…` | Sets `q` | READ |
+| (row) | clickable table row | client-name cell | Opens the client | READ |
+| Clear filters | link | worklist empty state | Resets filters | READ |
+| Research / Assessment / Discovery Call / Roadmap | tabs | role tab | Switch tab | READ |
+| Run compliance research | button | Research tab | Opens the research dialog | AI |
+| Re-run | outline button | Research tab | Opens the re-run dialog | AI |
+| Generate questionnaire / Regenerate | buttons | Assessment tab | Builds the questionnaire | AI, WRITE |
+| Download Markdown | button | Assessment tab | Saves a .md file | READ |
+| Download PDF | button | Assessment tab | Creates or refreshes the assessment document, downloads PDF | WRITE |
+| Save | button | under a changed question | Saves the answer | WRITE |
+| × | text button | `title "Remove question"` | Deletes the question, no confirm | DESTRUCTIVE |
+| Add Question / Add / Cancel | buttons | section footer | Adds a question | WRITE |
+| Lock to latest call | button | Discovery Call top bar | Locks the questionnaire | WRITE (no undo) |
+| (call select) | select | placeholder `Select a call` | Chooses the call | none |
+| Extract assessment answers | button | Discovery Call top bar | Proposes answers | AI, WRITE |
+| Import | button | Granola Import card | Imports call notes | WRITE |
+| Inbox / Refresh | link / button | Granola Import header | `/granola` / reload list | READ |
+| (check icon) / (X icon) | icon buttons, no label | candidate row | Approve / reject | WRITE |
+| `Apply to Assessment {n}` / `Apply {n}` | button | meeting card | Applies approved candidates | WRITE |
+| Generate draft / Regenerate draft | button | Roadmap tab | Builds a 12-month draft | AI |
+| Add Phase / Add Task / trash icons | buttons | draft editor | Local edits | none |
+| Accept draft | button | draft editor | Saves the roadmap | WRITE |
+| Mark presented / Mark re-presented | outline button | status bar | Sets presented | WRITE |
+| Approve | outline button | status bar | Approves, no confirm | WRITE (no undo) |
+| Mark lost | outline button | status bar | Marks lost, no confirm | DESTRUCTIVE |
+
+## Waits and signals
+- Compliance research takes several minutes; the Research tab polls every 3 seconds while running. Done: toast `Compliance research ready`.
+- Questionnaire generation, answer extraction and draft generation run while the button spins; there is no polling.
+- Roadmap draft generation has no success toast. The draft editor appearing is the signal.
+- Loading text: `Loading…`. Granola list: `Loading Granola imports...`.
+
+## Gotchas
+- The worklist defaults to Stage **Draft**. Set **All** to find most clients.
+- Worklist rows are not links. Click the client-name cell.
+- Without `?tab=`, the workspace opens on the last tab this user picked. Tab clicks do not change the URL.
+- The roadmap draft is lost if you leave before **Accept draft**.
+- **Approve**, **Mark lost** and question remove (×) save to the server on one click with no confirmation. Draft trash icons also act without confirmation but only change the unsaved draft.
+- Research and Granola form labels are not linked to their inputs. Target by placeholder or by position under the label text.
+- Granola approve and reject buttons have no text or aria-label. Use position: check icon then X icon at the right of each candidate.
+- In-app help says "Click the client. The workspace opens on **Research**." It opens on the last tab used unless `?tab=` is given.
+- In-app help says **Domain** and **Company name** are both required. Only an empty **Domain** blocks **Run compliance research**.
+- In-app help mentions "✓ or ✗" buttons for candidates; the app shows icons with no text.
+
+## Related
+- [Generate page](/documents/generate-page)
+- [Create a document](/documents/create-a-document)
+- [Account books](/sales/account-books)
+- [Sales Today and accounts](/sales/today-and-accounts)
+
+## Source files
+- `packages/web/src/app/(dashboard)/sales/hr-roadmap/page.tsx`
+- `packages/web/src/app/(dashboard)/sales/hr-roadmap/_components/worklist-presentation.ts`
+- `packages/web/src/app/(dashboard)/sales/hr-roadmap/_components/worklist-ui.tsx`
+- `packages/web/src/app/(dashboard)/sales/hr-roadmap/[clientId]/page.tsx`
+- `packages/web/src/app/(dashboard)/sales/hr-roadmap/[clientId]/_components/assessment-tab.tsx`
+- `packages/web/src/app/(dashboard)/sales/hr-roadmap/[clientId]/_components/discovery-call-tab.tsx`
+- `packages/web/src/app/(dashboard)/sales/hr-roadmap/[clientId]/_components/roadmap-draft-panel.tsx`
+- `packages/web/src/app/(dashboard)/clients/[slug]/components/granola-intakes-tab.tsx`
+- `packages/web/src/app/(dashboard)/clients/[slug]/components/roadmap-tab.tsx`

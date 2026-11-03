@@ -1,0 +1,725 @@
+---
+title: "Task router"
+sidebarTitle: "Task router"
+description: "Look up what the user asked for and find the page and recipe that does it, with its risk class and the roles that can run it."
+keywords: ["router", "index", "find recipe", "what page", "how do I", "task list", "intent"]
+---
+
+<Info>
+**Use:** match the user's request to a row, open the linked recipe, follow it · **Rows:** 645 recipes across 10 areas · **Risk tags:** see [Operating rules](/start/operating-rules#risk-classes-and-the-approval-policy)
+</Info>
+
+Each row is one recipe. The first column lists ways a user might phrase the request; match on meaning, not exact words. If two rows fit, prefer the one whose page matches the object the user named (document, case, client, campaign). If no row fits, use the sidebar map in [Global UI patterns](/start/global-ui) and [Roles and access](/start/roles-and-access) to find the area, then read that page's recipes.
+
+`EXTERNAL` and `DESTRUCTIVE` rows always need human approval before the risky click, even when the user asked for the task directly.
+
+## Most common requests
+
+| User asks | Recipe | Risk |
+|---|---|---|
+| Create, draft or write any HR document | [Create a document from a request](/documents/create-a-document#create-a-document-from-a-request) | `WRITE` `AI` |
+| The assistant asked questions | [Answer the assistant's questions](/documents/create-a-document#answer-questions-from-the-assistant) | `AI` `WRITE` |
+| Change something in a draft | [Refine the draft](/documents/create-a-document#refine-the-draft) | `AI` `WRITE` |
+| Download a document as PDF | [Download the PDF](/documents/create-a-document#download-the-pdf) | `READ` |
+| Use an exact template or an official PDF form | [Generate now](/documents/create-a-document#variant-from-a-template-with-generate-now) | `WRITE` |
+| Make the standard set of documents for one client | [Packet run](/documents/create-a-document#variant-packet-run) | `WRITE` |
+| Which template fits a request | [Choosing a template](/documents/choosing-a-template) | `READ` |
+| What is on my plate today | [Your day](/command-center/your-day) | `READ` |
+| Find or open a client | [Clients list](/clients/clients-list) | `READ` |
+| Add a client | [New client](/clients/new-client) | `WRITE` |
+| Reply to a client email | [Email and replies](/operations/email-and-replies) | `EXTERNAL` |
+
+## Documents and templates
+
+| User might say | Recipe | Risk | Roles |
+|---|---|---|---|
+| create an incident report for Rachel at ABC Dental; draft an offer letter for Dana; write up an employee for lateness; make a remote work policy for a client | [Create a document from a request](/documents/create-a-document#create-a-document-from-a-request) | `WRITE` `AI` | Principal, Operator |
+| is the draft done yet; wait for the assistant to finish; the document is still drafting | [Wait for the turn to finish](/documents/create-a-document#wait-for-the-turn-to-finish) | `READ` | Principal, Operator |
+| did the assistant finish; the assistant failed; why is there no document | [Decide how the turn ended](/documents/create-a-document#decide-how-the-turn-ended) | `READ` | Principal, Operator |
+| answer the assistant's questions; the AI is asking for details; fill in the blockers | [Answer the assistant's questions](/documents/create-a-document#answer-questions-from-the-assistant) | `AI` `WRITE` | Principal, Operator |
+| change the incident time; add a second witness; fix the start date in the draft; edit the draft | [Refine the draft](/documents/create-a-document#refine-the-draft) | `AI` `WRITE` | Principal, Operator |
+| download the PDF; give me the file; export the document as PDF; flat PDF | [Download the PDF](/documents/create-a-document#download-the-pdf) | `READ` | Principal, Operator |
+| attach the document to the case; stage it on the case reply; link the draft to the ticket | [Attach the draft to a case](/documents/create-a-document#attach-the-draft-to-a-case) | `WRITE` | Principal, Operator |
+| create a document for client X; start a document for ABC Dental; preselect the client | [Variant: a specific client](/documents/create-a-document#variant-a-specific-client) | `WRITE` `AI` | Principal, Operator |
+| use the offer letter template in chat; start from the written warning template; draft from a template with AI | [Variant: from a template with Use in chat](/documents/create-a-document#variant-from-a-template-with-use-in-chat) | `WRITE` `AI` | Principal, Operator |
+| generate from this exact template; fill Form 8655; DE 48 power of attorney; isolved implementation kit | [Variant: from a template with Generate now](/documents/create-a-document#variant-from-a-template-with-generate-now) | `WRITE` `AI` | Principal, Operator |
+| draft a document for this case; generate from case; create the deliverable for the ticket | [Variant: from an Operations case](/documents/create-a-document#variant-from-an-operations-case) | `WRITE` `AI` | Principal, Operator |
+| generate a document from the client page; Generate Document button; draft deliverable from roadmap | [Variant: from a client profile](/documents/create-a-document#variant-from-a-client-profile) | `WRITE` `AI` | Principal, Operator |
+| run the onboarding packet for a client; generate all onboarding documents; create the whole document set | [Variant: packet run](/documents/create-a-document#variant-packet-run) | `WRITE` | Principal, Operator |
+| open documents for client X; open documents with the case attached; show my document chats | [Open the page with a client, case or view preselected](/documents/documents-home#open-the-page-with-a-client-case-or-view-preselected) | `READ` | Principal, Operator |
+| find a document; look up the offer letter we made; preview a document | [Find and preview a document](/documents/documents-home#find-and-preview-a-document) | `READ` | Principal, Operator |
+| download an existing document; get the PDF of an old document; one page PDF | [Download a PDF from the library](/documents/documents-home#download-a-pdf-from-the-library) | `READ` | Principal, Operator |
+| open the document in the editor; edit an existing document by hand | [Open a document in the editor](/documents/documents-home#open-a-document-in-the-editor) | `READ` | Principal, Operator |
+| delete a document; remove that draft; get rid of the duplicate document | [Delete a document](/documents/documents-home#delete-a-document) | `DESTRUCTIVE` | Principal, Operator |
+| reopen my last chat; continue the document chat; find the chat for that draft | [Reopen a chat](/documents/documents-home#reopen-a-chat) | `READ` | Principal, Operator |
+| send a message to the document assistant; ask the chat for a change; continue drafting | [Send a request or change and wait](/documents/chat-workspace#send-a-request-or-change-and-wait) | `AI` `WRITE` | Principal, Operator |
+| answer the blockers card; send answers to the assistant | [Answer blockers](/documents/chat-workspace#answer-blockers) | `AI` | Principal, Operator |
+| attach the complaint email; upload a source file to the chat; use this PDF as evidence | [Attach a source file](/documents/chat-workspace#attach-a-source-file) | `WRITE` | Principal, Operator |
+| send a screenshot to the assistant; paste an image into the chat | [Send a screenshot](/documents/chat-workspace#send-a-screenshot) | `AI` | Principal, Operator |
+| go back to the previous version; restore v2; undo the last change in the chat | [View or restore an older version](/documents/chat-workspace#view-or-restore-an-older-version) | `READ` `WRITE` | Principal, Operator |
+| open the draft in the editor from the chat; edit fields by hand | [Open the draft in the editor](/documents/chat-workspace#open-the-draft-in-the-editor) | `READ` | Principal, Operator |
+| switch to another chat; open my other document chat | [Switch to another chat](/documents/chat-workspace#switch-to-another-chat) | `READ` | Principal, Operator |
+| start a new chat; wrong client in the chat; use a different client | [Start a new chat or use a different client](/documents/chat-workspace#start-a-new-chat-or-use-a-different-client) | `READ` | Principal, Operator |
+| delete this chat; remove the conversation | [Delete a chat](/documents/chat-workspace#delete-a-chat) | `DESTRUCTIVE` | Principal, Operator |
+| open document by id; open the editor for this document | [Open a document in the editor](/documents/document-editor#open-a-document-in-the-editor) | `READ` | Principal, Operator |
+| edit the document fields; change the date and save; fix a field by hand | [Edit fields and save](/documents/document-editor#edit-fields-and-save) | `WRITE` | Principal, Operator |
+| clear the sample data; remove the template example values | [Clear template sample data](/documents/document-editor#clear-template-sample-data) | `WRITE` | Principal, Operator |
+| fill the PDF form; fill in Form 8655 fields; complete the DE 48 | [Fill an official PDF form](/documents/document-editor#fill-an-official-pdf-form) | `WRITE` | Principal, Operator |
+| download from the editor; print the document; non-editable PDF | [Download or print](/documents/document-editor#download-or-print) | `READ` | Principal, Operator |
+| compare versions; restore an older version of the document; version history | [View, compare or restore a version](/documents/document-editor#view-compare-or-restore-a-version) | `READ` `WRITE` | Principal, Operator |
+| edit this document with AI; go back to the chat; ask the assistant to change this document | [Edit with AI or go back to the chat](/documents/document-editor#edit-with-ai-or-go-back-to-the-chat) | `WRITE` `AI` | Principal, Operator |
+| send for review; ask Jane to review the draft; assign a reviewer | [Send for review](/documents/document-editor#send-for-review) | `WRITE` | Principal, Operator |
+| approve and deliver the document; mark delivered; approve the draft | [Approve and deliver as the reviewer](/documents/document-editor#approve-and-deliver-as-the-reviewer) | `WRITE` `DESTRUCTIVE` | Assigned reviewer |
+| request a revision; send the draft back with changes | [Request a revision as the reviewer](/documents/document-editor#request-a-revision-as-the-reviewer) | `WRITE` | Assigned reviewer |
+| attach to case reply from the editor; stage this PDF on the case | [Attach to the case reply](/documents/document-editor#attach-to-the-case-reply) | `READ` | Principal, Operator |
+| find a template; preview the offer letter template; which templates do we have | [Find and preview a template](/documents/templates#find-and-preview-a-template) | `READ` | Principal, Operator |
+| use this template; generate from the template | [Start a document from a template](/documents/templates#start-a-document-from-a-template) | `WRITE` `AI` | Principal, Operator |
+| open the template; see the template slug; view template details | [Open the template studio](/documents/templates#open-the-template-studio) | `READ` | Principal, Operator (read-only) |
+| customize the template; make our own version of the built-in template | [Customize a built-in template](/documents/templates#customize-a-built-in-template) | `WRITE` | Principal |
+| edit the template; change the template title; add a field to the template; change template CSS | [Edit a customized template](/documents/templates#edit-a-customized-template) | `WRITE` | Principal |
+| ask AI to change the template; polish the template wording | [Change a template with the template assistant](/documents/templates#change-a-template-with-the-template-assistant) | `AI` `WRITE` | Principal |
+| publish the template; lock the template version; pin the version for new documents | [Lock a version for new documents](/documents/templates#lock-a-version-for-new-documents) | `WRITE` | Principal |
+| restore an older template version; template history | [View or restore a template version](/documents/templates#view-or-restore-a-template-version) | `READ` `WRITE` | Principal |
+| reset the template to default; remove our customization | [Reset a customized template to the built-in](/documents/templates#reset-a-customized-template-to-the-built-in) | `DESTRUCTIVE` | Principal |
+| create a new template; make a PIP template; clone this PDF's design as a template | [Create a new template with the wizard](/documents/templates#create-a-new-template-with-the-wizard) | `AI` `WRITE` | Principal |
+| run a packet; generate the onboarding bundle for a client | [Run a packet for one client](/documents/brand-and-packets#run-a-packet-for-one-client) | `WRITE` | Principal, Operator |
+| create a packet; add a template to the packet; reorder the packet | [Create or edit a packet](/documents/brand-and-packets#create-or-edit-a-packet) | `WRITE` | Principal |
+| delete a packet; remove the onboarding bundle | [Delete a packet](/documents/brand-and-packets#delete-a-packet) | `DESTRUCTIVE` | Principal |
+| show the brand sets; preview the brand; which logo do templates use | [View or preview a brand set](/documents/brand-and-packets#view-or-preview-a-brand-set) | `READ` | Principal, Operator |
+| create a brand set; change the brand colours; upload a logo for templates | [Create or edit a brand set](/documents/brand-and-packets#create-or-edit-a-brand-set) | `WRITE` | Principal |
+| delete a brand set; remove the old brand | [Delete a brand set](/documents/brand-and-packets#delete-a-brand-set) | `DESTRUCTIVE` | Principal |
+| use the generate page; generate document from the client page; research and fill the form | [Generate a document on the generate page](/documents/generate-page#generate-a-document-on-the-generate-page) | `WRITE` `AI` | Principal, Operator |
+| save the generate draft; reset the generate form | [Save or reset a local draft](/documents/generate-page#save-or-reset-a-local-draft) | `READ` | Principal, Operator |
+| which template should I use; what template for X; is there a template for | [Map a request to a template](/documents/choosing-a-template) | `READ` | Principal, Operator |
+| what templates exist; list of document types; template catalog | [Look up the template catalog](/documents/template-catalog) | `READ` | Principal, Operator |
+| how do templates work; why is this field blank; why did the assistant ask me | [Understand how templates are picked and filled](/documents/how-templates-work) | `READ` | Principal, Operator |
+| PIP; performance improvement plan; separation agreement; handbook addendum | [Handle a request with no seeded template](/documents/choosing-a-template#phrases-with-no-template) | `READ` | Principal, Operator |
+| offer letter; job offer; make an offer to | [Create an Offer Letter (`offer-letter`)](/documents/create-a-document` + `/documents/catalog/business#offer-letter) | `WRITE` `AI` | Principal, Operator |
+| job description; JD; role profile; duties | [Create a Job Description (`job-description`)](/documents/create-a-document` + `/documents/catalog/business#job-description) | `WRITE` `AI` | Principal, Operator |
+| new hire packet; onboarding packet; I-9 and W-4 checklist | [Create a New Hire Packet (`new-hire-packet`)](/documents/create-a-document` + `/documents/catalog/business#new-hire-packet) | `WRITE` `AI` | Principal, Operator |
+| new hire welcome; welcome letter for new hire | [Create a New Hire Welcome (`new-hire-welcome`)](/documents/create-a-document` + `/documents/catalog/business#new-hire-welcome) | `WRITE` `AI` | Principal, Operator |
+| employee information form; new-hire intake form | [Create an Employee Information (`employee-information`)](/documents/create-a-document` + `/documents/catalog/business#employee-information) | `WRITE` `AI` | Principal, Operator |
+| direct deposit form; direct deposit authorization | [Create a Direct Deposit Authorization (`direct-deposit`)](/documents/create-a-document` + `/documents/catalog/business#direct-deposit-authorization) | `WRITE` `AI` | Principal, Operator |
+| 30-60-90 day plan; 90 day plan; ramp plan | [Create a 30-60-90 day plan (`ninety-day-plan`)](/documents/create-a-document` + `/documents/catalog/business#30-60-90-day-plan) | `WRITE` `AI` | Principal, Operator |
+| equity grant; stock option grant notice; RSU grant | [Create an Equity Grant Notice (`equity-grant`)](/documents/create-a-document` + `/documents/catalog/business#equity-grant-notice) | `WRITE` `AI` | Principal, Operator |
+| contractor agreement; 1099 agreement; independent contractor contract | [Create a Contractor Agreement (1099) (`contractor-agreement`)](/documents/create-a-document` + `/documents/catalog/business#contractor-agreement-1099) | `WRITE` `AI` | Principal, Operator |
+| 1099 contractor onboarding; contractor onboarding packet | [Create a 1099 Contractor Onboarding Packet (`contractor-onboarding-packet-1099`)](/documents/create-a-document` + `/documents/catalog/business#1099-contractor-onboarding-packet) | `WRITE` `AI` | Principal, Operator |
+| commission agreement; sales rep commission contract | [Create an Independent Contractor Commission Agreement (`independent-contractor-commission-agreement`)](/documents/create-a-document` + `/documents/catalog/business#independent-contractor-commission-agreement) | `WRITE` `AI` | Principal, Operator |
+| performance review; annual review; quarterly review of an employee | [Create a Performance Review (`performance-review`)](/documents/create-a-document` + `/documents/catalog/business#performance-review) | `WRITE` `AI` | Principal, Operator |
+| promotion letter; promote an employee | [Create a Promotion Letter (`promotion-letter`)](/documents/create-a-document` + `/documents/catalog/business#promotion-letter) | `WRITE` `AI` | Principal, Operator |
+| pay increase notice; hourly raise letter; salary increase | [Create a Pay Increase Notice (`pay-increase-notice`)](/documents/create-a-document` + `/documents/catalog/business#pay-increase-notice) | `WRITE` `AI` | Principal, Operator |
+| compensation review framework; pay bands; raise policy | [Create a Compensation Review Framework (`compensation-review-framework`)](/documents/create-a-document` + `/documents/catalog/business#compensation-review-framework) | `WRITE` `AI` | Principal, Operator |
+| PTO request; leave request; time-off request form | [Create a PTO / Leave Request (`pto-request`)](/documents/create-a-document` + `/documents/catalog/business#pto-%2F-leave-request) | `WRITE` `AI` | Principal, Operator |
+| accommodation request; ADA request; interactive process | [Create an Accommodation request (`accommodation-request`)](/documents/create-a-document` + `/documents/catalog/business#accommodation-request) | `WRITE` `AI` | Principal, Operator |
+| expense report; reimbursement report | [Create an Expense Report (`expense-report`)](/documents/create-a-document` + `/documents/catalog/business#expense-report) | `WRITE` `AI` | Principal, Operator |
+| written warning; final written warning; verbal warning; write up | [Create a Written Warning (`written-warning`)](/documents/create-a-document` + `/documents/catalog/business#written-warning) | `WRITE` `AI` | Principal, Operator |
+| corrective action warning; corrective action form; discipline notice | [Create a Corrective Action Warning (`corrective-action-warning`)](/documents/create-a-document` + `/documents/catalog/business#corrective-action-warning) | `WRITE` `AI` | Principal, Operator |
+| incident report; workplace incident; investigation summary; witness statement | [Create an HR Incident Report (`hr-incident-report`)](/documents/create-a-document` + `/documents/catalog/business#hr-incident-report) | `WRITE` `AI` | Principal, Operator |
+| termination letter; fire an employee; layoff letter; final pay | [Create a Termination Letter (`termination-letter`)](/documents/create-a-document` + `/documents/catalog/business#termination-letter) | `WRITE` `AI` | Principal, Operator |
+| termination packet; separation packet; offboarding packet | [Create a Termination Packet (`termination-packet`)](/documents/create-a-document` + `/documents/catalog/business#termination-packet) | `WRITE` `AI` | Principal, Operator |
+| resignation acknowledgment; employee resigned | [Create a Resignation Acknowledgment (`resignation-acknowledgment`)](/documents/create-a-document` + `/documents/catalog/business#resignation-acknowledgment) | `WRITE` `AI` | Principal, Operator |
+| severance summary; separation package; severance offer | [Create a Severance summary (`severance-summary`)](/documents/create-a-document` + `/documents/catalog/business#severance-summary) | `WRITE` `AI` | Principal, Operator |
+| exit interview; exit survey | [Create an Exit interview (`exit-interview`)](/documents/create-a-document` + `/documents/catalog/business#exit-interview) | `WRITE` `AI` | Principal, Operator |
+| employee handbook; handbook; rebuild our handbook; policy update | [Create an Employee Handbook (`employee-handbook`)](/documents/create-a-document` + `/documents/catalog/business#employee-handbook) | `WRITE` `AI` | Principal, Operator |
+| handbook assessment; handbook discovery; handbook gap analysis | [Create an Employee Handbook Discovery & Assessment (`employee-handbook-discovery-assessment`)](/documents/create-a-document` + `/documents/catalog/business#employee-handbook-discovery-%26-assessment) | `WRITE` `AI` | Principal, Operator |
+| handbook development agreement; handbook engagement letter | [Create an Employee Handbook Development Agreement (`employee-handbook-development-agreement`)](/documents/create-a-document` + `/documents/catalog/business#employee-handbook-development-agreement) | `WRITE` `AI` | Principal, Operator |
+| AI policy; confidential data policy; ChatGPT policy | [Create an AI and Confidential Data Policy (`ai-confidential-data-policy`)](/documents/create-a-document` + `/documents/catalog/business#ai-and-confidential-data-policy) | `WRITE` `AI` | Principal, Operator |
+| remote work policy; expense reimbursement policy | [Create a Remote Work and Expense Reimbursement Policy (`remote-work-expense-reimbursement-policy`)](/documents/create-a-document` + `/documents/catalog/business#remote-work-and-expense-reimbursement-policy) | `WRITE` `AI` | Principal, Operator |
+| IIPP; injury and illness prevention program; safety program | [Create an Injury and Illness Prevention Program (`injury-illness-prevention-program`)](/documents/create-a-document` + `/documents/catalog/business#injury-and-illness-prevention-program) | `WRITE` `AI` | Principal, Operator |
+| workplace violence prevention plan; WVPP; SB 553 plan | [Create a Workplace Violence Prevention Plan (`workplace-violence-prevention-plan`)](/documents/create-a-document` + `/documents/catalog/business#workplace-violence-prevention-plan) | `WRITE` `AI` | Principal, Operator |
+| wage theft prevention notice; Labor Code 2810.5 notice; wage notice | [Create a Wage Theft Prevention Notice (`wage-theft-prevention-notice`)](/documents/create-a-document` + `/documents/catalog/business#wage-theft-prevention-notice) | `WRITE` `AI` | Principal, Operator |
+| compliance checklist; HR compliance review; wage-hour checklist | [Create an HR Compliance Checklist (`compliance-checklist`)](/documents/create-a-document` + `/documents/catalog/business#hr-compliance-checklist) | `WRITE` `AI` | Principal, Operator |
+| time off policy intake; PTO policy questionnaire | [Create a Time Off Policy Intake (`time-off-policy-intake`)](/documents/create-a-document` + `/documents/catalog/business#time-off-policy-intake) | `WRITE` `AI` | Principal, Operator |
+| industry resource center; industry compliance one-pager | [Create an Industry Resource Center (`industry-resource`)](/documents/create-a-document` + `/documents/catalog/business#industry-resource-center) | `WRITE` `AI` | Principal, Operator |
+| workers comp summary; workers compensation coverage summary | [Create a Workers Comp Summary (`workers-comp-summary`)](/documents/create-a-document` + `/documents/catalog/business#workers-comp-summary) | `WRITE` `AI` | Principal, Operator |
+| client intake form; discovery questionnaire | [Create a Client Intake Form (`intake-form`)](/documents/create-a-document` + `/documents/catalog/business#client-intake-form) | `WRITE` `AI` | Principal, Operator |
+| company information sheet; client one-pager | [Create a Company Information (`company-info`)](/documents/create-a-document` + `/documents/catalog/business#company-information) | `WRITE` `AI` | Principal, Operator |
+| HR assessment; HR discovery assessment | [Create an HR Assessment (`hr-assessment`)](/documents/create-a-document` + `/documents/catalog/business#hr-assessment) | `WRITE` `AI` | Principal, Operator |
+| HR audit report; HR audit findings | [Create an HR Audit Report (`hr-audit-report`)](/documents/create-a-document` + `/documents/catalog/business#hr-audit-report) | `WRITE` `AI` | Principal, Operator |
+| HR roadmap; advisory roadmap; 12-month HR plan | [Create an HR Roadmap (`hr-roadmap`)](/documents/create-a-document` + `/documents/catalog/business#hr-roadmap) | `WRITE` `AI` | Principal, Operator |
+| AI readiness audit report; AI audit readout | [Create an AI Readiness Audit Report (`ai-readiness-audit-report`)](/documents/create-a-document` + `/documents/catalog/business#ai-readiness-audit-report) | `WRITE` `AI` | Principal, Operator |
+| AI readiness scorecard; readiness framework | [Create an AI Readiness Scorecard (`readiness-scorecard`)](/documents/create-a-document` + `/documents/catalog/business#ai-readiness-scorecard) | `WRITE` `AI` | Principal, Operator |
+| opportunity register; AI initiative list | [Create an Opportunity Register (`opportunity-register`)](/documents/create-a-document` + `/documents/catalog/business#opportunity-register) | `WRITE` `AI` | Principal, Operator |
+| QBR; quarterly business review | [Create a Quarterly Business Review (`qbr`)](/documents/create-a-document` + `/documents/catalog/business#quarterly-business-review) | `WRITE` `AI` | Principal, Operator |
+| status report; weekly client update; monthly status | [Create a Status Report (`status-report`)](/documents/create-a-document` + `/documents/catalog/business#status-report) | `WRITE` `AI` | Principal, Operator |
+| meeting agenda; meeting minutes; agenda and notes | [Create a Meeting Agenda & Minutes (`meeting-agenda`)](/documents/create-a-document` + `/documents/catalog/business#meeting-agenda-%26-minutes) | `WRITE` `AI` | Principal, Operator |
+| SOP; runbook; standard operating procedure | [Create an SOP / Runbook (`sop`)](/documents/create-a-document` + `/documents/catalog/business#sop-%2F-runbook) | `WRITE` `AI` | Principal, Operator |
+| sales handoff; sales to implementation handoff | [Create a Sales to Implementation Handoff Form (`sales-to-implementation-handoff`)](/documents/create-a-document` + `/documents/catalog/business#sales-to-implementation-handoff-form) | `WRITE` `AI` | Principal, Operator |
+| personal engagement letter; advisory MOU | [Create a Personal Engagement Letter (`personal-engagement-letter`)](/documents/create-a-document` + `/documents/catalog/business#personal-engagement-letter) | `WRITE` `AI` | Principal, Operator |
+| client service agreement; CSA; Ariya service agreement | [Create a Client Service Agreement (`client-service-agreement`)](/documents/create-a-document` + `/documents/catalog/business#client-service-agreement) | `WRITE` `AI` | Principal, Operator |
+| service agreement (generic); services contract | [Create a Service Agreement (`service-agreement`)](/documents/create-a-document` + `/documents/catalog/business#service-agreement) | `WRITE` `AI` | Principal, Operator |
+| NDA; non-disclosure agreement; confidentiality agreement | [Create a Non-Disclosure Agreement (`nda`)](/documents/create-a-document` + `/documents/catalog/business#non-disclosure-agreement) | `WRITE` `AI` | Principal, Operator |
+| pricing quote; quote; estimate | [Create a Pricing Quote (`pricing-quote`)](/documents/create-a-document` + `/documents/catalog/business#pricing-quote) | `WRITE` `AI` | Principal, Operator |
+| invoice; bill the client | [Create an Invoice (`invoice`)](/documents/create-a-document` + `/documents/catalog/business#invoice) | `WRITE` `AI` | Principal, Operator |
+| influencer agreement; creator contract | [Create an Influencer agreement (`influencer-agreement`)](/documents/create-a-document` + `/documents/catalog/business#influencer-agreement) | `WRITE` `AI` | Principal, Operator |
+| board update; board memo | [Create a Board update (`board-update`)](/documents/create-a-document` + `/documents/catalog/business#board-update) | `WRITE` `AI` | Principal, Operator |
+| deal memo; IC memo (short) | [Create a Deal memo (short) (`deal-memo`)](/documents/create-a-document` + `/documents/catalog/business#deal-memo-short) | `WRITE` `AI` | Principal, Operator |
+| investment memo; partner memo | [Create an Investment memo (`investment-memo`)](/documents/create-a-document` + `/documents/catalog/business#investment-memo) | `WRITE` `AI` | Principal, Operator |
+| LP onboarding packet; new LP welcome | [Create an LP onboarding packet (`lp-onboarding`)](/documents/create-a-document` + `/documents/catalog/business#lp-onboarding-packet) | `WRITE` `AI` | Principal, Operator |
+| LP quarterly update; investor letter | [Create an LP quarterly update (`lp-update`)](/documents/create-a-document` + `/documents/catalog/business#lp-quarterly-update) | `WRITE` `AI` | Principal, Operator |
+| term sheet; investment term sheet | [Create a Term sheet (`term-sheet`)](/documents/create-a-document` + `/documents/catalog/business#term-sheet) | `WRITE` `AI` | Principal, Operator |
+| energy project assessment; solar site assessment | [Create an Energy project assessment (`energy-project-assessment`)](/documents/create-a-document` + `/documents/catalog/business#energy-project-assessment) | `WRITE` `AI` | Principal, Operator |
+| returns policy; refund and exchange policy | [Create a Returns policy (`returns-policy`)](/documents/create-a-document` + `/documents/catalog/business#returns-policy) | `WRITE` `AI` | Principal, Operator |
+| tech pack; production cover sheet | [Create a Tech pack (cover sheet) (`tech-pack`)](/documents/create-a-document` + `/documents/catalog/business#tech-pack-cover-sheet) | `WRITE` `AI` | Principal, Operator |
+| wholesale order; wholesale order form | [Create a Wholesale order (`wholesale-order`)](/documents/create-a-document` + `/documents/catalog/business#wholesale-order) | `WRITE` `AI` | Principal, Operator |
+| HR proposal; proposal for HR services | [Create an HR Proposal (`proposal`)](/documents/create-a-document` + `/documents/catalog/sales#hr-proposal) | `WRITE` `AI` | Principal, Operator |
+| services proposal; payroll services proposal; itemized pricing proposal | [Create a Services Proposal (`services-proposal`)](/documents/create-a-document` + `/documents/catalog/sales#services-proposal) | `WRITE` `AI` | Principal, Operator |
+| consulting proposal; project proposal | [Create a Consulting Proposal (`consulting-proposal`)](/documents/create-a-document` + `/documents/catalog/sales#consulting-proposal) | `WRITE` `AI` | Principal, Operator |
+| discovery summary; call recap; post-call summary | [Create a Discovery Summary (`discovery-summary`)](/documents/create-a-document` + `/documents/catalog/sales#discovery-summary) | `WRITE` `AI` | Principal, Operator |
+| tier flyer; HR OnDemand flyer; Elevated HR flyer | [Create a Tier Flyer (`tier-flyer`)](/documents/create-a-document` + `/documents/catalog/sales#tier-flyer) | `WRITE` `AI` | Principal, Operator |
+| workers' comp proposal; WC proposal | [Create a Workers' Comp Proposal (`wc-proposal`)](/documents/create-a-document` + `/documents/catalog/sales#workers%E2%80%99-comp-proposal) | `WRITE` `AI` | Principal, Operator |
+| workers' comp contractor one-pager; WC leave-behind | [Create a Workers' Comp Contractor One-Pager (`wc-contractor-onepager`)](/documents/create-a-document` + `/documents/catalog/sales#workers%E2%80%99-comp-contractor-one-pager) | `WRITE` `AI` | Principal, Operator |
+| capabilities overview; capabilities brief | [Create a Capabilities overview (`capabilities-overview`)](/documents/create-a-document` + `/documents/catalog/marketing#capabilities-overview) | `WRITE` `AI` | Principal, Operator |
+| overview flyer; first-send flyer | [Create an Overview Flyer (`overview-flyer`)](/documents/create-a-document` + `/documents/catalog/marketing#overview-flyer) | `WRITE` `AI` | Principal, Operator |
+| solution flyer; single service flyer | [Create a Solution flyer (single service) (`solution-flyer`)](/documents/create-a-document` + `/documents/catalog/marketing#solution-flyer-single-service) | `WRITE` `AI` | Principal, Operator |
+| service comparison; tier comparison sheet | [Create a Service comparison (tiered) (`service-comparison`)](/documents/create-a-document` + `/documents/catalog/marketing#service-comparison-tiered) | `WRITE` `AI` | Principal, Operator |
+| marketing flyer; product flyer | [Create a Marketing flyer (`marketing-flyer`)](/documents/create-a-document` + `/documents/catalog/marketing#marketing-flyer) | `WRITE` `AI` | Principal, Operator |
+| contractor solutions flyer; 1099 crew flyer | [Create a Contractor Solutions Flyer (`contractor-solutions-flyer`)](/documents/create-a-document` + `/documents/catalog/marketing#contractor-solutions-flyer) | `WRITE` `AI` | Principal, Operator |
+| HR tech bundle flyer | [Create an HR Tech Bundle Flyer (`hr-tech-bundle-flyer`)](/documents/create-a-document` + `/documents/catalog/marketing#hr-tech-bundle-flyer) | `WRITE` `AI` | Principal, Operator |
+| integrations flyer; supported platforms sheet | [Create an Integrations Flyer (`integrations-flyer`)](/documents/create-a-document` + `/documents/catalog/marketing#integrations-flyer) | `WRITE` `AI` | Principal, Operator |
+| officer payroll flyer; S-corp owner payroll flyer | [Create an Officer Payroll Flyer (`officer-payroll-flyer`)](/documents/create-a-document` + `/documents/catalog/marketing#officer-payroll-flyer) | `WRITE` `AI` | Principal, Operator |
+| timekeeping flyer | [Create a Timekeeping Flyer (`timekeeping-flyer`)](/documents/create-a-document` + `/documents/catalog/marketing#timekeeping-flyer) | `WRITE` `AI` | Principal, Operator |
+| CA HR compliance update; annual California compliance update | [Create a CA HR Compliance Update (`ca-hr-compliance`)](/documents/create-a-document` + `/documents/catalog/marketing#ca-hr-compliance-update) | `WRITE` `AI` | Principal, Operator |
+| case study; client success story | [Create a Case Study (`case-study`)](/documents/create-a-document` + `/documents/catalog/marketing#case-study) | `WRITE` `AI` | Principal, Operator |
+| email newsletter; client newsletter | [Create an Email Newsletter (`email-newsletter`)](/documents/create-a-document` + `/documents/catalog/marketing#email-newsletter) | `WRITE` `AI` | Principal, Operator |
+| press release; announcement for media | [Create a Press Release (`press-release`)](/documents/create-a-document` + `/documents/catalog/marketing#press-release) | `WRITE` `AI` | Principal, Operator |
+| pitch deck; mini deck | [Create a Pitch Deck (mini) (`pitch-deck-mini`)](/documents/create-a-document` + `/documents/catalog/marketing#pitch-deck-mini) | `WRITE` `AI` | Principal, Operator |
+| editorial pitch; pitch to an editor | [Create an Editorial pitch (`editorial-pitch`)](/documents/create-a-document` + `/documents/catalog/marketing#editorial-pitch) | `WRITE` `AI` | Principal, Operator |
+| drop announcement; product drop email | [Create a Drop announcement (`drop-announcement`)](/documents/create-a-document` + `/documents/catalog/marketing#drop-announcement) | `WRITE` `AI` | Principal, Operator |
+| DTC product page; product page mock | [Create a DTC product page (`dtc-product-page`)](/documents/create-a-document` + `/documents/catalog/marketing#dtc-product-page) | `WRITE` `AI` | Principal, Operator |
+| line book; per-door line book | [Create a Line book (per-door) (`gfs-linebook`)](/documents/create-a-document` + `/documents/catalog/marketing#line-book-per-door) | `WRITE` `AI` | Principal, Operator |
+| linesheet; wholesale linesheet | [Create a Linesheet (`linesheet`)](/documents/create-a-document` + `/documents/catalog/marketing#linesheet) | `WRITE` `AI` | Principal, Operator |
+| lookbook page; lookbook spread | [Create a Lookbook page (`lookbook-page`)](/documents/create-a-document` + `/documents/catalog/marketing#lookbook-page) | `WRITE` `AI` | Principal, Operator |
+| cap table snapshot; cap table | [Create a Cap table snapshot (`cap-table-snapshot`)](/documents/create-a-document` + `/documents/catalog/data#cap-table-snapshot) | `WRITE` `AI` | Principal, Operator |
+| financial model; P&L sketch | [Create a Financial model (mini) (`financial-model`)](/documents/create-a-document` + `/documents/catalog/data#financial-model-mini) | `WRITE` `AI` | Principal, Operator |
+| risk register; risk log | [Create a Risk register (`risk-register`)](/documents/create-a-document` + `/documents/catalog/data#risk-register) | `WRITE` `AI` | Principal, Operator |
+| variance analysis; budget vs actual report | [Create a Variance Analysis (`variance-report`)](/documents/create-a-document` + `/documents/catalog/data#variance-analysis) | `WRITE` `AI` | Principal, Operator |
+| business card | [Create a Business card (`business-card`)](/documents/create-a-document` + `/documents/catalog/print-and-social#business-card) | `WRITE` `AI` | Principal, Operator |
+| social asset pack; social media graphics | [Create a Social asset pack (`social-pack`)](/documents/create-a-document` + `/documents/catalog/print-and-social#social-asset-pack) | `WRITE` `AI` | Principal, Operator |
+| Form 8655; reporting agent authorization; report authorization form | [Create the Report Authorization Form PDF form (`report-authorization-form`, Documents UI only)](/documents/templates` + `/documents/catalog/pdf-forms#report-authorization-form) | `WRITE` `AI` | Principal, Operator |
+| CA POA; DE 48; EDD power of attorney; California power of attorney | [Create the Power of Attorney California PDF form (`power-of-attorney-california`, Documents UI only)](/documents/templates` + `/documents/catalog/pdf-forms#power-of-attorney-california) | `WRITE` `AI` | Principal, Operator |
+| implementation kit; isolved implementation kit; initial information form; payroll ACH form | [Create the ISolved Implementation Kit Form PDF form (`isolved-implementation-kit-form`, Documents UI only)](/documents/templates` + `/documents/catalog/pdf-forms#isolved-implementation-kit-form) | `WRITE` `AI` | Principal, Operator |
+
+## Operations (inbox, cases, email)
+
+| User might say | Recipe | Risk | Roles |
+|---|---|---|---|
+| open triage; show my cases; show waiting on vendor; open the done queue | [Open a queue](/operations/inbox#open-a-queue) | `READ` | Principal, Operator |
+| start my day in operations; go through my inbox; what's in operations today | [Start the day in Operations](/operations/inbox#start-the-day-in-operations) | `READ` | Principal, Operator |
+| show everyone's cases; switch to the whole desk; show only mine | [Switch between Mine and Everyone](/operations/inbox#switch-between-mine-and-everyone) | `READ` | Principal only |
+| show Rachel's cases; what is my teammate working on; see a colleague's queue | [See a teammate's work](/operations/inbox#see-the-work-of-a-teammate) | `READ` | Principal only |
+| find the email from ADP; search cases for W-2; look up the thread about X | [Search mail and cases](/operations/inbox#search-mail-and-cases) | `READ` | Principal, Operator |
+| sort by priority; oldest first; compact view | [Sort the list and change density](/operations/inbox#sort-the-list-and-change-density) | `READ` | Principal, Operator |
+| open that email; read the latest message; show the thread | [Open a row in the reading pane](/operations/inbox#open-a-row-in-the-reading-pane) | `READ` | Principal, Operator |
+| make this email a case; track this email; triage the email from X into a case | [Triage an email into a case](/operations/inbox#triage-an-email-into-a-case) | `WRITE` | Principal, Operator |
+| dismiss that email; not a case; hide this email; mark the triage email done | [Dismiss, hide or mark a triage email done](/operations/inbox#dismiss-hide-or-mark-a-triage-email-done) | `WRITE` | Principal, Operator |
+| stop these newsletters showing up; suppress similar emails; don't triage emails like this | [Stop similar emails reaching Triage](/operations/inbox#stop-similar-emails-reaching-triage) | `WRITE` | Principal, Operator |
+| restore that dismissed email; undo the dismissal from yesterday; recently dismissed | [Restore a dismissed email](/operations/inbox#restore-a-dismissed-email) | `WRITE` | Principal, Operator |
+| go through triage one by one; focus mode; clear my triage | [Triage in Focus mode](/operations/inbox#triage-in-focus-mode) | `WRITE` | Principal, Operator |
+| quickly mark that row done; park it from the list | [Act on a row without opening it](/operations/inbox#act-on-a-row-without-opening-it) | `WRITE` | Principal, Operator |
+| make my sent email a case; track the email I sent | [Make sent mail a case](/operations/inbox#make-sent-mail-a-case) | `WRITE` | Principal, Operator |
+| scan my inbox; pull in new emails; check Gmail for new mail | [Scan the inbox](/operations/inbox#scan-the-inbox) | `EXTERNAL` `AI` | Principal, Operator |
+| show operations performance; service mix report; how many cases closed this month | [Read the desk reports](/operations/inbox#read-the-desk-reports) | `READ` | Principal, Operator |
+| show keyboard shortcuts; how do I connect Gmail help | [Open the shortcuts and Gmail help](/operations/inbox#open-the-shortcuts-and-gmail-help) | `READ` | Principal, Operator |
+| open this old case link; service-desk cases link | [Open an old case link](/operations/inbox#open-an-old-case-link) | `READ` | Principal, Operator |
+| open case X; show me the case for ABC Dental | [Open a case](/operations/case#open-a-case) | `READ` | Principal, Operator |
+| open the case full screen; show case details and documents tab | [Open the case at full width](/operations/case#open-the-case-at-full-width) | `READ` `AI` | Principal, Operator |
+| what's the status of this case; summarize the case; read the thread | [Read the brief and conversation](/operations/case#read-the-brief-and-conversation) | `READ` | Principal, Operator |
+| refresh the case brief; the brief looks right; the brief is wrong | [Refresh or rate the brief](/operations/case#refresh-or-rate-the-brief) | `AI` `WRITE` | Principal, Operator |
+| we're waiting on the client; park it with the client; mark waiting on client | [Set waiting on the client](/operations/case#set-waiting-on-the-client) | `WRITE` | Principal, Operator |
+| waiting on ADP; park with the vendor; add a new vendor to this case | [Set waiting on a vendor](/operations/case#set-waiting-on-a-vendor) | `WRITE` | Principal, Operator |
+| ball is with us; bring it back to my cases | [Keep the ball with us](/operations/case#keep-the-ball-with-us) | `WRITE` | Principal, Operator |
+| assign this case to Rachel; take this case; reassign the case | [Take or reassign a case](/operations/case#take-or-reassign-a-case) | `WRITE` | Principal, Operator |
+| hand this case to Agentic AI; let the AI agent own it | [Assign a case to Agentic AI](/operations/case#assign-a-case-to-agentic-ai) | `WRITE` | Principal, Operator |
+| make this P1; change the service; change case type to vendor | [Change priority, service or type](/operations/case#change-priority-service-or-type) | `WRITE` `AI` | Principal, Operator |
+| link this case to ABC Dental; change the client on the case; unlink the client | [Link or change the client](/operations/case#link-or-change-the-client) | `WRITE` | Principal, Operator |
+| set the SLA date; change the follow-up date; add client impact | [Edit case details](/operations/case#edit-case-details) | `WRITE` | Principal, Operator |
+| clear the follow-up reminder | [Clear a follow-up](/operations/case#clear-a-follow-up) | `WRITE` | Principal, Operator |
+| escalate this case; mark the case blocked; clear the escalation | [Flag a case escalated or blocked](/operations/case#flag-a-case-escalated-or-blocked) | `WRITE` | Principal, Operator |
+| close this case; mark the case done; resolve the case | [Mark a case done](/operations/case#mark-a-case-done) | `WRITE` | Principal, Operator |
+| reopen that case; the case isn't finished | [Reopen a case](/operations/case#reopen-a-case) | `WRITE` | Principal, Operator |
+| merge these two cases; this is a duplicate of the other case | [Merge two cases](/operations/case#merge-two-cases) | `WRITE` | Principal, Operator |
+| accept the merge suggestion; they're not the same case | [Answer a merge suggestion](/operations/case#answer-a-merge-suggestion) | `WRITE` | Principal, Operator |
+| unmerge that case; split the merged cases | [Unmerge a case](/operations/case#unmerge-a-case) | `WRITE` | Principal or case owner |
+| attach the handbook to this case; link the document to the case | [Link an existing document to a case](/operations/case#link-an-existing-document-to-a-case) | `WRITE` | Principal, Operator |
+| create a document from this case; generate the letter for this case | [Generate a document from a case](/operations/case#generate-a-document-from-a-case) | `READ` `AI` `WRITE` | Principal, Operator |
+| attach the document to my reply; stage the PDF for the reply | [Stage a document for the reply](/operations/case#stage-a-document-for-the-reply) | `READ` | Principal, Operator |
+| add a note to the case; leave an internal note | [Add an internal note](/operations/case#add-an-internal-note) | `WRITE` | Principal, Operator |
+| show case history; show past emails with this client | [Read case activity and correspondence history](/operations/case#read-case-activity-and-correspondence-history) | `READ` | Principal, Operator |
+| draft a reply; write a response to the client; have Ariya draft the email | [Draft a reply with Ariya](/operations/email-and-replies#draft-a-reply-with-ariya) | `AI` | Principal, Operator |
+| make the reply more formal; polish the draft; fix the grammar | [Polish or fix the grammar of a draft](/operations/email-and-replies#polish-or-fix-the-grammar-of-a-draft) | `AI` | Principal, Operator |
+| nudge the client; draft a follow-up asking for an update; chase the vendor | [Draft a nudge](/operations/email-and-replies#draft-a-nudge) | `AI` | Principal, Operator |
+| cc Rachel on the reply; change who the reply goes to; add a bcc | [Set the reply recipients](/operations/email-and-replies#set-the-reply-recipients) | `READ` | Principal, Operator |
+| attach a file from Drive to the reply; attach the PDF to my email | [Attach files to the reply](/operations/email-and-replies#attach-files-to-the-reply) | `READ` `EXTERNAL` | Principal, Operator |
+| after sending, mark waiting on client; keep it with us after I reply | [Choose where the case goes after sending](/operations/email-and-replies#choose-where-the-case-goes-after-sending) | `READ` | Principal, Operator |
+| open the reply in a bigger window; pop out the reply | [Use the larger reply window](/operations/email-and-replies#use-the-larger-reply-window) | `READ` | Principal, Operator |
+| send the reply; send it; reply to the client now | [Send the reply](/operations/email-and-replies#send-the-reply) | `EXTERNAL` | Principal, Operator |
+| undo send; stop that email; cancel the reply | [Undo a reply send](/operations/email-and-replies#undo-a-reply-send) | `READ` | Principal, Operator |
+| where does the case go after sending; mark waiting on vendor after reply | [Answer where the ball goes after a send](/operations/email-and-replies#answer-where-the-ball-goes-after-a-send) | `WRITE` | Principal, Operator |
+| reply again on this case; write another reply | [Reply again on the same case](/operations/email-and-replies#reply-again-on-the-same-case) | `READ` | Principal, Operator |
+| write a new email to the client; compose an email; draft an email to X | [Compose a new email](/operations/email-and-replies#compose-a-new-email) | `READ` | Principal, Operator |
+| send a new email and track it; email X and open a case | [Send a new email and create a case](/operations/email-and-replies#send-a-new-email-and-create-a-case) | `EXTERNAL` | Principal, Operator |
+| show triage settings; what domains are configured; operations settings | [Read the triage settings](/operations/settings#read-the-triage-settings) | `READ` | Principal, Operator |
+| add a client domain; treat acme.com as a client; add a noise keyword | [Add a client, noise domain or noise keyword](/operations/settings#add-a-client-noise-domain-or-noise-keyword) | `WRITE` | Principal (and Admin) |
+| add Gusto as a vendor domain; add a vendor domain | [Add a vendor domain](/operations/settings#add-a-vendor-domain) | `WRITE` | Principal (and Admin) |
+| remove that domain; delete the noise keyword | [Remove a domain or keyword](/operations/settings#remove-a-domain-or-keyword) | `DESTRUCTIVE` | Principal (and Admin) |
+| scan the last 60 days; change the scan window | [Change the inbox scan window and scan](/operations/settings#change-the-inbox-scan-window-and-scan) | `WRITE` `EXTERNAL` `AI` | Principal, Operator |
+| pause that suppression rule; turn the learned rule back on | [Pause or reactivate a learned rule](/operations/settings#pause-or-reactivate-a-learned-rule) | `WRITE` | Principal, Operator |
+| change Ariya's reply tone; words to avoid in replies; set reply voice | [Set the reply voice](/operations/settings#set-the-reply-voice) | `WRITE` | Principal only |
+| connect my Gmail; reconnect Gmail; Gmail is not connected | [Connect Gmail (human hand-off)](/operations/settings#connect-gmail) | `EXTERNAL` | Principal, Operator |
+| did Gmail connect; Gmail connection failed | [Read the Gmail callback result](/operations/settings#read-the-gmail-callback-result) | `READ` | Principal, Operator |
+
+## Command Center
+
+| User might say | Recipe | Risk | Roles |
+|---|---|---|---|
+| what's on my plate today; summarize my day; what do I have today; show my command center | [Read the day](/command-center/your-day#read-the-day) | `READ` | Principal, Operator |
+| start my day; take me to my first task; what should I do first | [Start my day](/command-center/your-day#start-my-day) | `READ` | Principal, Operator |
+| show only overdue to-dos; filter my to-do list by client; sort my tasks by priority | [Filter and sort the to-do list](/command-center/your-day#filter-and-sort-the-to-do-list) | `READ` | Principal, Operator |
+| tick off the payroll task; mark that to-do done; check off X on my list | [Mark a to-do done](/command-center/your-day#mark-a-to-do-done) | `WRITE` | Principal, Operator |
+| push this to tomorrow; move X to tomorrow; defer that task | [Move a to-do to tomorrow](/command-center/your-day#move-a-to-do-to-tomorrow) | `WRITE` | Principal, Operator |
+| undo marking that done; bring back the task I moved; un-tick X | [Bring back a done or moved item](/command-center/your-day#bring-back-a-done-or-moved-item) | `WRITE` | Principal, Operator |
+| who am I waiting on; what's waiting on clients; follow up on outstanding items | [Follow up on waiting items](/command-center/your-day#follow-up-on-waiting-items) | `READ` | Principal, Operator |
+| what meetings do I have today; prep for my next meeting; show my calendar | [Check today's meetings](/command-center/your-day#check-the-meetings-for-today) | `READ` | Principal, Operator |
+| approve the memory for ABC Dental; remember that fact; dismiss that memory suggestion | [Approve or dismiss a client memory](/command-center/your-day#approve-or-dismiss-a-client-memory) | `WRITE` | Principal, Operator |
+| approve the offer letter; approve and deliver that document; sign off the draft | [Approve and deliver a document](/command-center/your-day#approve-and-deliver-a-document) | `WRITE` | Principal, Operator |
+| send the document back with changes; reject the draft and ask for edits; request revisions on that document | [Send a document back for changes](/command-center/your-day#send-a-document-back-for-changes) | `WRITE` | Principal, Operator |
+| refresh my day; reload the command center | [Reload the day](/command-center/your-day#reload-the-day) | `READ` | Principal, Operator |
+| show me Rachel's day; what is my teammate working on; open someone else's day | [See a teammate's day (not available; use Operations)](/command-center/your-day#see-the-day-of-a-teammate) | `READ` | Principal only |
+| find the request about X; look up a request; search the action queue | [Find a request](/command-center/action-queue#find-a-request) | `READ` | Principal, Operator |
+| open request X; show the request details | [Open a request](/command-center/action-queue#open-a-request) | `READ` | Principal, Operator |
+| log a request; create a new request for ABC Dental; add to the action queue | [Create a request](/command-center/action-queue#create-a-request) | `WRITE` | Principal, Operator |
+| start work on that request; submit for review; approve and deliver the request; close the request | [Move a request through its status](/command-center/action-queue#move-a-request-through-its-status) | `WRITE` | Principal, Operator |
+| assign that request to me; take that request | [Assign a request](/command-center/action-queue#assign-a-request) | `WRITE` | Principal, Operator |
+| generate a document for this request; draft the deliverable for the request | [Generate a document for a request](/command-center/action-queue#generate-a-document-for-a-request) | `READ` `AI` `WRITE` | Principal, Operator |
+| open the client for this request; show client documents from the request | [Open client context from a request](/command-center/action-queue#open-client-context-from-a-request) | `READ` | Principal, Operator |
+| mark that request helpful; flag the request as needing follow-up | [Log operator feedback on a request](/command-center/action-queue#log-operator-feedback-on-a-request) | `WRITE` | Principal, Operator |
+| delete that request; remove the request from the queue | [Delete a request](/command-center/action-queue#delete-a-request) | `DESTRUCTIVE` | Principal, Operator |
+| show pending contact changes; review the contact change request | [Review a contact change request](/command-center/approvals-and-compliance#review-a-contact-change-request) | `READ` | Principal, Operator |
+| approve the contact change; accept the new phone number | [Approve a contact change](/command-center/approvals-and-compliance#approve-a-contact-change) | `WRITE` | Principal, Operator |
+| reject the contact change; decline that contact update | [Reject a contact change](/command-center/approvals-and-compliance#reject-a-contact-change) | `DESTRUCTIVE` | Principal, Operator |
+| apply the approved contact change; update the contact record now | [Apply an approved contact change](/command-center/approvals-and-compliance#apply-an-approved-contact-change) | `WRITE` | Principal, Operator |
+| refresh the approvals list | [Reload the approval queue](/command-center/approvals-and-compliance#reload-the-approval-queue) | `READ` | Principal, Operator |
+| what compliance items are overdue; show compliance deadlines for ABC Dental; what's due in 30 days | [Find compliance items](/command-center/approvals-and-compliance#find-compliance-items) | `READ` | Principal, Operator |
+| sync compliance; re-evaluate obligations; refresh compliance items | [Sync outstanding compliance items](/command-center/approvals-and-compliance#sync-outstanding-compliance-items) | `WRITE` | Principal, Operator |
+| sync this client's obligations from HR Intel | [Sync one client from an HR Intel handoff](/command-center/approvals-and-compliance#sync-one-client-from-an-hr-intel-handoff) | `WRITE` | Principal, Operator |
+| mark the harassment training done; complete that compliance item; log evidence for X | [Mark a compliance item complete](/command-center/approvals-and-compliance#mark-a-compliance-item-complete) | `WRITE` | Principal, Operator |
+| waive that compliance item; skip this obligation | [Waive a compliance item](/command-center/approvals-and-compliance#waive-a-compliance-item) | `DESTRUCTIVE` | Principal, Operator |
+| open the law for that item; show the source for this rule | [Open the source law for an item](/command-center/approvals-and-compliance#open-the-source-law-for-an-item) | `READ` | Principal, Operator |
+| show the work queue; what needs attention across clients; staff work queue | [See what needs work across clients](/command-center/work-queue-and-management#see-what-needs-work-across-clients) | `READ` | Principal, Operator |
+| filter the work queue by owner; show only stale clients; show blocked requests | [Filter the work queue](/command-center/work-queue-and-management#filter-the-work-queue) | `READ` | Principal, Operator |
+| open that work item; go to the client from the work queue | [Open a work item](/command-center/work-queue-and-management#open-a-work-item) | `READ` | Principal, Operator |
+| show the management cockpit; portfolio summary; how is the book doing | [Read the management summary](/command-center/work-queue-and-management#read-the-management-summary) | `READ` | Principal, Operator |
+| which clients have no contact; open the compliance attention count; drill into open requests | [Drill into a management number](/command-center/work-queue-and-management#drill-into-a-management-number) | `READ` | Principal, Operator |
+| refresh the work queue; reload management | [Reload either page](/command-center/work-queue-and-management#reload-either-page) | `READ` | Principal, Operator |
+
+## Clients, people and contacts
+
+| User might say | Recipe | Risk | Roles |
+|---|---|---|---|
+| find client ABC Dental; open the client; go to a client's page; look up a customer | [Find and open a client](/clients/clients-list#find-and-open-a-client) | `READ` | All |
+| show elevated HR clients; list clients with open cases; which clients are prospects; clients on Gusto payroll | [Filter the portfolio](/clients/clients-list#filter-the-portfolio) | `READ` | All |
+| go through each client in this list; next client; previous client | [Step through a filtered list of clients](/clients/clients-list#step-through-a-filtered-list-of-clients) | `READ` | All |
+| assign Jane as HR advisor for ABC Dental; change the HR advisor; unassign the advisor; who covers this client | [Change the HR Advisor on a client](/clients/clients-list#change-the-hr-advisor-on-a-client) | `WRITE` | Principal, Admin (Operator gets 403) |
+| fill in the missing CPA; which clients are missing a bookkeeper; add the primary contact for clients missing one; profile gaps | [Fill missing profile data (Profile Workspace)](/clients/clients-list#fill-missing-profile-data-profile-workspace) | `WRITE` | Principal, Admin (Operator gets 403, error hidden) |
+| what road map work is overdue; HR road map across clients; elevated HR progress; open roadmap queue | [Review HR Road Map work across clients](/clients/clients-list#review-hr-road-map-work-across-clients) | `READ` | All |
+| clients by service tier; clients by HR advisor; how many clients does each advisor have | [Review clients by service tier or by HR Advisor](/clients/clients-list#review-clients-by-service-tier-or-by-hr-advisor) | `READ` | All |
+| which clients are missing contacts; clients we can't reach; contact coverage gaps | [Find clients with contact gaps](/clients/clients-list#find-clients-with-contact-gaps) | `READ` | All |
+| add a client; create a new client; set up a new customer; add a prospect | [Create a client](/clients/new-client#create-a-client) | `WRITE` | Principal, Admin |
+| open ABC Dental's payroll tab; go to the client's documents; show me the client's road map tab | [Open a client on a specific tab](/clients/client-profile#open-a-client-on-a-specific-tab) | `READ` | All |
+| next client; previous client; back to the client list | [Step to the previous or next client](/clients/client-profile#step-to-the-previous-or-next-client) | `READ` | All |
+| generate a document for ABC Dental; write something for this client; create a document for the client | [Start a document for this client from the header](/clients/client-profile#start-a-document-for-this-client-from-the-header) | `READ` | All |
+| create a service item for ABC Dental; open a request for this client; log a service request | [Create a service item for this client](/clients/client-profile#create-a-service-item-for-this-client) | `READ` | All |
+| open ABC Dental in HubSpot; show the HubSpot company record | [Open the client in HubSpot](/clients/client-profile#open-the-client-in-hubspot) | `READ` | All |
+| run a roadmap progress report for ABC Dental; progress report; check work against the roadmap | [Start a roadmap progress report](/clients/client-profile#start-a-roadmap-progress-report) | `READ` | Principal |
+| what needs my attention on this client; what's due for ABC Dental; draft what's suggested | [Act on Needs you on this client](/clients/client-profile#act-on-needs-you-on-this-client) | `READ` | All |
+| update the client's address; change the company name; edit client phone; set pay frequency | [Edit company details](/clients/client-profile#edit-company-details) | `WRITE` | Principal, Admin |
+| change service tier; set the payroll platform; update active services; set the CPA or broker | [Edit the service ecosystem](/clients/client-profile#edit-the-service-ecosystem) | `WRITE` | Principal, Admin |
+| add a California jurisdiction; add a state; remove a jurisdiction; set employee count by state | [Add or remove a jurisdiction](/clients/client-profile#add-or-remove-a-jurisdiction) | `WRITE` `DESTRUCTIVE` | Principal, Admin |
+| use the client's logo on documents; set client brand colors; client branding; stop using tenant branding | [Set client branding for documents](/clients/client-profile#set-client-branding-for-documents) | `WRITE` | Principal, Admin |
+| delete client ABC Dental; remove this client; permanently delete the client | [Delete a client](/clients/client-profile#delete-a-client) | `DESTRUCTIVE` | Principal, Admin |
+| create an incident report for ABC Dental; draft a document for this client; which URL starts a client document | [Create a document for this client](/clients/client-tabs-work#create-a-document-for-this-client) | `READ` | All |
+| show ABC Dental's cases; how many open cases; case history for the client; how fast do we resolve cases | [Review the cases for a client](/clients/client-tabs-work#review-the-cases-for-a-client) | `READ` | All |
+| open the client's case in Operations; show this client in the service desk | [Open a case or the client Operations queue](/clients/client-tabs-work#open-a-case-or-the-client-operations-queue) | `READ` | All |
+| find the handbook for ABC Dental; show the client's documents; open the offer letter we made for them | [Find a client document](/clients/client-tabs-work#find-a-client-document) | `READ` | All |
+| start a new document from the client documents tab; generate from documents tab | [Start a new document for this client](/clients/client-tabs-work#start-a-new-document-for-this-client) | `READ` | All |
+| draft the next document; what document comes next; draft with context | [Draft the likely next document](/clients/client-tabs-work#draft-the-likely-next-document) | `READ` | All |
+| delete this client document; remove the draft; delete the old version of the letter | [Delete a client document](/clients/client-tabs-work#delete-a-client-document) | `DESTRUCTIVE` | All |
+| show the meeting from last week; open the Granola meeting | [Open a specific meeting](/clients/client-tabs-work#open-a-specific-meeting) | `READ` | All |
+| log a call with ABC Dental; record a note about the client; log a conversation | [Log a call or note](/clients/client-tabs-work#log-a-call-or-note) | `WRITE` | Principal, Admin |
+| import Granola notes; add meeting notes; import a meeting | [Import a Granola meeting](/clients/client-tabs-work#import-a-granola-meeting) | `WRITE` | Principal, Admin |
+| approve the meeting items; apply meeting takeaways; reject a meeting suggestion | [Review and apply meeting candidates](/clients/client-tabs-work#review-and-apply-meeting-candidates) | `WRITE` `DESTRUCTIVE` | Principal, Admin |
+| mark the commitment done; we sent it, close the commitment | [Mark a commitment done](/clients/client-tabs-work#mark-a-commitment-done) | `WRITE` | Principal, Admin |
+| upload this file to the client's Drive; add the client's old handbook; store a document for the client | [Upload files to the client Drive folder](/clients/client-tabs-work#upload-files-to-the-client-drive-folder) | `EXTERNAL` `AI` | Principal, Admin (Operator gets 403) |
+| fix the date on this file; correct the document date | [Correct the date of a document](/clients/client-tabs-work#correct-the-date-of-a-document) | `WRITE` | Principal, Admin (Operator gets 403) |
+| re-read this file; scan the document again | [Read a document again](/clients/client-tabs-work#read-a-document-again) | `AI` | Principal, Admin (Operator gets 403) |
+| remove this file from Drive; delete the external document | [Remove a document from Drive](/clients/client-tabs-work#remove-a-document-from-drive) | `DESTRUCTIVE` `EXTERNAL` | Principal, Admin (Operator gets 403) |
+| what do we know about ABC Dental; search the client's memory; client preferences | [Find a memory](/clients/client-tabs-work#find-a-memory) | `READ` | All |
+| remember that the client prefers formal language; add a memory; save a fact about the client | [Add a memory](/clients/client-tabs-work#add-a-memory) | `WRITE` | Principal, Admin |
+| approve proposed memories; dismiss that memory; review memory suggestions | [Approve or dismiss a proposed memory](/clients/client-tabs-work#approve-or-dismiss-a-proposed-memory) | `WRITE` `DESTRUCTIVE` | Principal, Admin |
+| forget that fact; delete the memory; archive the memory; make it a core memory | [Promote, archive, restore or delete a memory](/clients/client-tabs-work#promote-archive-restore-or-delete-a-memory) | `WRITE` `DESTRUCTIVE` | Principal, Admin |
+| add a note to the client; note that Denise prefers calls; pin a note for drafts | [Add a note](/clients/client-tabs-work#add-a-note) | `WRITE` | Principal, Admin |
+| pin this note; unpin the note; edit the client note | [Pin, unpin or edit a note](/clients/client-tabs-work#pin-unpin-or-edit-a-note) | `WRITE` | Principal, Admin |
+| archive the note; remove that client note | [Archive a note](/clients/client-tabs-work#archive-a-note) | `DESTRUCTIVE` | Principal, Admin |
+| add Rachel as a contact at ABC Dental; add a new contact; add the HR manager | [Request a new contact](/clients/client-tabs-people-hr#request-a-new-contact) | `WRITE` | Principal, Admin |
+| update Rachel's email; change the contact's title; fix the phone number | [Request an edit to a contact](/clients/client-tabs-people-hr#request-an-edit-to-a-contact) | `WRITE` | Principal, Admin |
+| make Rachel the primary contact; change the primary contact | [Make a contact the primary contact](/clients/client-tabs-people-hr#make-a-contact-the-primary-contact) | `WRITE` | Principal, Admin |
+| Rachel left the company; archive the contact; unlink this person from the client | [Request to archive or unlink a contact](/clients/client-tabs-people-hr#request-to-archive-or-unlink-a-contact) | `DESTRUCTIVE` | Principal, Admin |
+| confirm contact roles; who is the payroll contact; assign roles to imported contacts | [Confirm contact roles in the coverage resolver](/clients/client-tabs-people-hr#confirm-contact-roles-in-the-coverage-resolver) | `WRITE` | Principal, Admin |
+| add this email sender as a contact; add to HubSpot; who is writing on cases but not a contact | [Request a case participant as a contact](/clients/client-tabs-people-hr#request-a-case-participant-as-a-contact) | `WRITE` | Principal, Admin |
+| add an employee; add Rachel to the employee list; new hire record | [Add an employee](/clients/client-tabs-people-hr#add-an-employee) | `WRITE` | Principal, Admin (Operator via row click only) |
+| update the employee's pay rate; change the job title; terminate the employee | [Edit an employee](/clients/client-tabs-people-hr#edit-an-employee) | `WRITE` `DESTRUCTIVE` | Principal, Admin, Operator (row click) |
+| import employees from CSV; upload the employee census; bulk add employees | [Import employees from a CSV](/clients/client-tabs-people-hr#import-employees-from-a-csv) | `WRITE` | Principal, Admin |
+| update the EIN; change payday; add a state tax ID; payroll configuration | [Update payroll and tax details](/clients/client-tabs-people-hr#update-payroll-and-tax-details) | `WRITE` | Principal, Admin |
+| import contacts from this document; pull payroll details from the PDF; extract employees from a file | [Import values from a document](/clients/client-tabs-people-hr#import-values-from-a-document) | `AI` `WRITE` | Principal, Admin |
+| run compliance research; build the compliance register; what compliance obligations apply | [Run compliance research](/clients/client-tabs-people-hr#run-compliance-research) | `AI` | Principal, Admin (Operator gets 403) |
+| what's expiring for ABC Dental; show the compliance register; which licenses are outdated | [Read the compliance register](/clients/client-tabs-people-hr#read-the-compliance-register) | `READ` | All |
+| research ABC Dental; run AI research on the client; look up public info about the client | [Run client research](/clients/client-tabs-people-hr#run-client-research) | `AI` | Principal, Admin |
+| save the research findings; accept the research facts; update the company file from research | [Review and save research facts](/clients/client-tabs-people-hr#review-and-save-research-facts) | `WRITE` | Principal, Admin |
+| fix the research value; edit the suggested fact | [Edit a research suggestion](/clients/client-tabs-people-hr#edit-a-research-suggestion) | `WRITE` | Principal, Admin |
+| reject the research facts; that research is wrong, discard it | [Reject research facts](/clients/client-tabs-people-hr#reject-research-facts) | `DESTRUCTIVE` | Principal, Admin |
+| does ABC Dental have a road map; start a discovery assessment; resume the assessment | [Open the road map or start an assessment](/clients/client-tabs-roadmap#open-the-road-map-or-start-an-assessment) | `READ` | All |
+| mark the handbook initiative complete; complete the road map task; reopen that initiative | [Complete or reopen an initiative](/clients/client-tabs-roadmap#complete-or-reopen-an-initiative) | `WRITE` | Principal, Admin, Operator |
+| add an initiative to the road map; add a road map task | [Add an initiative](/clients/client-tabs-roadmap#add-an-initiative) | `WRITE` | Principal, Admin, Operator |
+| rename the phase; change the due date; link a doc type to the task | [Edit phases and initiatives](/clients/client-tabs-roadmap#edit-phases-and-initiatives) | `WRITE` | Principal, Admin, Operator |
+| delete the road map task; remove that initiative | [Delete an initiative](/clients/client-tabs-roadmap#delete-an-initiative) | `DESTRUCTIVE` | Principal, Admin, Operator |
+| draft the road map deliverable; draft the next deliverable | [Draft a road map deliverable](/clients/client-tabs-roadmap#draft-a-road-map-deliverable) | `READ` | All |
+| export the road map PDF; download the road map | [Export the road map as PDF](/clients/client-tabs-roadmap#export-the-road-map-as-pdf) | `WRITE` | Principal, Admin, Operator |
+| ask the HR advisor; add the advisor's recommendation to the road map | [Ask the advisor and apply a recommendation](/clients/client-tabs-roadmap#ask-the-advisor-and-apply-a-recommendation) | `WRITE` | Principal, Admin, Operator (memory part fails) |
+| accept the suggested initiative; add the suggestion to the road map | [Accept a suggested initiative](/clients/client-tabs-roadmap#accept-a-suggested-initiative) | `WRITE` | Principal, Admin, Operator |
+| start research from the road map; research this client for the road map | [Start client research from the road map](/clients/client-tabs-roadmap#start-client-research-from-the-road-map) | `AI` | Principal, Admin (Operator gets 403) |
+| import the road map PDF; upload road map source documents | [Import a road map from a PDF or add source documents](/clients/client-tabs-roadmap#import-a-road-map-from-a-pdf-or-add-source-documents) | `AI` `WRITE` | Principal, Admin, Operator |
+| road map history; earlier versions of the road map | [View road map version history](/clients/client-tabs-roadmap#view-road-map-version-history) | `READ` | All |
+| run the roadmap report; compare work to the roadmap; work record for a client with no roadmap | [Run a roadmap progress report](/clients/client-tabs-roadmap#run-a-roadmap-progress-report) | `AI` | Principal |
+| finalize the roadmap report; create the client progress PDF; set verdicts on roadmap items | [Review and finalize the report](/clients/client-tabs-roadmap#review-and-finalize-the-report) | `WRITE` | Principal |
+| discard the roadmap report; throw away this analysis | [Discard a report](/clients/client-tabs-roadmap#discard-a-report) | `DESTRUCTIVE` | Principal |
+| download the last roadmap report; previous progress report PDF | [Download a previous report PDF](/clients/client-tabs-roadmap#download-a-previous-report-pdf) | `READ` | Principal |
+| implementation status for ABC Dental; start the implementation; reactivate implementation; complete hand-off | [Check or start the client implementation](/clients/client-tabs-roadmap#check-or-start-the-client-implementation) | `READ` `WRITE` | Principal, Admin, Operator |
+| find contact Rachel; look up a person by email; who is this contact | [Find a person](/clients/people-and-contacts#find-a-person) | `READ` | All |
+| open Rachel's profile; show the person's history | [Open a person profile](/clients/people-and-contacts#open-a-person-profile) | `READ` | All |
+| fix Rachel's role at the client; set up this person's client role | [Fix the client role or details of a person](/clients/people-and-contacts#fix-the-client-role-or-details-of-a-person) | `READ` | All |
+| which clients have no primary contact; missing HR payroll contacts | [Find clients missing a primary or HR payroll contact](/clients/people-and-contacts#find-clients-missing-a-primary-or-hr-payroll-contact) | `READ` | All |
+| find emails with Rachel; save Gmail messages to her history; scan Gmail for this contact | [Save Gmail messages to the history of a person](/clients/people-and-contacts#save-gmail-messages-to-the-history-of-a-person) | `EXTERNAL` `WRITE` | Principal, Admin (Operator: save gets 403) |
+| HubSpot contacts list; unlinked HubSpot contacts; export unlinked contacts | [HubSpot contacts pages (not working)](/clients/people-and-contacts#hubspot-contacts-pages-not-working) | `READ` | All (route broken) |
+
+## Implementation
+
+| User might say | Recipe | Risk | Roles |
+|---|---|---|---|
+| show implementations for Sam; which clients are at risk; filter onboarding by stage; find implementation for ABC Dental | [Find implementations by filter](/implementation/portfolio#find-implementations-by-filter) | `READ` | Principal, Operator |
+| which clients are blocked; show blocked implementations across the team; what's stuck in onboarding | [List blocked clients across the team](/implementation/portfolio#list-blocked-clients-across-the-team) | `READ` | Principal, Operator |
+| sort implementations by first payroll; order clients by health; who has been blocked longest | [Sort the clients table](/implementation/portfolio#sort-the-clients-table) | `READ` | Principal, Operator |
+| open ABC Dental's implementation; go to the onboarding for this client; show me the implementation workspace | [Open a client implementation](/implementation/portfolio#open-a-client-implementation) | `READ` | Principal, Operator |
+| what's the next step for ABC Dental; do the next action on this implementation; follow the next action chip | [Follow the next action for a client](/implementation/portfolio#follow-the-next-action-for-a-client) | `READ` | Principal, Operator |
+| what milestones are due this week; which milestones need attention; show milestones waiting on the client | [Review milestones that need attention](/implementation/portfolio#review-milestones-that-need-attention) | `READ` | Principal, Operator |
+| show the implementation board; group implementations by stage; kanban of onboarding | [Use the board view](/implementation/portfolio#use-the-board-view) | `READ` | Principal, Operator |
+| reassign these milestones to Priya; move all of Sam's milestones to me; bulk change milestone owner | [Reassign milestones in bulk](/implementation/portfolio#reassign-milestones-in-bulk) | `WRITE` | Principal, Operator |
+| push these due dates back a week; shift milestone dates by 5 days; move deadlines earlier | [Shift milestone due dates in bulk](/implementation/portfolio#shift-milestone-due-dates-in-bulk) | `WRITE` | Principal, Operator |
+| nudge the clients who owe us documents; chase clients by email; send follow-up emails for waiting milestones | [Nudge clients by email](/implementation/portfolio#nudge-clients-by-email) | `EXTERNAL` | Principal, Operator |
+| sync HubSpot; pull latest HubSpot companies; refresh from HubSpot before starting onboarding | [Sync HubSpot](/implementation/portfolio#sync-hubspot) | `WRITE` | Principal |
+| start onboarding for ABC Dental; create a new implementation; kick off implementation for a new client | [Start a new implementation](/implementation/portfolio#start-a-new-implementation) | `WRITE` | Principal, Operator |
+| reactivate ABC Dental's implementation; bring back a cancelled onboarding; restart the cancelled implementation | [Reactivate a cancelled implementation](/implementation/portfolio#reactivate-a-cancelled-implementation) | `WRITE` | Principal, Operator |
+| complete the hand-off for ABC Dental; generate the implementation plan; set first check date and states and generate milestones | [Complete the hand-off and generate the plan](/implementation/portfolio#complete-the-hand-off-and-generate-the-plan) | `WRITE` | Principal, Operator |
+| resume the hand-off draft; save and exit the start flow; continue where I left off on onboarding setup | [Resume or save a hand-off draft](/implementation/portfolio#resume-or-save-a-hand-off-draft) | `WRITE` | Principal, Operator |
+| how is ABC Dental's implementation going; what's the readiness score; show implementation status | [Read the implementation status](/implementation/workspace#read-the-implementation-status) | `READ` | Principal, Operator |
+| show stage 6 for ABC Dental; go to the payroll setup stage; open stage 2 | [Go to a stage](/implementation/workspace#go-to-a-stage) | `READ` | Principal, Operator |
+| run the next best action; what should I do next on this client; click Next on the implementation | [Run the next best action](/implementation/workspace#run-the-next-best-action) | `READ` | Principal, Operator |
+| make Priya the implementation owner; reassign this implementation; change who owns ABC Dental's onboarding | [Change the implementation owner](/implementation/workspace#change-the-implementation-owner) | `WRITE` | Principal, Operator |
+| mark the bank verification milestone complete; start this milestone; undo completing that milestone | [Start or complete a milestone](/implementation/workspace#start-or-complete-a-milestone) | `WRITE` | Principal, Operator |
+| set milestone to waiting on provider; mark this milestone done; reset milestone to not started | [Change a milestone status](/implementation/workspace#change-a-milestone-status) | `WRITE` | Principal, Operator |
+| block this milestone because we're waiting on the bank; skip the prior provider milestone; mark milestone blocked with a reason | [Block or skip a milestone](/implementation/workspace#block-or-skip-a-milestone) | `WRITE` | Principal, Operator |
+| nudge the client about this milestone; email the client to chase the missing W-4s; send a reminder for this milestone | [Nudge the client about a milestone](/implementation/workspace#nudge-the-client-about-a-milestone) | `EXTERNAL` | Principal, Operator |
+| change this milestone's due date; make this milestone urgent; assign this milestone to Sam | [Edit milestone owner, priority or due date](/implementation/workspace#edit-milestone-owner-priority-or-due-date) | `WRITE` | Principal, Operator |
+| update the blocked reason; change why this milestone is waiting; edit skip reason | [Edit the milestone reason](/implementation/workspace#edit-the-milestone-reason) | `WRITE` | Principal, Operator |
+| attach the signed form to this milestone; add a note as evidence; link a Drive file to the milestone | [Attach evidence to a milestone](/implementation/workspace#attach-evidence-to-a-milestone) | `WRITE` | Principal, Operator |
+| remove that attachment from the milestone; detach evidence; remove stage attachment | [Remove evidence or a stage attachment](/implementation/workspace#remove-evidence-or-a-stage-attachment) | `DESTRUCTIVE` | Principal, Operator |
+| comment on this milestone; leave a note for the team on the milestone; add a milestone comment | [Comment on a milestone](/implementation/workspace#comment-on-a-milestone) | `WRITE` | Principal, Operator |
+| add a milestone to stage 3; create a custom task in this stage; add an extra step for this client | [Add a milestone to a stage](/implementation/workspace#add-a-milestone-to-a-stage) | `WRITE` | Principal, Operator |
+| complete stage 2; mark everything in this stage done; close out the stage | [Complete a stage](/implementation/workspace#complete-a-stage) | `WRITE` | Principal, Operator |
+| mark the payroll register received; validate migration artifacts; we got the prior provider files | [Update migration artifacts](/implementation/workspace#update-migration-artifacts) | `WRITE` | Principal, Operator |
+| generate the billing memo for ABC Dental; update the billing memo; create billing memo from this contract | [Generate the billing memo](/implementation/workspace#generate-the-billing-memo) | `AI` `WRITE` | Principal, Operator |
+| set up the client's Drive folders; run Google Drive setup; create the folder structure in Drive | [Run Google Drive setup](/implementation/workspace#run-google-drive-setup) | `EXTERNAL` `WRITE` | Principal, Operator |
+| add a source document from Drive; apply this contract to the client profile; regenerate documents from the source | [Add and apply a source document](/implementation/workspace#add-and-apply-a-source-document) | `AI` `WRITE` | Principal, Operator |
+| deep enrich the target documents; run deep enrichment; enrich the onboarding docs | [Deep-enrich target documents](/implementation/workspace#deep-enrich-target-documents) | `AI` `WRITE` | Principal, Operator |
+| remove that source document; stop using this source; delete the source doc | [Remove a source document](/implementation/workspace#remove-a-source-document) | `DESTRUCTIVE` | Principal, Operator |
+| generate the signing package; build the signing packet draft; regenerate signing package | [Generate the signing package](/implementation/workspace#generate-the-signing-package) | `WRITE` | Principal, Operator |
+| send the stage 0 documents for signature; build a DocuSign envelope; prepare the stage 4 envelope | [Build a DocuSign envelope](/implementation/workspace#build-a-docusign-envelope) | `READ` `EXTERNAL` | Principal, Operator |
+| mark the envelope as completed; update DocuSign envelope status; envelope was signed | [Update an envelope status](/implementation/workspace#update-an-envelope-status) | `WRITE` | Principal, Operator |
+| what's left before go-live; is ABC Dental ready to go live; add the missing first check date | [Check go-live readiness and fill missing inputs](/implementation/workspace#check-go-live-readiness-and-fill-missing-inputs) | `READ` `WRITE` | Principal, Operator |
+| activate go-live; mark the client live; start stabilization | [Activate go-live](/implementation/workspace#activate-go-live) | `WRITE` | Principal, Operator |
+| change the first check date; set the tracker blocker; update state tax ID path | [Edit tracker settings](/implementation/workspace#edit-tracker-settings) | `WRITE` | Principal, Operator |
+| add benefits admin to elected services; mark the 401k service confirmed; update services purchased | [Update elected services](/implementation/workspace#update-elected-services) | `WRITE` | Principal, Operator |
+| track a post go-live service; schedule the handbook after go-live; add after go-live follow-up | [Track a service after go-live](/implementation/workspace#track-a-service-after-go-live) | `WRITE` | Principal, Operator |
+| pause ABC Dental's implementation; put onboarding on hold; resume the implementation | [Pause or resume an implementation](/implementation/workspace#pause-or-resume-an-implementation) | `WRITE` | Principal, Operator |
+| cancel ABC Dental's implementation; client backed out, cancel onboarding; stop this implementation | [Cancel an implementation](/implementation/workspace#cancel-an-implementation) | `DESTRUCTIVE` | Principal, Operator |
+| show implementation activity; what happened on this onboarding; implementation history | [Read the activity log](/implementation/workspace#read-the-activity-log) | `READ` | Principal, Operator |
+
+## Sales and HR Roadmap
+
+| User might say | Recipe | Risk | Roles |
+|---|---|---|---|
+| go to sales; open account books; open the HR roadmap page; where is campaigns in sales | [Open a Sales page from the sidebar](/sales/today-and-accounts#open-a-sales-page-from-the-sidebar) | `READ` | Principal, Operator |
+| sync HubSpot; pull latest companies from HubSpot; refresh accounts from HubSpot | [Pull the latest companies from HubSpot](/sales/today-and-accounts#pull-the-latest-companies-from-hubspot) | `WRITE` | Principal, Operator |
+| prep my next meeting; prep the meeting with Acme on Tuesday; retry the failed prep | [Prep a meeting from Today](/sales/today-and-accounts#prep-a-meeting-from-today) | `AI` `EXTERNAL` | Principal, Operator |
+| is the prep kit ready; check the meeting prep; refresh prep status | [Check whether a prep kit is ready](/sales/today-and-accounts#check-whether-a-prep-kit-is-ready) | `READ` | Principal, Operator |
+| show me the prep kit for Acme; open the meeting kit; what are the discovery questions for my call | [Open a ready prep kit](/sales/today-and-accounts#open-a-ready-prep-kit) | `READ` | Principal, Operator |
+| which books need review; review the staged accounts from today | [Review a staged book from Today](/sales/today-and-accounts#review-a-staged-book-from-today) | `READ` | Principal, Operator |
+| show my accounts with meetings this week; filter accounts by stage; find account Acme; accounts with failed prep | [Filter the accounts list](/sales/today-and-accounts#filter-the-accounts-list) | `READ` | Principal, Operator |
+| prep the meeting from the accounts list; one-click prep for Acme | [Prep a meeting from the Accounts list](/sales/today-and-accounts#prep-a-meeting-from-the-accounts-list) | `AI` `EXTERNAL` | Principal, Operator |
+| prep a meeting and enter the meeting time; start prep with this contact email | [Prep a meeting from the account workspace](/sales/today-and-accounts#prep-a-meeting-from-the-account-workspace) | `AI` `EXTERNAL` | Principal, Operator |
+| what should I do next with Acme; generate next best action; regenerate the recommendation | [Generate the next best action](/sales/today-and-accounts#generate-the-next-best-action) | `AI` | Principal, Operator |
+| accept the recommendation; open the draft email for Acme | [Accept a recommendation and open the draft](/sales/today-and-accounts#accept-a-recommendation-and-open-the-draft) | `WRITE` | Principal, Operator |
+| dismiss this recommendation; reject the next best action because | [Dismiss a recommendation](/sales/today-and-accounts#dismiss-a-recommendation) | `WRITE` | Principal, Operator |
+| mark the next action done; I already did that follow-up | [Mark a recommendation done](/sales/today-and-accounts#mark-a-recommendation-done) | `WRITE` | Principal, Operator |
+| create the suggested document; make the collateral for Acme; create a proposal from the recommendation | [Create the suggested document](/sales/today-and-accounts#create-the-suggested-document) | `AI` `WRITE` | Principal, Operator |
+| send the follow-up email to Acme; email the contact with the PDF attached; send the draft | [Send the follow-up email](/sales/today-and-accounts#send-the-follow-up-email) | `EXTERNAL` | Principal, Operator |
+| copy the email; give me the email text instead of sending | [Copy the email instead of sending](/sales/today-and-accounts#copy-the-email-instead-of-sending) | `READ` | Principal, Operator |
+| which templates can sales recommend; why isn't my template suggested | [See which templates the next best action can suggest](/sales/today-and-accounts#see-which-templates-the-next-best-action-can-suggest) | `READ` | Principal, Operator |
+| show HubSpot history for Acme; what meetings did we have with Acme; account activity | [Read account history and context](/sales/today-and-accounts#read-account-history-and-context) | `READ` | Principal, Operator |
+| find the account book; show books needing review; list archived books | [Find an account book](/sales/account-books#find-an-account-book) | `READ` | Principal, Operator |
+| create an account book; new target list; start a book called Q4 India Retail | [Create an account book](/sales/account-books#create-an-account-book) | `WRITE` | Principal, Operator |
+| fill the book with retail companies in India; find 20 accounts by industry and size; ICP search | [Fill a book from ICP filters](/sales/account-books#fill-a-book-from-icp-filters) | `WRITE` `AI` | Principal, Operator |
+| find companies hiring a head of payroll; intent search; add accounts showing a buying signal | [Fill a book from an intent signal](/sales/account-books#fill-a-book-from-an-intent-signal) | `AI` | Principal, Operator |
+| is the research run done; wait for the book research | [Wait for a research run to finish](/sales/account-books#wait-for-a-research-run-to-finish) | `READ` | Principal, Operator |
+| review the results and add them to the book; add the new accounts; commit the run | [Review a run and add accounts](/sales/account-books#review-a-run-and-add-accounts) | `WRITE` | Principal, Operator |
+| the research run failed; why did the book run fail | [Handle a failed run](/sales/account-books#handle-a-failed-run) | `READ` | Principal, Operator |
+| run compliance research on these accounts; research the selected companies | [Run compliance research on several accounts](/sales/account-books#run-compliance-research-on-several-accounts) | `AI` | Principal, Operator |
+| remove Acme from the book; take this company out of the list | [Remove an account from a book](/sales/account-books#remove-an-account-from-a-book) | `DESTRUCTIVE` | Principal, Operator |
+| find contacts at these accounts; find HR leaders at the book's companies; people search | [Find contacts at the book's accounts](/sales/account-books#find-contacts-at-the-accounts-in-a-book) | `WRITE` | Principal, Operator |
+| find emails for the contacts; look up email addresses | [Find emails for contacts](/sales/account-books#find-emails-for-contacts) | `WRITE` | Principal, Operator |
+| export the contacts; show only sendable contacts; which emails are at the wrong domain | [Filter and export contacts](/sales/account-books#filter-and-export-contacts) | `READ` | Principal, Operator |
+| fix this contact's email; mark contact as do not contact; edit contact title | [Edit a contact or mark do not contact](/sales/account-books#edit-a-contact-or-mark-do-not-contact) | `WRITE` | Principal, Operator |
+| start the campaign from this book; send the next wave; launch wave 2 | [Start a campaign wave from the book](/sales/account-books#start-a-campaign-wave-from-the-book) | `EXTERNAL` | Principal, Operator |
+| how is the wave going; how many replies from this book | [Watch a running wave](/sales/account-books#watch-a-running-wave) | `READ` | Principal, Operator |
+| rename the book; lock the book; archive this account book; reopen the book | [Change book settings](/sales/account-books#change-book-settings) | `WRITE` `DESTRUCTIVE` | Principal, Operator |
+| research Acme's compliance; re-run compliance research for this company | [Run compliance research for one company](/sales/account-books#run-compliance-research-for-one-company) | `AI` | Principal, Operator |
+| show the compliance report; what are Acme's top risks; open the call guide | [Read a compliance report](/sales/account-books#read-a-compliance-report) | `READ` | Principal, Operator |
+| show campaigns; list my email campaigns | [See all campaigns](/sales/campaigns#see-all-campaigns) | `READ` | Principal, Operator |
+| write an email template; create a campaign template; new outreach email | [Write an email template](/sales/campaigns#write-an-email-template) | `WRITE` | Principal, Operator |
+| edit the template; change the template subject | [Edit a template](/sales/campaigns#edit-a-template) | `WRITE` | Principal, Operator |
+| preview the template; how will the email look for this book | [Preview a template against a book](/sales/campaigns#preview-a-template-against-a-book) | `READ` | Principal, Operator |
+| archive the template; remove this email template | [Archive a template](/sales/campaigns#archive-a-template) | `DESTRUCTIVE` | Principal, Operator |
+| launch a campaign; send the campaign to this book; start emailing the contacts | [Launch a campaign](/sales/campaigns#launch-a-campaign) | `EXTERNAL` | Principal, Operator |
+| how is the campaign doing; how many sent; campaign progress | [Watch campaign progress](/sales/campaigns#watch-campaign-progress) | `READ` | Principal, Operator |
+| pause the campaign; stop sending for now | [Pause a campaign](/sales/campaigns#pause-a-campaign) | `WRITE` | Sender only (Principal or Operator) |
+| resume the campaign; start sending again | [Resume a campaign](/sales/campaigns#resume-a-campaign) | `EXTERNAL` | Sender only (Principal or Operator) |
+| check for replies; any new replies to the campaign | [Check for replies](/sales/campaigns#check-for-replies) | `EXTERNAL` `AI` | Sender only (Principal or Operator) |
+| change the reply label to positive; relabel this reply | [Change a reply label](/sales/campaigns#change-a-reply-label) | `WRITE` | Principal, Operator |
+| snooze this contact; lift the snooze | [Snooze a contact or lift a snooze](/sales/campaigns#snooze-a-contact-or-lift-a-snooze) | `WRITE` | Principal, Operator |
+| reply to the positive response; open the reply in Gmail | [Open a reply in Gmail](/sales/campaigns#open-a-reply-in-gmail) | `READ` | Principal, Operator |
+| cancel the campaign; stop the campaign for good | [Cancel a campaign](/sales/campaigns#cancel-a-campaign) | `DESTRUCTIVE` | Sender only (Principal or Operator) |
+| find Acme in HR roadmap; which clients are in assessment; show approved roadmaps | [Find a client in the worklist](/sales/hr-roadmap#find-a-client-in-the-worklist) | `READ` | Principal, Operator |
+| open Acme's assessment tab; go to the discovery call tab | [Open a client on a specific tab](/sales/hr-roadmap#open-a-client-on-a-specific-tab) | `READ` | Principal, Operator |
+| research the client for elevated HR; run compliance research for the assessment | [Run compliance research on a client](/sales/hr-roadmap#run-compliance-research-on-a-client) | `AI` | Principal, Operator |
+| re-run the client's compliance research; refresh the research | [Re-run compliance research](/sales/hr-roadmap#re-run-compliance-research) | `AI` | Principal, Operator |
+| generate the HR assessment questionnaire; build the questionnaire | [Generate the questionnaire](/sales/hr-roadmap#generate-the-questionnaire) | `AI` `WRITE` | Principal, Operator |
+| record the assessment answers; fill in the questionnaire | [Record questionnaire answers](/sales/hr-roadmap#record-questionnaire-answers) | `WRITE` | Principal, Operator |
+| add a question to the questionnaire; edit a question; remove a question | [Edit, add or remove questions](/sales/hr-roadmap#edit-add-or-remove-questions) | `WRITE` `DESTRUCTIVE` | Principal, Operator |
+| download the questionnaire PDF; export the assessment | [Download the questionnaire](/sales/hr-roadmap#download-the-questionnaire) | `READ` `WRITE` | Principal, Operator |
+| regenerate the questionnaire; new questionnaire version | [Regenerate the questionnaire](/sales/hr-roadmap#regenerate-the-questionnaire) | `AI` `WRITE` | Principal, Operator |
+| import the Granola notes; add the discovery call notes | [Import discovery call notes from Granola](/sales/hr-roadmap#import-discovery-call-notes-from-granola) | `WRITE` | Principal, Operator |
+| approve the call-note updates; apply Granola candidates to the assessment | [Review and apply call-note candidates](/sales/hr-roadmap#review-and-apply-call-note-candidates) | `WRITE` | Principal, Operator |
+| lock the questionnaire to the call; lock to latest call | [Lock the questionnaire to the latest call](/sales/hr-roadmap#lock-the-questionnaire-to-the-latest-call) | `WRITE` `DESTRUCTIVE` | Principal, Operator |
+| extract answers from the discovery call; pull assessment answers from the call | [Extract assessment answers from a call](/sales/hr-roadmap#extract-assessment-answers-from-a-call) | `AI` `WRITE` | Principal, Operator |
+| generate the HR roadmap; draft the 12-month roadmap | [Generate a roadmap draft](/sales/hr-roadmap#generate-a-roadmap-draft) | `AI` | Principal, Operator |
+| edit and accept the roadmap draft; save the roadmap | [Edit and accept the roadmap draft](/sales/hr-roadmap#edit-and-accept-the-roadmap-draft) | `WRITE` | Principal, Operator |
+| mark the roadmap presented; we presented the roadmap | [Mark the roadmap presented](/sales/hr-roadmap#mark-the-roadmap-presented) | `WRITE` | Principal, Operator |
+| approve the roadmap; client approved the roadmap | [Approve the roadmap](/sales/hr-roadmap#approve-the-roadmap) | `WRITE` `DESTRUCTIVE` | Principal, Operator |
+| mark the roadmap lost; client said no to elevated HR | [Mark the roadmap lost](/sales/hr-roadmap#mark-the-roadmap-lost) | `DESTRUCTIVE` | Principal, Operator |
+| draft the next deliverable from the roadmap; create the roadmap document for Acme | [Draft a roadmap deliverable document](/sales/hr-roadmap#draft-a-roadmap-deliverable-document) | `AI` `WRITE` | Principal, Operator |
+| research a prospect company; look up Bluebird Dental in prospect studio | [Research a company in Prospect Studio](/sales/prospects-and-other#research-a-company-in-prospect-studio) | `READ` | Principal, Operator |
+| promote to prospect; add this company as a prospect | [Promote a candidate to a prospect](/sales/prospects-and-other#promote-a-candidate-to-a-prospect) | `WRITE` | Principal, Operator |
+| review the evidence; approve the sources and facts | [Review evidence](/sales/prospects-and-other#review-evidence) | `READ` | Principal, Operator |
+| draft sales materials; write an opportunity brief and email for the prospect | [Draft sales materials](/sales/prospects-and-other#draft-sales-materials) | `WRITE` | Principal, Operator |
+| find the prospect; list sales prospects | [Find a prospect](/sales/prospects-and-other#find-a-prospect) | `READ` | Principal (all), Operator (own or assigned) |
+| log a call with the prospect; add a note to the prospect | [Log activity on a prospect](/sales/prospects-and-other#log-activity-on-a-prospect) | `WRITE` | Principal, Operator |
+| draft proposal context; prepare the proposal for this prospect | [Draft proposal context](/sales/prospects-and-other#draft-proposal-context) | `WRITE` | Principal, Operator |
+| complete the follow-up; skip this sales action; reschedule the follow-up to Friday | [Complete, skip or reschedule a follow-up](/sales/prospects-and-other#complete-skip-or-reschedule-a-follow-up) | `WRITE` | Principal (all), Operator (own or assigned) |
+| show the sales pipeline; prospects by stage | [Read the pipeline](/sales/prospects-and-other#read-the-pipeline) | `READ` | Principal, Operator (own or assigned) |
+| generate an HR assessment document; sales documents; proposal readiness | [Generate an HR assessment document from Sales Documents](/sales/prospects-and-other#generate-an-hr-assessment-document-from-sales-documents) | `READ` `AI` `WRITE` | Principal, Operator |
+| review handoffs; what's missing for the handoff; escalate the blocked handoff | [Review a handoff and copy missing facts](/sales/prospects-and-other#review-a-handoff-and-copy-missing-facts) | `READ` `WRITE` | Principal, Operator (own or assigned) |
+| convert the won prospect to a client; create a client from this prospect | [Convert a won prospect to a local client](/sales/prospects-and-other#convert-a-won-prospect-to-a-local-client) | `WRITE` | Principal only |
+| sales manager view; stuck opportunities; owner workload | [Read the manager view](/sales/prospects-and-other#read-the-manager-view) | `READ` | Principal only |
+
+## Intelligence
+
+| User might say | Recipe | Risk | Roles |
+|---|---|---|---|
+| open intelligence; AI insights; intelligence overview | [Open Intelligence and follow a quick action](/intelligence/intelligence#open-intelligence-and-follow-a-quick-action) | `READ` | Principal |
+| search HR Intel sources; find trusted sources on overtime; search the corpus | [Search the trusted corpus](/intelligence/intelligence#search-the-trusted-corpus) | `READ` | Principal |
+| ask HR Intel; compliance question; what does California require | [Ask HR Intel a question](/intelligence/intelligence#ask-hr-intel-a-question) | `AI` | Principal |
+| HR Intel brief for a client; client obligations brief; generate compliance brief | [Generate a client HR Intel brief](/intelligence/intelligence#generate-a-client-hr-intel-brief) | `WRITE` `AI` | Principal |
+| approve HR Intel action; mark applied; review brief actions | [Approve or apply an HR Intel action](/intelligence/intelligence#approve-or-apply-an-hr-intel-action) | `WRITE` | Principal |
+| test the agent; run in playground; try a prompt | [Run a prompt in the Playground](/intelligence/intelligence#run-a-prompt-in-the-playground) | `AI` | Principal |
+| see the trace; which tools ran; playground history | [Inspect a Playground turn](/intelligence/intelligence#inspect-a-playground-turn) | `READ` | Principal |
+| approve memory; accept memory proposal; curate memory | [Approve a memory proposal](/intelligence/intelligence#approve-a-memory-proposal) | `WRITE` | Principal |
+| archive memory proposal; reject memory; remove memory suggestion | [Archive a memory proposal](/intelligence/intelligence#archive-a-memory-proposal) | `DESTRUCTIVE` | Principal |
+| memory contradictions; top applied memories; memory by client | [Review memory health](/intelligence/intelligence#review-memory-health) | `READ` | Principal |
+| connect Granola; link my Granola account; add Granola API key | [Connect Granola](/intelligence/intelligence#connect-granola) | `EXTERNAL` | Principal, Operator |
+| sync Granola; pull meeting notes; refresh Granola | [Sync Granola notes](/intelligence/intelligence#sync-granola-notes) | `EXTERNAL` `WRITE` | Principal, Operator |
+| attach meeting notes to a client; file Granola note; link meeting to client | [Attach a Granola note to a client](/intelligence/intelligence#attach-a-granola-note-to-a-client) | `WRITE` | Principal, Operator |
+| see the meeting on the client; review attached note | [Review an attached note on the client](/intelligence/intelligence#review-an-attached-note-on-the-client) | `READ` | Principal, Operator |
+| API usage; token cost; how much did we spend on AI | [Read API usage](/intelligence/intelligence#read-api-usage) | `READ` | Principal |
+| data health; is HubSpot in sync; sync status | [Check Data Health](/intelligence/data-and-sources#check-data-health) | `READ` | Principal |
+| sync HubSpot; run HubSpot import; pull HubSpot now | [Run a HubSpot sync](/intelligence/data-and-sources#run-a-hubspot-sync) | `EXTERNAL` `WRITE` | Principal |
+| unlinked contacts; CRM hygiene; contacts without a client | [Review unlinked CRM contacts](/intelligence/data-and-sources#review-unlinked-crm-contacts) | `READ` | Principal |
+| contacts from acme.com; unlinked contacts for a domain | [Drill into one email domain](/intelligence/data-and-sources#drill-into-one-email-domain) | `READ` | Principal |
+| export unlinked contacts; download CRM hygiene CSV | [Export unlinked contacts as CSV](/intelligence/data-and-sources#export-unlinked-contacts-as-csv) | `READ` | Principal |
+| skipped HubSpot contacts; lifecycle policy skipped | [See contacts skipped by lifecycle policy](/intelligence/data-and-sources#see-contacts-skipped-by-lifecycle-policy) | `READ` | Principal |
+| compare versions; what changed in this document; diff two versions | [Compare two versions of a document](/intelligence/data-and-sources#compare-two-versions-of-a-document) | `READ` | Principal, Operator |
+| find a trusted source; stale sources; source catalog | [Find a trusted source](/intelligence/data-and-sources#find-a-trusted-source) | `READ` | Principal |
+| edit trusted source; change source owner; update source topics | [Edit a trusted source](/intelligence/data-and-sources#edit-a-trusted-source) | `WRITE` | Principal |
+| mark source reviewed; review a trusted source | [Mark a trusted source reviewed](/intelligence/data-and-sources#mark-a-trusted-source-reviewed) | `WRITE` | Principal |
+| archive trusted source; retire a source | [Archive a trusted source](/intelligence/data-and-sources#archive-a-trusted-source) | `DESTRUCTIVE` | Principal |
+
+## Settings
+
+| User might say | Recipe | Risk | Roles |
+|---|---|---|---|
+| change the workspace name; set timezone to Pacific; update the lead consultant | [Change workspace details](/settings/general-and-team#change-workspace-details) | `WRITE` | Principal |
+| change our brand colours; set document fonts; update footer tagline | [Change document branding](/settings/general-and-team#change-document-branding) | `WRITE` | Principal |
+| switch the default model to Haiku; change AI model; use Sonnet by default | [Change the default AI model](/settings/general-and-team#change-the-default-ai-model) | `WRITE` | Principal |
+| invite Jane to Ariya; add a new team member; give Sam an operator login | [Invite a team member](/settings/general-and-team#invite-a-team-member) | `EXTERNAL` | Principal |
+| resend Jane's invite; she didn't get the invitation email; send the invitation again | [Resend an invitation](/settings/general-and-team#resend-an-invitation) | `EXTERNAL` | Principal |
+| revoke the invite for Jane; cancel that invitation; withdraw pending invite | [Revoke an invitation](/settings/general-and-team#revoke-an-invitation) | `DESTRUCTIVE` | Principal |
+| require MFA; only allow our domain to sign in; turn on SSO requirement | [Change the access policy](/settings/general-and-team#change-the-access-policy) | `WRITE` | Principal |
+| deactivate Sam's account; disable a user; offboard staff member | [Deactivate a user](/settings/general-and-team#deactivate-a-user) | `DESTRUCTIVE` | Principal |
+| reactivate Sam; turn Sam's account back on; restore user access | [Reactivate a user](/settings/general-and-team#reactivate-a-user) | `WRITE` | Principal |
+| remove Sam from the workspace; delete this user permanently; remove team member | [Remove a user from the workspace](/settings/general-and-team#remove-a-user-from-the-workspace) | `DESTRUCTIVE` | Principal |
+| make Sam an admin; change a user's role; change profile | [Change a user profile](/settings/general-and-team#change-a-user-profile) | `READ` | Principal |
+| log in as Sam; proxy login as a user; see what Priya sees | [Proxy login as a user](/settings/general-and-team#proxy-login-as-a-user) | `WRITE` | Principal |
+| check integration health; is HubSpot connected; which integrations are down | [Check integration health](/settings/integrations#check-integration-health) | `READ` | Principal, Operator |
+| connect my Gmail; connect Google calendar; set up Gmail for sending nudges | [Connect your Google Workspace account](/settings/integrations#connect-your-google-workspace-account) | `EXTERNAL` | Principal, Operator |
+| reconnect Google; fix Google permissions; Gmail permissions blocked | [Reconnect Google after a permission block](/settings/integrations#reconnect-google-after-a-permission-block) | `EXTERNAL` | Principal, Operator |
+| preview my Gmail metadata; test the Google connection; read-only Gmail preview | [Preview Google Workspace metadata](/settings/integrations#preview-google-workspace-metadata) | `READ` | Principal, Operator |
+| sync Gmail metadata; import email activity into timelines; pull Gmail into Ariya | [Sync Gmail metadata into Ariya](/settings/integrations#sync-gmail-metadata-into-ariya) | `WRITE` | Principal, Operator |
+| disconnect my Gmail; unlink Google account; remove Google Workspace connection | [Disconnect your Google Workspace account](/settings/integrations#disconnect-your-google-workspace-account) | `EXTERNAL` `DESTRUCTIVE` | Principal, Operator |
+| finish connecting Google; I'm back from Google consent; Google redirect page | [Finish an OAuth callback](/settings/integrations#finish-an-oauth-callback) | `READ` | Principal, Operator |
+| connect Google Drive for implementations; reconnect Drive; Drive access was revoked | [Connect or reconnect Google Drive](/settings/integrations#connect-or-reconnect-google-drive) | `EXTERNAL` | Principal |
+| disconnect Google Drive; unlink the shared Drive; remove Drive integration | [Disconnect Google Drive](/settings/integrations#disconnect-google-drive) | `EXTERNAL` `DESTRUCTIVE` | Principal |
+| set the shared drive ID; change active clients folder path; set external documents folder | [Set Google Drive paths and IDs](/settings/integrations#set-google-drive-paths-and-ids) | `WRITE` | Principal |
+| preview HubSpot companies; test HubSpot read; show HubSpot contacts sample | [Preview HubSpot data](/settings/integrations#preview-hubspot-data) | `READ` | Principal |
+| run a HubSpot sync now; manual HubSpot sync; pull contacts from HubSpot | [Run a manual HubSpot sync](/settings/integrations#run-a-manual-hubspot-sync) | `WRITE` | Principal |
+| record a HubSpot dry run; audit HubSpot sync; dry-run HubSpot | [Record a HubSpot dry-run](/settings/integrations#record-a-hubspot-dry-run) | `WRITE` | Principal |
+| stage this HubSpot contact for approval; match HubSpot contact to client; review HubSpot import | [Stage a HubSpot contact for review](/settings/integrations#stage-a-hubspot-contact-for-review) | `WRITE` | Principal |
+| create a HubSpot import plan; bulk import from HubSpot; match HubSpot rows to clients | [Create and work a bulk HubSpot import plan](/settings/integrations#create-and-work-a-bulk-hubspot-import-plan) | `WRITE` | Principal |
+| archive this HubSpot plan row; drop that import row; archive import candidate | [Archive a HubSpot plan row](/settings/integrations#archive-a-hubspot-plan-row) | `DESTRUCTIVE` | Principal |
+| give DocuSign consent; connect DocuSign; authorize DocuSign | [Grant DocuSign consent](/settings/integrations#grant-docusign-consent) | `EXTERNAL` | Principal |
+| verify DocuSign credentials; test DocuSign; is DocuSign working | [Verify DocuSign credentials](/settings/integrations#verify-docusign-credentials) | `READ` | Principal |
+| open Granola; connect Granola meeting notes; Granola settings | [Open Granola](/settings/integrations#open-granola) | `READ` | Principal, Operator |
+| customize the discovery questions; fork the question library; edit roadmap questions section | [Customize a question library section](/settings/catalogs-and-defaults#customize-a-question-library-section) | `WRITE` | Principal |
+| add a discovery question; reword a roadmap question; reorder assessment questions | [Edit library questions](/settings/catalogs-and-defaults#edit-library-questions) | `WRITE` | Principal |
+| remove that discovery question; delete a roadmap question; drop question from library | [Remove a library question](/settings/catalogs-and-defaults#remove-a-library-question) | `DESTRUCTIVE` | Principal |
+| create a roadmap template; new blueprint template; build an Elevated HR roadmap | [Create a blueprint roadmap template](/settings/catalogs-and-defaults#create-a-blueprint-roadmap-template) | `WRITE` | Principal |
+| edit the roadmap template; add a phase to the blueprint; rename roadmap task | [Edit a blueprint roadmap template](/settings/catalogs-and-defaults#edit-a-blueprint-roadmap-template) | `WRITE` | Principal |
+| delete that roadmap phase; remove a task from the template; delete blueprint task | [Delete a roadmap phase or task](/settings/catalogs-and-defaults#delete-a-roadmap-phase-or-task) | `DESTRUCTIVE` | Principal |
+| find the California sick leave rule; search compliance rules; list federal rules | [Find a compliance rule](/settings/catalogs-and-defaults#find-a-compliance-rule) | `READ` | Principal |
+| add a compliance rule; create a new state filing deadline; add annual posting requirement | [Add a compliance rule](/settings/catalogs-and-defaults#add-a-compliance-rule) | `WRITE` | Principal |
+| edit the compliance rule; change rule schedule; update source law | [Edit a compliance rule](/settings/catalogs-and-defaults#edit-a-compliance-rule) | `WRITE` | Principal |
+| turn off this compliance rule; deactivate compliance rule; reactivate rule | [Turn a compliance rule on or off](/settings/catalogs-and-defaults#turn-a-compliance-rule-on-or-off) | `WRITE` `DESTRUCTIVE` | Principal |
+| lock the billing memo template; use this template for every billing memo; change billing memo template version | [Lock the billing memo template](/settings/catalogs-and-defaults#lock-the-billing-memo-template) | `WRITE` | Principal |
+| unlock billing memo template; let operators choose billing memo template | [Unlock the billing memo template](/settings/catalogs-and-defaults#unlock-the-billing-memo-template) | `WRITE` | Principal |
+| rename stage 6; change service label; rename arc B | [Rename a service, stage or arc label](/settings/catalogs-and-defaults#rename-a-service-stage-or-arc-label) | `WRITE` | Principal |
+| change the lead days on a milestone template; move milestone to another stage; edit task template | [Override a milestone task template](/settings/catalogs-and-defaults#override-a-milestone-task-template) | `WRITE` | Principal |
+| suppress this milestone for our workspace; hide a default milestone; restore suppressed milestone | [Suppress or restore a milestone](/settings/catalogs-and-defaults#suppress-or-restore-a-milestone) | `WRITE` | Principal |
+| add a custom milestone to every implementation; create custom milestone template | [Add a custom milestone](/settings/catalogs-and-defaults#add-a-custom-milestone) | `WRITE` | Principal |
+| remove that custom milestone; delete custom milestone template | [Remove a custom milestone](/settings/catalogs-and-defaults#remove-a-custom-milestone) | `DESTRUCTIVE` | Principal |
+| change migration artifact stage; rename migration artifact; edit artifact catalog | [Override a migration artifact](/settings/catalogs-and-defaults#override-a-migration-artifact) | `WRITE` | Principal |
+| add a target document; remove template from target documents; configure deep enrich targets | [Add or remove target documents](/settings/catalogs-and-defaults#add-or-remove-target-documents) | `WRITE` `DESTRUCTIVE` | Principal |
+| map HubSpot plan values; set HubSpot values for Guided HR; plan tier mapping | [Map HubSpot values to a plan](/settings/catalogs-and-defaults#map-hubspot-values-to-a-plan) | `WRITE` | Principal |
+| add a sub-service; create benefits administration sub-service; new service catalog entry | [Add a sub-service](/settings/catalogs-and-defaults#add-a-sub-service) | `WRITE` | Principal |
+| edit the sub-service description; change which plans include a sub-service | [Edit a sub-service](/settings/catalogs-and-defaults#edit-a-sub-service) | `WRITE` | Principal |
+| deactivate a sub-service; stop using this sub-service; reactivate sub-service | [Deactivate or reactivate a sub-service](/settings/catalogs-and-defaults#deactivate-or-reactivate-a-sub-service) | `DESTRUCTIVE` `WRITE` | Principal |
+| delete that sub-service; remove sub-service permanently | [Delete a sub-service](/settings/catalogs-and-defaults#delete-a-sub-service) | `DESTRUCTIVE` | Principal |
+| add Gusto as a vendor; add a payroll vendor; register vendor domain | [Add a vendor](/settings/catalogs-and-defaults#add-a-vendor) | `WRITE` | Principal |
+| remove ADP from vendors; delete vendor; drop that vendor | [Remove a vendor](/settings/catalogs-and-defaults#remove-a-vendor) | `DESTRUCTIVE` | Principal |
+
+## Platform Admin, Internal Ops and account
+
+| User might say | Recipe | Risk | Roles |
+|---|---|---|---|
+| platform admin health; is admin working; admin endpoint | [Check the admin endpoint](/admin/platform-admin#check-the-admin-endpoint) | `READ` | Principal |
+| list tenants; all tenants; how many tenants | [List tenants](/admin/platform-admin#list-tenants) | `READ` | Principal |
+| tenant details; tenant members; tenant memory | [Inspect a tenant](/admin/platform-admin#inspect-a-tenant) | `READ` | Principal |
+| edit tenant memory; fix a memory row | [Edit a tenant memory row](/admin/platform-admin#edit-a-tenant-memory-row) | `WRITE` | Principal |
+| archive tenant memory; restore memory row | [Archive or restore a tenant memory row](/admin/platform-admin#archive-or-restore-a-tenant-memory-row) | `DESTRUCTIVE` `WRITE` | Principal |
+| switch tenant; view as another tenant; open client in tenant X | [View another tenant](/admin/platform-admin#view-another-tenant) | `READ` | Principal |
+| list skills; master skills; open a skill | [Browse master skills](/admin/platform-admin#browse-master-skills) | `READ` | Principal |
+| add a skill; new master skill; import skill manifest | [Create a master skill](/admin/platform-admin#create-a-master-skill) | `WRITE` | Principal |
+| archive skill; disable a skill; restore skill | [Archive or restore a master skill](/admin/platform-admin#archive-or-restore-a-master-skill) | `DESTRUCTIVE` `WRITE` | Principal |
+| governance files; system prompt; read governance | [Read governance files](/admin/platform-admin#read-governance-files) | `READ` | Principal |
+| change someone's role; make her an admin; assign profile | [Assign a profile to a person](/admin/platform-admin#assign-a-profile-to-a-person) | `WRITE` | Principal |
+| invite a user; add a team member; send invitation | [Invite a platform team member](/admin/platform-admin#invite-a-platform-team-member) | `EXTERNAL` | Principal |
+| resend invite; revoke invitation; cancel invite | [Resend or revoke an invitation](/admin/platform-admin#resend-or-revoke-an-invitation) | `EXTERNAL` `DESTRUCTIVE` | Principal |
+| deactivate user; remove access; reactivate member | [Deactivate or reactivate a member](/admin/platform-admin#deactivate-or-reactivate-a-member) | `DESTRUCTIVE` `WRITE` | Principal |
+| require SSO; require MFA; allowed email domains | [Change the platform sign-in policy](/admin/platform-admin#change-the-platform-sign-in-policy) | `DESTRUCTIVE` | Principal |
+| ask Ariya company memory; what did we decide about; search internal memory | [Query Ariya company memory](/admin/platform-admin#query-ariya-company-memory) | `AI` | Principal |
+| run memory audit; Ariya memory audit | [Run the Ariya memory audit](/admin/platform-admin#run-the-ariya-memory-audit) | `READ` | Principal |
+| platform memory; cross-tenant heuristics; browse platform memories | [Browse platform memory](/admin/platform-admin#browse-platform-memory) | `READ` | Principal |
+| promote memory to platform; share a heuristic across tenants | [Promote a tenant memory to platform](/admin/platform-admin#promote-a-tenant-memory-to-platform) | `AI` `WRITE` | Principal |
+| add platform memory; add heuristic manually | [Add platform memory manually](/admin/platform-admin#add-platform-memory-manually) | `WRITE` | Principal |
+| archive platform memory; retire heuristic | [Archive a platform memory](/admin/platform-admin#archive-a-platform-memory) | `DESTRUCTIVE` | Principal |
+| add personal email domain; treat gmail.com as personal | [Add a personal email domain](/admin/platform-admin#add-a-personal-email-domain) | `WRITE` | Principal |
+| rename email domain label; edit domain label | [Edit a personal email domain label](/admin/platform-admin#edit-a-personal-email-domain-label) | `WRITE` | Principal |
+| remove personal email domain; delete domain | [Remove a personal email domain](/admin/platform-admin#remove-a-personal-email-domain) | `DESTRUCTIVE` | Principal |
+| integration health; HubSpot readiness; HRIS bridge status | [Check integration health](/admin/platform-admin#check-integration-health) | `READ` | Principal |
+| style guide; brand kit; brand colours | [View the style guide](/admin/platform-admin#view-the-style-guide) | `READ` | Principal |
+| proxy login; act as user; log in as someone | [Start a proxy login](/admin/platform-admin#start-a-proxy-login) | `WRITE` | Principal |
+| internal ops today; Ariya OS cockpit; what needs judgment | [Review today's internal ops](/admin/internal-ops#review-internal-ops-for-today) | `READ` | Principal |
+| people readiness; staff onboarding status; contractor readiness | [Check people readiness](/admin/internal-ops#check-people-readiness) | `READ` | Principal |
+| open staff member readiness; start onboarding request for a person | [Open a person and draft a lifecycle request](/admin/internal-ops#open-a-person-and-draft-a-lifecycle-request) | `READ` | Principal |
+| find internal request; list internal requests; pending internal approvals | [Find an internal request](/admin/internal-ops#find-an-internal-request) | `READ` | Principal |
+| draft internal request; request tool access; new internal approval request | [Draft an internal request](/admin/internal-ops#draft-an-internal-request) | `WRITE` | Principal |
+| submit internal request; send for review | [Submit an internal request for review](/admin/internal-ops#submit-an-internal-request-for-review) | `WRITE` | Principal |
+| approve internal request; reject internal request | [Approve or reject an internal request](/admin/internal-ops#approve-or-reject-an-internal-request) | `DESTRUCTIVE` | Principal |
+| cancel internal request; withdraw request | [Cancel an internal request](/admin/internal-ops#cancel-an-internal-request) | `DESTRUCTIVE` | Principal |
+| comment on internal request; add note to audit timeline | [Comment on an internal request](/admin/internal-ops#comment-on-an-internal-request) | `WRITE` | Principal |
+| change my name; update profile name | [Update your display name](/admin/account-and-feedback#update-your-display-name) | `WRITE` | Principal, Operator |
+| set timezone; default landing page; my preferences | [Set your preferences and default landing page](/admin/account-and-feedback#set-your-preferences-and-default-landing-page) | `WRITE` | Principal, Operator |
+| change my password; update password | [Change your password](/admin/account-and-feedback#change-your-password) | `WRITE` | Principal, Operator |
+| active sessions; where am I logged in; security events | [Review active sessions and sign-in activity](/admin/account-and-feedback#review-active-sessions-and-sign-in-activity) | `READ` | Principal, Operator |
+| revoke session; sign out other devices; log out everywhere | [Revoke sessions](/admin/account-and-feedback#revoke-sessions) | `DESTRUCTIVE` | Principal, Operator |
+| sign out from account page | [Sign out from the account page](/admin/account-and-feedback#sign-out-from-the-account-page) | `WRITE` | Principal, Operator |
+| feedback reports; bug reports list; platform feedback | [Review platform feedback](/admin/account-and-feedback#review-platform-feedback) | `READ` | Principal, Operator |
+| mark feedback triaged; close feedback; feedback in progress | [Change a feedback report status](/admin/account-and-feedback#change-a-feedback-report-status) | `WRITE` | Principal, Operator |
+| link feedback to request; create request from feedback | [Link feedback to a request](/admin/account-and-feedback#link-feedback-to-a-request) | `WRITE` | Principal, Operator |
+| create Linear issue; open GitHub issue; preview ticket | [Preview and create an external ticket](/admin/account-and-feedback#preview-and-create-an-external-ticket) | `READ` `EXTERNAL` | Principal, Operator |
+| fix packet; generate fix prompt; download fix packet | [Generate a fix packet](/admin/account-and-feedback#generate-a-fix-packet) | `WRITE` | Principal, Operator |
+| feedback screenshot; open attachment | [Open a feedback screenshot](/admin/account-and-feedback#open-a-feedback-screenshot) | `READ` | Principal, Operator |
+
+## Sign in, navigation and access
+
+| User might say | Recipe | Risk | Roles |
+|---|---|---|---|
+| am I logged in; check the session; is the agent signed in | [Check whether you are signed in](/start/login-and-session#check-whether-you-are-signed-in) | `READ` | Principal, Operator |
+| log in to Ariya; sign in; start a session | [Sign in with email and password](/start/login-and-session#sign-in-with-email-and-password) | `WRITE` | Principal, Operator |
+| sign in with Google; SSO login; MFA required; locked out of login | [Hand off sign-in to a human](/start/login-and-session#hand-off-sign-in-to-a-human) | `EXTERNAL` | Principal, Operator |
+| forgot password; send a password reset email; reset my password | [Request a password reset link](/start/login-and-session#request-a-password-reset-link) | `EXTERNAL` | Principal, Operator |
+| open this reset link; accept the invitation; is this invite link still valid | [Recognise a reset or invitation link](/start/login-and-session#recognise-a-reset-or-invitation-link) | `READ` | Principal, Operator |
+| open the partner handoff link; partner document link | [Recognise a partner handoff link](/start/login-and-session#recognise-a-partner-handoff-link) | `READ` | none (external partners) |
+| where do I land after login; set the page to open after sign in; go to my page after login | [Go to the right page after sign-in](/start/login-and-session#go-to-the-right-page-after-sign-in) | `READ` | Principal, Operator |
+| session expired; got logged out; invalid or expired token | [Recover from an expired session](/start/login-and-session#recover-from-an-expired-session) | `READ` | Principal, Operator |
+| log out; sign out of Ariya | [Sign out](/start/login-and-session#sign-out) | `WRITE` | Principal, Operator |
+| switch to the operator account; use the principal account; change user | [Switch between the Principal and Operator accounts](/start/login-and-session#switch-between-the-principal-and-operator-accounts) | `WRITE` | Principal, Operator |
+| exit proxy login; stop acting as this user; what is the purple proxy banner | [Recognise and exit a proxy login](/start/login-and-session#recognise-and-exit-a-proxy-login) | `WRITE` | Principal |
+| getting started checklist; first login steps; onboarding checklist | [Use the getting started checklist](/start/login-and-session#use-the-getting-started-checklist) | `READ` | Principal, Operator |
+| go to a page; open the menu; navigate to documents | [Open a page from the sidebar](/start/global-ui#open-a-page-from-the-sidebar) | `READ` | Principal, Operator |
+| collapse the sidebar; expand the menu; show menu labels | [Collapse or expand the sidebar](/start/global-ui#collapse-or-expand-the-sidebar) | `WRITE` | Principal, Operator |
+| switch tab; open the usage tab; top nav tabs | [Switch tabs in the workspace tab bar](/start/global-ui#switch-tabs-in-the-workspace-tab-bar) | `READ` | Principal, Operator |
+| cmd k; search or jump; quick open a page; command palette | [Jump to a page with the command palette](/start/global-ui#jump-to-a-page-with-the-command-palette) | `READ` | Principal, Operator |
+| favorite a page; star in command palette | [Favorite a command palette entry](/start/global-ui#favorite-a-command-palette-entry) | `READ` | Principal, Operator |
+| open help; page guide; close the help panel | [Open and close the help panel](/start/global-ui#open-and-close-the-help-panel) | `READ` | Principal, Operator |
+| alerts bell; notifications menu; what needs attention | [Check the alerts menu](/start/global-ui#check-the-alerts-menu) | `READ` | Principal, Operator |
+| confirm the dialog; are you sure popup; type to confirm | [Answer an in-app confirm dialog](/start/global-ui#answer-an-in-app-confirm-dialog) | `DESTRUCTIVE` | Principal, Operator |
+| browser popup; native confirm; accept the alert | [Answer a native browser dialog](/start/global-ui#answer-a-native-browser-dialog) | depends | Principal |
+| fill the prompt dialog; enter a value in the popup | [Fill a prompt dialog](/start/global-ui#fill-a-prompt-dialog) | depends | Principal, Operator |
+| pick a client; select client dropdown; choose the client | [Pick a client in a client picker](/start/global-ui#pick-a-client-in-a-client-picker) | `READ` | Principal, Operator |
+| filter the list; clear filters; search the table | [Filter a list with the filter bar](/start/global-ui#filter-a-list-with-the-filter-bar) | `READ` | Principal, Operator |
+| next page; load more; page through results | [Page through a long list](/start/global-ui#page-through-a-long-list) | `READ` | Principal, Operator |
+| report a bug; send feedback about Ariya; file platform feedback | [Send platform feedback](/start/global-ui#send-platform-feedback) | `WRITE` | Principal, Operator |
+| move the feedback button; hide the feedback launcher | [Move or hide the feedback launcher](/start/global-ui#move-or-hide-the-feedback-launcher) | `READ` | Principal, Operator |
+| page crashed; this page hit an error; try again | [Recover from a page crash](/start/global-ui#recover-from-a-page-crash) | `READ` | Principal, Operator |
+| which role am I; am I principal or operator; what profile is this | [Find out which profile you are using](/start/roles-and-access#find-out-which-profile-you-are-using) | `READ` | Principal, Operator |
+| can the operator do this; which account do I need; is this page available to me | [Check a page is available before you start](/start/roles-and-access#check-a-page-is-available-before-you-start) | `READ` | Principal, Operator |
+| view only; buttons are disabled; can't edit this client | [Recognise a view-only page](/start/roles-and-access#recognise-a-view-only-page) | `READ` | Principal, Operator |
+| not available on the operator profile; access denied; principal access required | [Handle a page your profile cannot use](/start/roles-and-access#handle-a-page-your-profile-cannot-use) | `READ` | Principal, Operator |

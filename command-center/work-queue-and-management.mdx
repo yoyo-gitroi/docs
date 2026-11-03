@@ -1,0 +1,153 @@
+---
+title: "Work Queue and Management Cockpit"
+sidebarTitle: "Work Queue and Management"
+description: "Read the tenant-wide work queue and the management summary, filter by bucket, owner or lifecycle, and drill into the client, request, compliance or CRM page behind each number."
+keywords: ["work queue", "staff work queue", "management", "management cockpit", "portfolio", "portfolio at a glance", "clients needing attention", "stale clients", "no primary contact", "operator workload", "blocked requests", "what needs attention"]
+---
+
+<Info>
+
+**URL:** `/work-queue` and `/management` · **Reach:** neither page is in the sidebar or a tab bar. Open the URL directly. `/management` is the Principal's landing page after sign-in; `/work-queue` is linked from `/management` · **Roles:** Principal ✓ Operator ✓ (no role gating in the pages) · **Ready when:** `/work-queue`: h1 **Work Queue** and the bucket tiles are visible. `/management`: h1 **Management Cockpit** and the card **Portfolio at a glance** are visible.
+
+</Info>
+
+Read-only overview pages. Every control is a filter or a link; nothing here changes data.
+
+<Note>Unverified: whether the server limits these summaries for Operators. A Principal reaches `/management` on sign-in; an Operator lands on `/` and must open these URLs directly.</Note>
+
+## Page map
+
+**Work Queue — `/work-queue`**
+- Header: h1 **Work Queue**, button **Refresh**.
+- Bucket tiles (toggle filters): **Compliance overdue**, **Blocked requests**, **Compliance due soon**, **No primary contact**, **Documents in draft / review**, **CRM hygiene match**, **Stale clients**.
+- Filter bar: **Owner** select ("All operators" or `{name} ({n})`), **Lifecycle** select ("All stages" or a stage), **Clear filters**.
+- One card per bucket with row links.
+
+**Management Cockpit — `/management`**
+- Header: h1 **Management Cockpit**, button **Refresh**.
+- **Portfolio at a glance**: tiles **Linked contacts**, **Unlinked contacts**, **Clients with no contact**, **Stale clients**, **Open requests**, **Compliance attention**, then the line "Lifecycle mix:".
+- **Clients needing attention**: client rows (links) and the link **Open full work queue**.
+- **Operator workload**.
+- **Recent changes**: Contacts imported, Documents created, Requests created, HubSpot syncs.
+- **Open a deeper view**: links **Staff work queue**, **CRM hygiene**, **Data Health**, **Compliance**, **Clients list**.
+
+## Recipes
+
+### See what needs work across clients
+**Risk:** `READ` · **Roles:** Principal, Operator
+
+1. Open `/work-queue`.
+   - Wait for: "Loading work queue..." to be replaced by the bucket tiles.
+2. Read the count on each tile and the rows in each bucket card.
+
+**Done when:** you have the counts and rows to report.
+
+| If you see | Why | Do this |
+|---|---|---|
+| `Work queue unavailable: {error}` | Load failed | Click **Refresh** once, then report the error. |
+| "No work items match this scope right now." | Nothing in the queue | Report it. |
+
+### Filter the work queue
+**Risk:** `READ` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** bucket, owner or lifecycle stage (any)
+
+1. Open `/work-queue`.
+2. Click a bucket tile to show only that bucket (click again to turn it off).
+3. Optional: choose **Owner** (select; "All operators" or `{name} ({n})`).
+4. Optional: choose **Lifecycle** (select; "All stages" or a stage).
+5. To reset, click **Clear filters**.
+
+**Done when:** only matching bucket cards and rows are shown.
+
+| If you see | Why | Do this |
+|---|---|---|
+| "All clear with the current filters." | Filters exclude everything | Click **Clear filters**. |
+| You opened `/work-queue?bucket=no_primary_contact` but every bucket shows | The page ignores `?bucket=` | Click the **No primary contact** tile. |
+
+### Open a work item
+**Risk:** `READ` · **Roles:** Principal, Operator
+
+1. In a bucket card on `/work-queue`, click the row (link).
+   - Client rows open the client page on the relevant tab.
+   - Request rows open `/requests?client={slug}`, which **opens the New Request sheet** instead of a list. Click **Cancel** in the sheet if you did not mean to create a request.
+   - CRM rows open `/crm-hygiene?tab=needs-review`.
+
+**Done when:** the target page is open.
+
+### Read the management summary
+**Risk:** `READ` · **Roles:** Principal, Operator
+
+1. Open `/management`.
+   - Wait for: "Loading management summary..." to be replaced by **Portfolio at a glance**.
+2. Read the tiles, "Lifecycle mix:", **Clients needing attention**, **Operator workload** and **Recent changes**.
+
+**Done when:** you have the numbers to report.
+
+| If you see | Why | Do this |
+|---|---|---|
+| `Management summary unavailable: {error}` | Load failed | Click **Refresh** once, then report the error. |
+| "No clients need attention right now." | Nothing flagged | Report it. |
+| "No recent activity recorded." | No recent changes | Report it. |
+
+### Drill into a management number
+**Risk:** `READ` · **Roles:** Principal, Operator
+
+1. Open `/management`.
+2. Click the tile or link. Destinations:
+
+| Click | Opens |
+|---|---|
+| **Linked contacts** | `/contacts` |
+| **Unlinked contacts** | `/crm-hygiene` |
+| **Clients with no contact** | `/work-queue?bucket=no_primary_contact` (the bucket filter is ignored; click the **No primary contact** tile there) |
+| **Stale clients** | `/work-queue` |
+| **Open requests** | `/requests` |
+| **Compliance attention** | `/compliance` |
+| A row in **Clients needing attention** | that client |
+| **Open full work queue** / **Staff work queue** | `/work-queue` |
+| **CRM hygiene** / **Data Health** / **Compliance** / **Clients list** | those pages |
+
+**Done when:** the destination page is open.
+
+### Reload either page
+**Risk:** `READ` · **Roles:** Principal, Operator
+
+1. Click **Refresh** (button with a circular-arrow icon; visual: top right). The icon spins while loading.
+
+**Done when:** the icon stops spinning.
+
+## Controls reference
+| Visible text | Type | Locator | What it does | Risk |
+|---|---|---|---|---|
+| Refresh | button | page header | Reloads | `READ` |
+| Bucket tiles (7) | toggle buttons | `/work-queue` top | Filter by bucket | `READ` |
+| Owner | select | filter bar | "All operators" or a person | `READ` |
+| Lifecycle | select | filter bar | "All stages" or a stage | `READ` |
+| Clear filters | button | filter bar | Resets filters | `READ` |
+| (bucket row) | link | bucket card | Client tab, `/requests?client={slug}` or `/crm-hygiene?tab=needs-review` | `READ` |
+| Portfolio tiles (6) | links | Portfolio at a glance | See the drill table above | `READ` |
+| (client row) | link | Clients needing attention | Opens the client | `READ` |
+| Open full work queue | link | Clients needing attention | `/work-queue` | `READ` |
+| Staff work queue / CRM hygiene / Data Health / Compliance / Clients list | links | Open a deeper view | Navigation | `READ` |
+
+## Waits and signals
+- "Loading work queue..." / "Loading management summary..." while loading. The **Refresh** icon spins while reloading.
+- Errors: `Work queue unavailable: {error}`, `Management summary unavailable: {error}`.
+
+## Gotchas
+- Neither page is in the sidebar; use the URL.
+- `?bucket=` on `/work-queue` is ignored.
+- Work Queue request rows open the **New Request** sheet. Do not click **Create Request** unless asked.
+- Readiness checklist buttons **Open Work Queue** and **Open Management** also lead here.
+
+## Related
+- [Action Queue and requests](/command-center/action-queue)
+- [Approvals and compliance](/command-center/approvals-and-compliance)
+- [Your day](/command-center/your-day)
+
+## Source files
+- `packages/web/src/app/(dashboard)/work-queue/page.tsx`
+- `packages/web/src/components/work-queue/work-queue-view.tsx`
+- `packages/web/src/app/(dashboard)/management/page.tsx`
+- `packages/web/src/components/management/management-view.tsx`
+- `packages/transport-api/src/routes/work-queue.ts`

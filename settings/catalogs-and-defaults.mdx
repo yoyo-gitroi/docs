@@ -1,0 +1,485 @@
+---
+title: "Catalogs and defaults"
+sidebarTitle: "Catalogs and defaults"
+description: "Edit the HR roadmap question library and blueprint templates, compliance rules, the implementation catalog, sub-services and vendors."
+keywords: ["HR roadmaps", "roadmap template", "blueprint template", "discovery questions", "question library", "compliance rules", "add compliance rule", "compliance defaults", "implementation catalog", "billing memo template", "milestone template", "custom milestone", "suppress milestone", "stage labels", "target documents", "sub-services", "service catalog", "HubSpot plan values", "vendors", "add vendor", "payroll vendor"]
+---
+
+<Info>
+**URL:** `/settings/roadmaps` · `/settings/compliance` · `/settings/implementation-catalog` · `/settings/sub-services` · `/settings/vendors` · **Reach:** sidebar **Settings** → tab **HR Roadmaps**, **Compliance Defaults**, **Implementation Catalog**, **Sub-services** or **Vendors** · **Roles:** Principal ✓ Operator ✗ (Admin ✓, Member ✗) · **Ready when:** the tab's h2 is visible ("HR Roadmaps", "Compliance Rules", "Implementation Catalog", "Sub-services", "Vendors") and its loading text is gone.
+</Info>
+
+Workspace defaults that shape plans, alerts and case routing for every client. Changes apply to the whole workspace.
+
+**Templates**, **Brand Assets** and **Packets** (`/settings/templates`, `/settings/brand-assets`, `/settings/packets`) are covered at [Templates](/documents/templates) and [Brand assets and packets](/documents/brand-and-packets).
+
+<Note>
+**Operator.** These tabs and the sidebar **Settings** item are hidden from an Operator. Typing the URL still renders the page, with mixed results, so as an Operator do not edit here; report that a Principal or Admin is needed.
+- `/settings/roadmaps`: Question Library is read-only ("You can look at these questions, but editing them needs an admin or owner role."); Blueprint Templates still save.
+- `/settings/compliance`: loads and saves (the server does not block Operators).
+- `/settings/implementation-catalog`: sections fail with the toast "Forbidden: the implementation catalog can only be managed by a Principal or Admin".
+- `/settings/sub-services`: read-only list with no buttons and disabled Plans inputs.
+- `/settings/vendors`: list loads; **Add Vendor** may work; removing fails with "Failed to remove vendor".
+</Note>
+
+## Page map
+
+### HR roadmaps
+
+`/settings/roadmaps`, h2 "HR Roadmaps":
+
+- **Question Library** (h3; top): one card per section, header click expands; badge "Customized" or "Platform default", `{n} question(s)`.
+- **Blueprint Templates** (h3; below): **New Template** button, the create card "Create New Roadmap Template", and one expandable row per template.
+
+### Compliance defaults
+
+`/settings/compliance`, tab "Compliance Defaults", h2 **"Compliance Rules"**:
+
+- Count line `{n} rules ({a} active) across {j} jurisdictions`, **Add Rule** button.
+- Filters: search "Search rules by title...", "All Countries" (US / CA / UK / AU), "All States".
+- One card per jurisdiction (badge `{country}-{state}` or `{country}-Federal`, `{n} rule(s)`), table: Title, Scope, Category, Schedule, Industry, Emp Min, Active.
+- There is no delete control on this page.
+
+### Implementation catalog
+
+`/settings/implementation-catalog`, h2 "Implementation Catalog":
+
+- Card **Billing memo template** (testid "billing-memo-template-card").
+- Collapsed sections (each with **Refresh** except Arc Labels): "Service Catalog Labels", "Task Templates", "Migration Artifact Catalog", "Target Documents", "Stage Labels", "Arc Labels".
+- Changes apply only to implementations handed off after saving.
+
+### Sub-services
+
+`/settings/sub-services`, h2 "Sub-services":
+
+- **Add sub-service** (header button), count `{a} active of {n}`.
+- Card **Plans**: one row per plan tier.
+- Layer cards: "Foundation (every plan)", "HR OnDemand layer", "Guided HR layer", "Elevated HR layer". Each row: name, key, "Inactive" tag, plan pills (struck through when excluded), pencil icon `Edit {name}`.
+
+### Vendors
+
+`/settings/vendors`, h2 "Vendors":
+
+- Card "Configured Vendors": rows with name, domain, trash icon.
+- Card "Add Vendor": **Vendor Name**, **Domain**, **Add Vendor**.
+
+## Recipes
+
+### Customize a question library section
+
+**Risk:** `WRITE`, irreversible (treat as `DESTRUCTIVE` for approval) · **Roles:** Principal (Admin also)
+
+1. Open `/settings/roadmaps`.
+   - Wait for: "Loading templates..." and "Loading question library..." to disappear.
+2. Click the section card header to expand it (badge "Platform default").
+
+<Warning>**Approval required (irreversible).** Stop here and get approval before clicking **Customize this section**. It copies the platform defaults into workspace rows, and the UI has no way to undo it.</Warning>
+
+3. Click **Customize this section**.
+   - Wait for: "Customizing..." to finish.
+
+**Done when:** toast "Section customized for this workspace" and the badge reads "Customized".
+
+| If you see | Why | Do this |
+|---|---|---|
+| "Could not customize this section" / "Could not load the question library" | Server error | Retry once; report |
+| "You can look at these questions, but editing them needs an admin or owner role." | Operator or Member | Stop |
+
+### Edit library questions
+
+**Risk:** `WRITE` · **Roles:** Principal (Admin also)
+**Preconditions:** the section is Customized.
+
+1. Open `/settings/roadmaps` and expand the section.
+2. To edit, click a question input, change the text, then click outside it. It saves on blur with no success toast.
+3. To reorder, click ↑ (title "Move up") or ↓ (title "Move down").
+4. To add, click **Add Question**, type in "New question text", then press Enter or click **Add** (**Cancel** backs out).
+
+**Done when:** the question shows the new text or position. Errors: "Could not add the question", "Could not save the question", "Could not reorder questions".
+
+### Remove a library question
+
+**Risk:** `DESTRUCTIVE` (no confirm) · **Roles:** Principal (Admin also)
+
+<Warning>**Approval required (DESTRUCTIVE).** Stop here and get approval before clicking ×. The question is deleted at once with no confirm.</Warning>
+
+1. On the question, click × (title "Remove").
+
+**Done when:** the question disappears. Error: "Could not remove the question".
+
+### Create a blueprint roadmap template
+
+**Risk:** `WRITE` · **Roles:** Principal (Admin also)
+**Inputs from Clarwiz:** template name, description, phases (name, weeks, description), tasks (name, description, doc type).
+
+1. Open `/settings/roadmaps` and click **New Template** (Blueprint Templates section).
+   - Wait for: card "Create New Roadmap Template".
+2. Type **Template Name** (input, id "newRoadmapName", placeholder "e.g. Elevated HR Roadmap") and **Description** (id "newRoadmapDescription").
+3. Under "Phases", fill "Phase name", the weeks number (title "Duration (weeks)") and "Phase description (optional)".
+4. For each task, click **Add Task** and fill "Task name", "Task description (optional)" and the "Doc type" select.
+5. Click **Add Phase** for more phases; the trash icon removes a draft phase.
+6. Click **Create Template** (disabled without a name).
+   - Wait for: "Creating..." to finish.
+
+**Done when:** toast "Roadmap template created" and the template row appears. If nothing happens and no toast shows, the create failed silently: report it.
+
+### Edit a blueprint roadmap template
+
+**Risk:** `WRITE` · **Roles:** Principal (Admin also)
+
+1. Open `/settings/roadmaps` and click the template row to expand it ("Created `{date}`").
+2. Edit **Template Name** or **Description**, then click outside the field (saves on blur; toast "Name updated" for the name only).
+3. Click a phase's chevron to expand it. Edit its name input or weeks input ("wks") and click outside to save.
+4. Edit phase description and task name or description the same way. The task "Doc type" select saves on change.
+5. To add, click **Add Task** (creates "New task"; toast "Task added") or **Add Phase** (creates `Phase {n}`; toast "Phase added"), then rename them.
+
+**Done when:** the values stay after a reload. Blur saves fail silently, so reload `/settings/roadmaps` and check.
+
+### Delete a roadmap phase or task
+
+**Risk:** `DESTRUCTIVE` (cannot be undone) · **Roles:** Principal (Admin also)
+
+1. Open `/settings/roadmaps`, expand the template and the phase.
+2. Phase: click the trash icon on the phase header (icon button, no label). Task: hover the task row, then click its trash icon (hidden until hover).
+
+<Warning>**Approval required (DESTRUCTIVE).** Stop here and get approval before clicking **Delete**. "This action cannot be undone."</Warning>
+
+3. In "Delete phase" or "Delete task", click **Delete**.
+
+**Done when:** toast "Phase deleted" or "Task deleted".
+
+### Find a compliance rule
+
+**Risk:** `READ` · **Roles:** Principal (Admin also)
+
+1. Open `/settings/compliance`.
+   - Wait for: "Loading compliance rules..." to disappear.
+2. Type in the search box (placeholder "Search rules by title...") and/or pick a country in "All Countries" and a state in "All States".
+3. Click a rule row to expand its details.
+
+**Done when:** the rule's details show. Empty: "No rules match your filters." / "No compliance rules found." Error: "Failed to load compliance rules".
+
+### Add a compliance rule
+
+**Risk:** `WRITE` · **Roles:** Principal (Admin also)
+**Inputs from Clarwiz:** title, jurisdiction, category, schedule, and optional fields.
+
+1. Open `/settings/compliance` and click **Add Rule**.
+   - Wait for: sheet "Add Compliance Rule".
+2. Fill **Title** (required; id "ruleTitle") and **Description** (id "ruleDescription").
+3. Pick **Country** (id "ruleCountry") and **State/Province** (id "ruleState"; defaults to CA; "Federal (none)" for federal rules).
+4. Pick **Category** (id "ruleCategory"): tax, wage-hour, documentation, discrimination, safety, benefits, leave, general.
+5. Pick **Schedule Type** (id "ruleScheduleType"). Annual: fill Month 1-12 (id "ruleMonth") and Day (id "ruleDay"). Rolling: fill "Days Between (rolling)" (id "ruleDays").
+6. Optionally fill "Industry Filter (comma-separated)" (id "ruleIndustry"), **Employee Minimum** (id "ruleEmpMin"), **Source Law** (id "ruleSourceLaw"), **Source URL** (id "ruleSourceUrl").
+7. Click **Create Rule** (disabled without a title).
+   - Wait for: "Saving..." to finish.
+
+**Done when:** toast "Compliance rule created" and the rule appears under its jurisdiction.
+
+| If you see | Why | Do this |
+|---|---|---|
+| Alert "Failed to create rule" or a server message in the sheet | Save failed | Fix fields; retry once |
+
+### Edit a compliance rule
+
+**Risk:** `WRITE` · **Roles:** Principal (Admin also)
+
+1. Find and expand the rule (see [Find a compliance rule](#find-a-compliance-rule)).
+2. Click **Edit Rule** (in the expanded details).
+   - Wait for: sheet "Edit Compliance Rule".
+3. Change the fields asked for.
+4. Click **Update Rule**.
+
+**Done when:** toast "Compliance rule updated". Error alert: "Failed to update rule".
+
+### Turn a compliance rule on or off
+
+**Risk:** `WRITE` to activate; deactivating stops alerts for every client (treat as `DESTRUCTIVE` for approval) · **Roles:** Principal (Admin also)
+
+1. Find the rule row (see [Find a compliance rule](#find-a-compliance-rule)).
+
+<Warning>**Approval required (DESTRUCTIVE) when deactivating.** Stop here and get approval before turning a rule off. It applies at once with no confirm.</Warning>
+
+2. Click the toggle in the **Active** column (icon-only button with no label; visual: last column of the row).
+
+**Done when:** toast "Rule activated" or "Rule deactivated".
+
+### Lock the billing memo template
+
+**Risk:** `WRITE` (every future billing memo uses this version) · **Roles:** Principal (Admin also)
+**Inputs from Clarwiz:** template and version.
+
+1. Open `/settings/implementation-catalog`.
+2. In **Billing memo template**, click **Choose template** (or **Change template**). Disabled with "No template with fillable fields exists yet. Create one in Settings → Templates." when there are no candidates.
+3. Step "1 · Choose": pick **Template** (select, id "billing-memo-template", placeholder "Choose a template") and, for workspace templates, **Version** (id "billing-memo-version").
+4. Click **Continue to verify**.
+5. Step "2 · Verify & lock": review the preview, then tick "I've reviewed the preview. Every billing memo generated from now on uses exactly this version."
+6. Click **Verify & lock**.
+
+**Done when:** toast `Billing memos now use {label}` and the card reads `{label} is used for every generated billing memo.` (testid "billing-memo-locked").
+
+### Unlock the billing memo template
+
+**Risk:** `WRITE` · **Roles:** Principal (Admin also)
+
+1. Open `/settings/implementation-catalog`.
+2. In **Billing memo template**, click **Unlock**.
+3. At "Unlock and let operators pick per memo?", click **Unlock**.
+
+**Done when:** toast "Billing memo template unlocked" and the card reads "No template is locked…" (testid "billing-memo-unlocked").
+
+### Rename a service, stage or arc label
+
+**Risk:** `WRITE` · **Roles:** Principal (Admin also)
+**Inputs from Clarwiz:** which item and the new label.
+
+1. Open `/settings/implementation-catalog`.
+2. Click "Service Catalog Labels", "Stage Labels" or "Arc Labels" to expand it.
+   - Wait for: "Loading..." to disappear.
+3. On the row (`Stage {n}`, `Arc {X}` or the service), type in the input (placeholder "Tenant override label").
+4. Click **Save** on that row.
+5. To go back to the platform label, click **Reset** (only shown when an override exists).
+
+**Done when:** toast "Service label overridden" or "Label overridden" (or "Reverted to platform default" after Reset).
+
+| If you see | Why | Do this |
+|---|---|---|
+| "Enter a label different from the platform default" | Same as default | Use a different label, or Reset |
+
+### Override a milestone task template
+
+**Risk:** `WRITE` · **Roles:** Principal (Admin also)
+
+1. Open `/settings/implementation-catalog` and expand "Task Templates".
+2. On the template card, change only the fields asked for: Title (placeholder "Title"), Stage, Sequence, Lead days, Envelope slot (None / Stage 0 envelope / Stage 4 envelope), Applies when (Always / Existing payroll clients / New payroll clients / Has a prior payroll provider / Client handling state tax ID / Ariya handling state tax ID), "Repeats per state" (may be disabled: "Matched by exact key at runtime — cannot repeat per state").
+3. Click **Save** on that card. **Reset** returns to the platform version.
+
+**Done when:** toast "Task template overridden".
+
+| If you see | Why | Do this |
+|---|---|---|
+| "Title is required" | Empty title | Fill it |
+| "Sequence must be a positive integer" | Bad sequence | Use 1 or more |
+| "Lead days must be a non-negative integer" | Bad lead days | Use 0 or more |
+
+### Suppress or restore a milestone
+
+**Risk:** `WRITE` (applies at once) · **Roles:** Principal (Admin also)
+
+1. Open `/settings/implementation-catalog` and expand "Task Templates".
+2. On the card, tick or untick **Suppress for this tenant** (checkbox). It may be disabled with "Required by activation or at-risk scoring — cannot be suppressed".
+
+**Done when:** toast "Milestone suppressed for this tenant" or "Milestone restored".
+
+### Add a custom milestone
+
+**Risk:** `WRITE` · **Roles:** Principal (Admin also)
+**Inputs from Clarwiz:** key, title, stage (8 or lower), sequence, lead days, envelope slot, applies when, repeats per state.
+
+1. Open `/settings/implementation-catalog`, expand "Task Templates", and scroll to "Custom milestones".
+2. Type the key after the fixed prefix "custom_" (placeholder "key (lowercase, digits, _)").
+3. Fill Title, Stage, Sequence, Lead days, Envelope slot, Applies when and "Repeats per state".
+4. Click **Add custom milestone**.
+
+**Done when:** toast "Custom milestone added". Later edits use **Save** on the card (toast "Custom milestone saved").
+
+| If you see | Why | Do this |
+|---|---|---|
+| `Key must match {pattern}` | Invalid key | Use lowercase letters, digits and _ only |
+
+### Remove a custom milestone
+
+**Risk:** `DESTRUCTIVE` (no confirm) · **Roles:** Principal (Admin also)
+
+<Warning>**Approval required (DESTRUCTIVE).** Stop here and get approval before clicking **Remove**. It deletes at once with no confirm.</Warning>
+
+1. In "Task Templates" → "Custom milestones", click **Remove** on the card.
+
+**Done when:** toast "Custom milestone removed".
+
+### Override a migration artifact
+
+**Risk:** `WRITE` · **Roles:** Principal (Admin also)
+
+1. Open `/settings/implementation-catalog` and expand "Migration Artifact Catalog".
+2. On the row, edit Label, "Subcategory (optional)", Stage, Sequence.
+3. Click **Save** (**Reset** returns to the platform version).
+
+**Done when:** toast "Migration artifact overridden". Error: "Label is required".
+
+### Add or remove target documents
+
+**Risk:** `WRITE` to add; `DESTRUCTIVE` to remove (no confirm) · **Roles:** Principal (Admin also)
+**Inputs from Clarwiz:** template name.
+
+Target documents are the documents regenerated from an implementation's source documents.
+
+1. Open `/settings/implementation-catalog` and expand "Target Documents".
+2. Click the search input (placeholder "Search templates...") and type the template name.
+3. Click the item `{name} ({source})`.
+4. Click **Add**.
+
+**Done when:** toast "Added to Target Documents". "Select a template to add" means nothing was picked. Empty list: "No templates configured yet."
+
+To remove:
+
+<Warning>**Approval required (DESTRUCTIVE).** Stop here and get approval before clicking **Remove**. It removes at once with no confirm.</Warning>
+
+5. Click **Remove** on the row. Toast "Removed from list".
+
+### Map HubSpot values to a plan
+
+**Risk:** `WRITE` · **Roles:** Principal (Admin also)
+**Inputs from Clarwiz:** plan tier and HubSpot values.
+
+1. Open `/settings/sub-services`.
+   - Wait for: the spinner to stop.
+2. In **Plans**, edit the input for the tier (aria-label `HubSpot values for {tier}`).
+3. Click **Save** on that row (disabled when unchanged).
+
+**Done when:** toast `{tier}: HubSpot values saved`. Error: "Could not save the plan".
+
+### Add a sub-service
+
+**Risk:** `WRITE` · **Roles:** Principal (Admin also)
+**Inputs from Clarwiz:** name, key, layer, included plans, and the description fields.
+
+1. Open `/settings/sub-services` and click **Add sub-service** (header button).
+   - Wait for: card "New sub-service".
+2. Type **Name** (required; placeholder "e.g. Benefits administration"). It suggests the Key.
+3. Check **Key** (required; "Lowercase letters, digits and _. Cannot change later.").
+4. Pick **Layer** (select) and tick "Included in plans".
+5. Fill "What it is", "How the AI should recognise it", "Delivered today / covers", "Cadence / trigger / rule", "Platform needs" as given.
+6. Click **Add sub-service** (form button).
+
+**Done when:** toast `Added "{name}"`. Errors: "Name is required", "Could not save the sub-service".
+
+### Edit a sub-service
+
+**Risk:** `WRITE` · **Roles:** Principal (Admin also)
+
+1. Open `/settings/sub-services` and click the pencil icon on the row (aria-label `Edit {name}`).
+2. Change the fields. **Key** is fixed ("Fixed; cases point at it.").
+3. Click **Save**.
+
+**Done when:** toast `Saved "{name}"`.
+
+### Deactivate or reactivate a sub-service
+
+**Risk:** `DESTRUCTIVE` to deactivate (reversible); `WRITE` to reactivate · **Roles:** Principal (Admin also)
+
+1. Open `/settings/sub-services` and click the pencil icon (aria-label `Edit {name}`).
+
+<Warning>**Approval required (DESTRUCTIVE) when deactivating.** Stop here and get approval before clicking **Deactivate**. New cases stop using this sub-service.</Warning>
+
+2. Click **Deactivate** (or **Reactivate**).
+
+**Done when:** toast "Deactivated. Past cases keep this label; new cases will not use it." or "Reactivated". Error: "Could not change the sub-service".
+
+### Delete a sub-service
+
+**Risk:** `DESTRUCTIVE` (irreversible) · **Roles:** Principal (Admin also)
+
+1. Open `/settings/sub-services` and click the pencil icon (aria-label `Edit {name}`).
+2. Click **Delete**.
+
+<Warning>**Approval required (DESTRUCTIVE).** Stop here and get approval before confirming. Cases using it go back to Not sorted. Prefer **Deactivate** unless Clarwiz says delete.</Warning>
+
+3. In `Delete "{name}"?`, type `delete` (lowercase) in the "Type delete to confirm" field.
+4. Click **Delete**.
+
+**Done when:** toast `Deleted "{name}"` (optionally with the count of cases back to Not sorted). Error: "Could not delete the sub-service".
+
+### Add a vendor
+
+**Risk:** `WRITE` · **Roles:** Principal (Admin also)
+**Inputs from Clarwiz:** vendor name, email domain.
+
+1. Open `/settings/vendors`.
+   - Wait for: the spinner in "Configured Vendors" to stop.
+2. Type **Vendor Name** (input, id "vendor-name", placeholder "e.g. Gusto").
+3. Type **Domain** (input, id "vendor-domain", placeholder "e.g. gusto.com"). Always fill it: if empty, the app guesses `{name without spaces}.com`.
+4. Click **Add Vendor** (Enter in either input also adds).
+
+**Done when:** toast `Vendor "{name}" added` and the row appears.
+
+| If you see | Why | Do this |
+|---|---|---|
+| "Vendor name is required" | Empty name | Fill it |
+| "Failed to add vendor" | Server rejected it (bad or personal domain, or permissions) | Check the domain; report |
+
+### Remove a vendor
+
+**Risk:** `DESTRUCTIVE` (no confirm) · **Roles:** Principal (Admin also)
+
+<Warning>**Approval required (DESTRUCTIVE).** Stop here and get approval before clicking the trash icon. It removes at once with no confirm.</Warning>
+
+1. Open `/settings/vendors` and click the trash icon on the row (aria-label `Remove {label}`).
+
+**Done when:** toast `Vendor "{name}" removed`. Failure: "Failed to remove vendor".
+
+## Controls reference
+
+| Visible text | Type | Locator | What it does | Risk |
+|---|---|---|---|---|
+| **Customize this section** | button | Question Library section | Forks defaults, no undo | `WRITE` (irreversible) |
+| ↑ / ↓ / × | icon buttons | titles "Move up", "Move down", "Remove" | Reorder or delete question | `WRITE` / `DESTRUCTIVE` |
+| **Add Question** | button | customized section | New question | `WRITE` |
+| **New Template** / **Create Template** | buttons | Blueprint Templates | Create roadmap template | `WRITE` |
+| **Add Phase** / **Add Task** | buttons | template | Add rows | `WRITE` |
+| Phase / task trash | icon buttons, no label (task: hover only) | template | Delete after confirm | `DESTRUCTIVE` |
+| **Add Rule** / **Edit Rule** | buttons | Compliance | Opens rule sheet | `READ` |
+| **Create Rule** / **Update Rule** | buttons | rule sheet | Saves rule | `WRITE` |
+| Active toggle | icon button, no label | Active column | Toggles at once | `WRITE` / `DESTRUCTIVE` |
+| **Choose template** / **Change template** / **Verify & lock** | buttons | Billing memo template card | Lock memo template | `WRITE` |
+| **Unlock** | button | Billing memo template card | Unlock | `WRITE` |
+| **Save** / **Reset** | buttons | catalog rows | Override or revert | `WRITE` |
+| **Suppress for this tenant** | checkbox | task template card | Applies at once | `WRITE` |
+| **Add custom milestone** / **Remove** | buttons | Custom milestones | Add / delete (no confirm) | `WRITE` / `DESTRUCTIVE` |
+| **Add** / **Remove** | buttons | Target Documents | Add / remove (no confirm) | `WRITE` / `DESTRUCTIVE` |
+| Plan **Save** | button | Plans card | Saves HubSpot values | `WRITE` |
+| **Add sub-service** | button | header and form | Opens form / saves new | `WRITE` |
+| Pencil | icon button | aria-label `Edit {name}` | Edit form | `READ` |
+| **Deactivate** / **Reactivate** / **Delete** | buttons | edit form | Change status / delete | `DESTRUCTIVE` / `WRITE` |
+| **Add Vendor** | button | Add Vendor card | Adds vendor | `WRITE` |
+| Trash | icon button | aria-label `Remove {label}` | Removes vendor, no confirm | `DESTRUCTIVE` |
+
+## Waits and signals
+
+- Roadmaps: "Loading templates...", "Loading question library...", "Customizing...", "Creating...".
+- Compliance: "Loading compliance rules...", "Saving..." in the sheet.
+- Implementation catalog: each section shows "Loading..." after expanding or **Refresh**.
+- Sub-services: a spinner while loading.
+- Vendors: a spinner while loading or seeding.
+- Blur-saved fields (roadmaps question and template fields) show no toast on success except "Name updated".
+
+## Gotchas
+
+- Roadmaps fields save on blur and fail silently. Reload to confirm.
+- Question × and target-document, custom-milestone and vendor **Remove** act at once with no confirm.
+- Implementation catalog sections are collapsed; expand them first. Changes affect only implementations handed off after saving.
+- Opening `/settings/vendors` with an empty list auto-creates iSolved, ADP and Paychex. Removing the last vendor brings them back.
+- Sub-services empty state says to run a command ("No sub-services yet. Run pnpm --filter @ariya/core db:seed-sub-services to load the defaults, or add one."); you cannot run it from the browser. Report it.
+- In-app help (? panel) for roadmaps, titled "Discovery questions", says "Everyone can read them; admins and owners edit them"; the tab is hidden from Operators and Members, and the guide omits Blueprint Templates.
+- In-app help for the catalog says "Type your name in **Tenant override label** and press **Save**"; that text is a placeholder, exists only in the Service, Stage and Arc label sections, and the section must be expanded first. The guide omits the billing memo lock, Task Templates, Migration artifacts and Target Documents.
+- In-app help for sub-services says "Change the description and save"; the field is labelled "What it is".
+
+## Related
+
+- [General settings and team access](/settings/general-and-team)
+- [Integrations](/settings/integrations)
+- [Implementation workspace](/implementation/workspace)
+- [Templates](/documents/templates)
+- [Brand assets and packets](/documents/brand-and-packets)
+
+## Source files
+
+- `packages/web/src/app/(dashboard)/settings/roadmaps/page.tsx`
+- `packages/web/src/app/(dashboard)/settings/roadmaps/_components/question-library-manager.tsx`
+- `packages/web/src/app/(dashboard)/settings/compliance/page.tsx`
+- `packages/web/src/app/(dashboard)/settings/implementation-catalog/page.tsx`
+- `packages/web/src/app/(dashboard)/settings/implementation-catalog/billing-memo-template-card.tsx`
+- `packages/web/src/app/(dashboard)/settings/sub-services/page.tsx`
+- `packages/web/src/app/(dashboard)/settings/vendors/page.tsx`
+- `packages/transport-api/src/routes/implementations.ts` (catalog guard)
+- `packages/transport-api/src/routes/admin/ops-platform-config.ts` (vendor guard)

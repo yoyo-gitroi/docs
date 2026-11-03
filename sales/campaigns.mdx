@@ -1,0 +1,263 @@
+---
+title: "Campaigns and email templates"
+sidebarTitle: "Campaigns"
+description: "Write email templates, launch a paced Gmail campaign to an account book's contacts, track replies, and pause, resume or cancel a campaign."
+keywords: ["campaign", "email campaign", "outreach", "outbound", "send campaign", "email template", "placeholder", "replies", "check for replies", "pause campaign", "cancel campaign", "snooze", "wave"]
+---
+
+<Info>
+**URL:** `/sales/campaigns` · `/sales/campaigns/new` · `/sales/campaigns/{id}` · `/sales/campaigns/templates` · **Reach:** Sales sidebar **Campaigns** (paper-plane icon) · **Roles:** Principal ✓ Operator ✓ (Member ✗) · **Ready when:** the h1 reads **Campaigns**, **New campaign**, the campaign name, or **Email templates**, and no `Loading…` text remains.
+</Info>
+
+A campaign sends a template to the sendable contacts of one account book from the user's own Gmail, at most 50 a day about 90 seconds apart. Replies are pulled from Gmail and labelled here. Nothing is written to HubSpot.
+
+Principal and Operator see the same controls. The difference that matters is who launched the campaign: only the sender (the person whose Gmail sends it) gets **Pause**, **Resume**, **Check for replies** and **Cancel**. Anyone else sees `Only {name} can pause, resume or check replies — it's their Gmail.` **Campaigns** is missing from the sidebar when ABM is switched off; the URLs still exist.
+
+## Page map
+
+### Campaign list (`/sales/campaigns`)
+- Header: **Templates** (link) and **New campaign** (primary link).
+- Mailbox banner: green `Campaigns send from your Gmail: {email}` or an amber reason why it cannot send.
+- Table: **Campaign** (name link; sub-line book link and template), **Status** (Draft, Sending, Paused, Completed, Cancelled), **Progress** (`{n} sent · {n} queued` and failed count, or `Not launched`), **Replies** (`{n} ({rate})`), **Launched**.
+
+### New campaign (`/sales/campaigns/new`)
+- Card **Setup**: **Campaign name**, **Account book**, **Template**.
+- Card **Who will receive it** (after book and template are chosen): tiles **Contacts in book**, **Have an email**, **Verified email**, **Ready to send**; info banners; contacts table **Contact**, **Email**, **Status**.
+- **Start campaign** button.
+- `?book={batchId}` fixes the book and hides the book select.
+
+### Campaign detail (`/sales/campaigns/{id}`)
+- Title line: status pill, book link, `· {template} · from {email}`.
+- Header actions (sender only): **Pause** or **Resume**, **Check for replies**, **Cancel**.
+- Tiles **Sent**, **Replies**, **Failed**, **Queued**; progress bar (aria-label `Campaign progress`); `Replies are picked up when the mailbox is checked (last checked {date}).`
+- Card `Replies · {n}`: positive first, each with a label pill, **Snooze**, **Reply**.
+- Card `Recipients · {n}`: **Contact**, **Email**, **Status**, **Sent**.
+
+### Email templates (`/sales/campaigns/templates`)
+- Left: **New template** button and a list of templates (name and subject).
+- Right: card **New template** or **Edit template** (with **Archive** when editing), then card **Preview**.
+
+## Recipes
+
+### See all campaigns
+**Risk:** `READ` · **Roles:** Principal, Operator
+
+1. Open `/sales/campaigns`.
+2. Read the mailbox banner and the table. Click a campaign name to open `/sales/campaigns/{id}`, or the book link to open `/sales/account-books/{batchId}?step=campaign`.
+
+**Done when:** the table is visible. Empty: `No campaigns yet` with links **Write a template** and **Open account books**. Error: `Could not load campaigns. {error}`.
+
+### Write an email template
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** template name, subject, message.
+
+1. Open `/sales/campaigns/templates`. Alternative: **Templates** on `/sales/campaigns`, or **Create a template** in the campaign launcher.
+2. Click **New template** (button; top of the left column). The message is prefilled with `Hi {{first_name|there}},` and `{{sender_name}}`.
+3. Type **Name** (input, id `tpl-name`, placeholder `e.g. HR leader intro`).
+4. Type **Subject** (input, id `tpl-subject`, placeholder `e.g. Payroll at {{company_name}}`). One line only.
+5. Type **Message** (textarea, id `tpl-body`).
+6. To insert a placeholder, click inside Subject or Message first, then click a chip under **Insert placeholder** (button such as `{{first_name}}`; `title` shows an example). It inserts at the last cursor position.
+7. Click **Save template**.
+
+**Done when:** toast `Saved “{name}”` and the template appears in the left list.
+
+| If you see | Why | Do this |
+|---|---|---|
+| Red list `{{x}} is not a placeholder — did you mean {{y}}?` | Unknown placeholder | Use the suggested one |
+| `There is an unclosed or malformed {{ }} placeholder.` | Broken braces | Fix the braces |
+| `The subject must be a single line.` | Line break in subject | Remove it |
+| Error toast | Save failed | Retry once; then report |
+
+A placeholder without a fallback (the part after the pipe, as in `first_name|there`) must have a value, or that contact is skipped.
+
+### Edit a template
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+
+1. Open `/sales/campaigns/templates`.
+2. Click the template in the left list (button with name and subject).
+3. Change **Name**, **Subject** or **Message** in the card **Edit template**.
+4. Click **Save template**.
+
+**Done when:** toast `Template saved`. Running campaigns keep the copy they started with.
+
+### Preview a template against a book
+**Risk:** `READ` (nothing is sent) · **Roles:** Principal, Operator
+
+1. Open `/sales/campaigns/templates` and select or write a template.
+2. In the card **Preview**, choose a book (select, placeholder `Choose a book`). The preview updates 500 ms after each edit.
+
+**Done when:** you see `To {name} <{email}> at {account}` (the address in angle brackets) and `{n} of {m} contacts in this book are ready for this template.`
+
+| If you see | Why | Do this |
+|---|---|---|
+| `Pick an account book to preview against.` | No book chosen | Choose one |
+| `Fix the template problems above to see a preview.` | Validation errors | Fix them |
+| `This book has no contacts yet.` | No contacts | Find contacts on the book first |
+
+### Archive a template
+**Risk:** `DESTRUCTIVE` · **Roles:** Principal, Operator
+
+1. Open `/sales/campaigns/templates` and click the template in the left list.
+
+<Warning>**Approval required (DESTRUCTIVE).** Stop here and get approval before clicking **Archive**. It acts immediately: no confirmation dialog, and Sales has no unarchive control.</Warning>
+
+2. Click **Archive** (ghost button; header of the **Edit template** card).
+
+**Done when:** toast `Template archived — running campaigns keep their copy` and the template leaves the list.
+
+### Launch a campaign
+**Risk:** `EXTERNAL` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** campaign name, book, template.
+**Preconditions:** the book has contacts with verified emails; a template exists; the mailbox banner is green.
+
+1. Open `/sales/campaigns/new` (or `/sales/campaigns/new?book={batchId}` to fix the book). Alternative: **New campaign** on `/sales/campaigns`, or the Campaign step of a book (`/sales/account-books/{id}?step=campaign`), where book and name are prefilled.
+2. Type **Campaign name** (input, id `camp-name`, placeholder `e.g. Q4 India HR leaders`).
+3. Choose **Account book** (select, placeholder `Choose a book`; absent when the book is fixed).
+4. Choose **Template** (select, placeholder `Choose a template`; auto-selected if there is only one).
+   - Wait for: `Checking contacts…` to be replaced by the card **Who will receive it**.
+5. Read the tiles and banners. Note **Ready to send** (the number that will be emailed), `Left out: {n} already emailed by an earlier wave of this book…`, `Missing values: …`, and any amber domain-mismatch warning. Report these to Clarwiz.
+6. Click **Start campaign** (button; disabled until there is a name, at least one sendable contact, and a mailbox that can send).
+7. A dialog `Send {n} emails?` opens: `These go from {email} to real people. … emails already sent cannot be recalled.`
+
+<Warning>**Approval required (EXTERNAL).** Stop here and get approval before clicking **Send from my Gmail**. Real emails go from the user's Gmail to every ready contact over the next days. Show the human the name, book, template, the number from `Send {n} emails?` and the sender address. To back out, click **Not yet**.</Warning>
+
+8. Click **Send from my Gmail** (primary button in the dialog).
+
+**Done when:** toast `Launched — {n} emails queued` and the browser opens `/sales/campaigns/{id}` (on a book's Campaign step the step reloads instead).
+
+| If you see | Why | Do this |
+|---|---|---|
+| `Name the campaign to start it.` | Name empty | Fill the name |
+| **Start campaign** disabled with a name | No sendable contacts or mailbox cannot send | Read the tiles and the mailbox banner; report |
+| `No contacts yet` / `This book has no contacts yet. Find people on its Contacts step first.` | No contacts | See [Find contacts](/sales/account-books#find-contacts-at-the-accounts-in-a-book) |
+| No templates, link **Create a template** | No template | [Write an email template](#write-an-email-template) |
+| Red banner `Could not launch` or a server message | Create or launch failed | Report; a **Draft** campaign with that name may have been left behind |
+
+### Watch campaign progress
+**Risk:** `READ` · **Roles:** Principal, Operator
+
+1. Open `/sales/campaigns/{id}`. The page refreshes every 5 seconds while the status is Sending.
+2. Read the tiles **Sent**, **Replies** (`{n} positive · {rate} replied`), **Failed** (`not delivered`), **Queued**, and the pacing line.
+3. In `Recipients · {n}`, statuses are Queued, Retrying, Sending, Sent, Failed, Cancelled, Replied, `Replied ×{n}`, `Snoozed to {date}`. Failed rows show red error text.
+
+**Done when:** the status pill reads **Completed**, or you have the counts. A status reason banner appears for **Paused**.
+
+### Pause a campaign
+**Risk:** `WRITE` · **Roles:** Principal or Operator, only if they launched this campaign (the sender)
+
+1. Open `/sales/campaigns/{id}`.
+2. Click **Pause** (outline button; page header; shown while Sending).
+
+**Done when:** the status pill reads **Paused**. Error toast: `Could not update the campaign`.
+
+### Resume a campaign
+**Risk:** `EXTERNAL` · **Roles:** Principal or Operator, only if they launched this campaign (the sender)
+
+1. Open `/sales/campaigns/{id}`.
+
+<Warning>**Approval required (EXTERNAL).** Stop here and get approval before clicking **Resume**. Queued emails start going out from the user's Gmail again.</Warning>
+
+2. Click **Resume** (primary button; page header; shown while Paused).
+
+**Done when:** the status pill reads **Sending**. Error toast: `Could not update the campaign`.
+
+### Check for replies
+**Risk:** `EXTERNAL` (reads the sender's Gmail) `AI` (labels each reply) · **Roles:** Principal or Operator, only if they launched this campaign (the sender)
+
+1. Open `/sales/campaigns/{id}`.
+
+<Warning>**Approval required (EXTERNAL).** Stop here and get approval before clicking **Check for replies**. It reads the sender's Gmail mailbox.</Warning>
+
+2. Click **Check for replies** (outline button; page header, or inside the empty Replies card).
+   - Wait for: a toast. New replies show the label **Labelling…** until the AI finishes.
+
+**Done when:** toast `{n} new replies` (or `1 new reply`) or `No new replies`. Error: `Could not check replies`.
+
+### Change a reply label
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+
+1. Open `/sales/campaigns/{id}` and find the reply in `Replies · {n}`.
+2. Click the label pill (dropdown button, aria-label `Label: {label}. Change it`).
+3. Choose **Positive**, **Not now**, **Not interested**, **Out of office** or **Other**.
+
+**Done when:** the pill shows the new label. Error toast: `Could not change the label`.
+
+### Snooze a contact or lift a snooze
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+**Preconditions:** the reply is labelled **Not now**.
+
+1. Open `/sales/campaigns/{id}`.
+2. Click **Snooze** (ghost button on the reply).
+3. To undo, click `Snoozed to {date} · undo` (ghost button, `title "Lift the snooze"`).
+
+**Done when:** toast `Snoozed for 30 days — left out of the next wave`, or `Snooze lifted`. Error: `Could not snooze`.
+
+### Open a reply in Gmail
+**Risk:** `READ` (opens Gmail in a new tab) · **Roles:** Principal, Operator
+
+1. Open `/sales/campaigns/{id}`.
+2. Click **Reply** (link; solid on the first positive reply) on the reply. Gmail opens in a new tab on that thread.
+
+**Done when:** the Gmail tab is open. Do not write or send anything in Gmail without separate approval (EXTERNAL). Switch back to the Ariya tab.
+
+### Cancel a campaign
+**Risk:** `DESTRUCTIVE` · **Roles:** Principal or Operator, only if they launched this campaign (the sender)
+
+1. Open `/sales/campaigns/{id}`.
+
+<Warning>**Approval required (DESTRUCTIVE).** Stop here and get approval before clicking **Cancel**. It drops every queued email at once, with no confirmation dialog and no undo. Emails already sent cannot be recalled.</Warning>
+
+2. Click **Cancel** (ghost button; page header; shown for Sending, Paused or Draft).
+
+**Done when:** the status pill reads **Cancelled** and queued recipients read Cancelled. Error toast: `Could not update the campaign`.
+
+## Controls reference
+
+| Visible text | Type | Locator | What it does | Risk |
+|---|---|---|---|---|
+| Templates | link | list header | `/sales/campaigns/templates` | READ |
+| New campaign | primary link | list header | `/sales/campaigns/new` | READ |
+| `{campaign name}` | link | list table | `/sales/campaigns/{id}` | READ |
+| Campaign name | input | id `camp-name` | Names the campaign | none |
+| Account book / Template | selects | placeholders `Choose a book` / `Choose a template` | Choose list and message | none |
+| Start campaign | button | launcher | Opens the send confirmation | none |
+| Not yet / Send from my Gmail | dialog buttons | `Send {n} emails?` dialog | Cancel or launch | EXTERNAL (send) |
+| Pause | outline button | campaign header | Pauses | WRITE |
+| Resume | primary button | campaign header | Resumes sending | EXTERNAL |
+| Check for replies | outline button | campaign header | Reads Gmail, labels replies | EXTERNAL, AI |
+| Cancel | ghost button | campaign header | Drops queued mail, no confirm | DESTRUCTIVE |
+| `{label}` | dropdown | aria-label `Label: {label}. Change it` | Changes the reply label | WRITE |
+| Snooze / `Snoozed to {date} · undo` | ghost buttons | reply item | Snooze 30 days / lift | WRITE |
+| Reply | link, new tab | reply item | Opens the Gmail thread | READ |
+| Open the book | link | empty recipients | Book Campaign step | READ |
+| New template | button | templates left column | Blank draft | none |
+| Name / Subject / Message | inputs | ids `tpl-name`, `tpl-subject`, `tpl-body` | Template fields | none |
+| `{{placeholder}}` chips | buttons | under **Insert placeholder** | Insert at cursor | none |
+| Save template | button | editor | Creates or updates | WRITE |
+| Archive | ghost button | **Edit template** header | Archives at once | DESTRUCTIVE |
+| (book select) | select | **Preview** card | Live preview | READ |
+
+## Waits and signals
+- Campaign detail polls every 5 seconds while Sending. A book's Campaign step polls every 30 seconds.
+- Sending is paced: at most 50 a day, about 90 seconds apart. Completion can take days.
+- Reply labels show **Labelling…** until the AI finishes.
+- Launch makes two requests (create, then launch). A failed launch can leave a **Draft** campaign.
+- Template preview updates 500 ms after you stop typing. The templates page has no loading text; lists simply fill in.
+
+## Gotchas
+- **Cancel** and **Archive** act on one click with no confirmation.
+- Header actions are missing for anyone other than the sender.
+- **Reply** opens Gmail in a new tab.
+- Placeholder chips insert where the cursor was last. Click into the field first.
+- In-app help says to click **Start a campaign** on a book's step 5. On that step **Start a campaign** is a heading; the button is **Start campaign**.
+
+## Related
+- [Account books](/sales/account-books)
+- [Sales Today and accounts](/sales/today-and-accounts)
+
+## Source files
+- `packages/web/src/app/(dashboard)/sales/campaigns/page.tsx`
+- `packages/web/src/app/(dashboard)/sales/campaigns/new/page.tsx`
+- `packages/web/src/app/(dashboard)/sales/campaigns/[id]/page.tsx`
+- `packages/web/src/app/(dashboard)/sales/campaigns/templates/page.tsx`
+- `packages/web/src/app/(dashboard)/sales/campaigns/_components/campaign-launcher.tsx`

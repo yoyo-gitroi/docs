@@ -1,0 +1,357 @@
+---
+title: "Client people and HR tabs: people, employees, payroll, compliance, research"
+sidebarTitle: "People and HR tabs"
+description: "Request contact and role changes, manage employee records, update payroll and tax details, import any of these from a document, run the compliance register and review AI research about a client."
+keywords: ["client contacts", "people and roles", "add contact", "primary contact", "archive contact", "unlink contact", "confirm role", "coverage resolver", "add to HubSpot", "employees", "add employee", "import employees", "CSV import", "terminate employee", "payroll", "tax ID", "EIN", "payroll and tax", "import from document", "compliance register", "compliance research", "research client", "save to company file"]
+---
+
+<Info>
+**URL:** `/clients/{slug}?tab=people`, `employees`, `payroll-tax`, `compliance`, `research` · **Reach:** client page → tab bar ([tab map](/clients/client-profile#tab-map)) · **Roles:** Principal ✓ Operator ✓ (People, Payroll and Research view only; Employees buttons disabled but row click edits; Compliance editable but **Start research** returns 403) · **Ready when:** the tab's H2 (**People & Roles**, **Employees**, **Payroll & Tax**, **Research**) or the **Compliance register** heading is visible and its loading text is gone.
+</Info>
+
+Five client tabs that hold people, staff and HR data, plus the shared **Import from document** dialog.
+
+<Note>
+Always open these with `?tab=`. Without it the client page jumps to the tab you last used ([Always pass ?tab=](/clients/client-profile#always-pass-the-tab-parameter)).
+</Note>
+
+## People and Roles tab
+People at the client that Ariya works with. Nothing here edits a contact directly: every add, edit, archive, unlink and role change files a **contact change request** that a person approves on `/approvals` (**Approve**, then **Apply Local Change**). No HubSpot write happens from this tab. Edit needs Clients and packets: Operator and Member see "View only…" and disabled controls.
+
+**Ready when:** H2 **People & Roles**, heading **Roles and contacts**, and the strip **Relationship changes** / **Approval required** with badges **No direct record mutation**, **Audit trail preserved**. Loading text "Loading people...".
+
+Layout top to bottom: person insight cards (stats **median reply**, **agrees first time**, **last contact**); **Seen on case threads, not in HubSpot**; **Ariya team on this account**; **How people insights are built**; **Roles and contacts** header with **Import from document** and **People Directory**; **Change requests** (pending only); the request form card (title **Assign person to client**, **Request person/role edit**, **Request archive** or **Request unlink**); **Coverage resolver**; **Confirmed roles** (groups **Primary contact**, **Accounting**, **HR / Payroll / Benefits**, **Employees**, **Executives / Owners**, **Other people**); **Archived**.
+
+Contact row icons (right end of each row in **Confirmed roles**, left to right; none has a label): **Use suggestion** (text button, only with a suggestion), pencil (edit), star (make primary; not on the current primary), broken chain (unlink), box (archive). Rows tagged **profile** have only the pencil.
+
+### Request a new contact
+**Risk:** `WRITE` (files a request) · **Roles:** Principal, Admin
+**Inputs from Clarwiz:** name and/or email, client role; optional title, phone, notes, reason.
+
+1. Open `/clients/{slug}?tab=people`.
+   - Wait for: "Loading people..." to finish.
+2. Scroll to the form card **Assign person to client**. If it shows another title, click **New Person** (button) to reset it.
+3. Fill **Name** and/or **Email** (inputs). Optional **Title**, **Phone**, **Notes**.
+4. Click **Client role** (select) and pick **Primary contact**, **Accounting**, **HR**, **Payroll**, **Benefits**, **Employee**, **Executive**, **Owner**, **Legal**, **Advisor** or **Other**.
+5. Optional: **Reason / context** (textarea, placeholder "Optional").
+6. Click **Request change** (button; reads **Submitting...**).
+
+**Done when:** toast "Contact change request submitted." and a row under **Change requests** with badges for the action and **Pending**. The contact itself appears only after approval and apply on `/approvals`.
+
+| If you see | Why | Do this |
+|---|---|---|
+| "Contact requires a name or email" | Both empty | Fill one |
+| "Action denied by policy" | 403 from the contact policy | Stop; report |
+| "Client id is required before requesting contact changes." | Client not loaded | Reload the tab |
+| `Contact coverage could not be loaded: {error}` on the resolver card | Same text as the submit error, not a load failure | Read it as the submit error |
+
+### Request an edit to a contact
+**Risk:** `WRITE` (files a request) · **Roles:** Principal, Admin
+
+1. In **Confirmed roles**, click the pencil on the contact (icon button, no label; visual: first icon at the right end of the row).
+   - Wait for: form title **Request person/role edit** with the contact's values.
+2. Change the fields.
+3. Click **Request change**.
+
+**Done when:** toast "Contact change request submitted." Error "No contact changes to request" means nothing changed. "Fallback contacts must be added before requesting this change" means the row is a **profile** fallback; request a new contact instead.
+
+### Make a contact the primary contact
+**Risk:** `WRITE` (files a request) · **Roles:** Principal, Admin
+
+1. Click the star on the contact (icon button, no label; visual: second icon at the right end of the row; absent on the current primary).
+   - It files the request immediately; there is no form.
+
+**Done when:** toast "Primary contact request submitted."
+
+### Request to archive or unlink a contact
+**Risk:** `DESTRUCTIVE` (files a request) · **Roles:** Principal, Admin
+
+1. Click the box icon (archive) or the broken-chain icon (unlink) on the contact (icon buttons, no label; visual: last two icons at the right end of the row).
+   - Wait for: form title **Request archive** or **Request unlink**; other fields are disabled.
+2. Type the reason in **Reason** (textarea, placeholder "Required").
+
+<Warning>
+**Approval required (DESTRUCTIVE).** Stop here and get approval before clicking **Request change**. This proposes removing the person from the client.
+</Warning>
+
+3. Click **Request change**.
+
+**Done when:** toast "Contact change request submitted." Errors: "Archive requests require a reason", "Unlink requests require a reason".
+
+### Confirm contact roles in the coverage resolver
+**Risk:** `WRITE` (files requests) · **Roles:** Principal, Admin
+
+1. Scroll to **Coverage resolver**.
+   - Wait for: "Loading contact coverage..." to finish.
+2. One contact: set the role (select, aria-label `Coverage role for {name}`), then click **Confirm role** (button on that row). Toast "Role confirmation submitted for approval."
+3. Several: tick **Select** (checkbox per row) or tick **Select suggested roles** (checkbox, selects all rows with a suggestion), then click **Submit selected**. Toast `{n} role confirmation request(s) submitted for approval.`
+4. **Use suggestion** on a row loads the suggestion into the form instead.
+
+**Done when:** the toast shows. "A coverage role is required" means no role was chosen. Empty: "No active contacts are available for coverage review.", "No imported contacts need role confirmation."
+
+HubSpot-imported contacts appear in **Confirmed roles** only after a role request is approved and applied.
+
+### Request a case participant as a contact
+**Risk:** `WRITE` (files a request; no HubSpot write despite the label) · **Roles:** Principal, Admin
+
+1. In **Seen on case threads, not in HubSpot**, click **Add to HubSpot** (button on the person's row).
+
+**Done when:** toast "Contact request submitted for approval." and the button reads **Requested**. The request uses the email prefix as the name and role "other". Empty: "Everyone writing on this client's cases is already a contact."
+
+Other controls: **People Directory** (opens `/people`, see [Contacts directory](/clients/people-and-contacts)); **Import from document** (see [Import from a document](#import-from-a-document)).
+
+## Employees tab
+Everyone who works at the client. Contacts we talk to are on People & Roles.
+
+<Warning>
+**Operator:** **Add Employee**, **Import CSV**, **Import from document** and the row **Edit** buttons are disabled for you, but clicking a table row (not the button) still opens the edit sheet and the API accepts your save. **Member:** the row click opens the sheet too, but saving returns 403 in the sheet's red box; do not retry.
+</Warning>
+
+**Ready when:** H2 **Employees** and text `{n} employee(s)`. Loading text "Loading employees...".
+
+Layout: tiles **Active**, **Hourly**, **Tipped**, **Salaried**; **By location**; buttons **Import CSV**, **Import from document**, **Add Employee**; table **Name**, **Email**, **Title**, **Department**, **Location**, **Pay basis**, **Tipped**, **Status**, **Start Date**, **Edit**. Empty: "No employees yet" / "Add individually or import a CSV."
+
+### Add an employee
+**Risk:** `WRITE` · **Roles:** Principal, Admin
+**Inputs from Clarwiz:** first and last name, plus any other fields.
+
+1. Open `/clients/{slug}?tab=employees`.
+2. Click **Add Employee** (button; visual: above the table, right).
+   - Wait for: side sheet **Add Employee**.
+3. **Personal Information:** **First Name** and **Last Name** (required), **Middle Name**, **Email**, **Phone**, **Date of Birth**, **Start Date**, **Status** (select: **Active**, **Terminated**, **On Leave**).
+4. **Job Information:** **Job Title**, **Department**, **Work location** (placeholder "e.g. Midtown"), **Receives tips** (checkbox), **Employment Type** (**W-2**, **1099 Contractor**), **Classification** (**Exempt**, **Non-Exempt**), **Job Type** (**Salaried**, **Hourly**, **Tipped**, **Commission**).
+5. **Compensation & Tax:** **Rate of Pay** (placeholder `e.g. $25/hr or $52,000/yr`), **Pay Frequency**, **Filing Status** (**Single**, **Married Filing Jointly**, **Married Filing Separately**, **Head of Household**), **Dependents Credit**.
+6. Click **Add Employee** (button, sheet footer; reads **Saving...**).
+
+**Done when:** toast "Employee added" and the row appears. Error "First and last name are required" in the sheet.
+
+### Edit an employee
+**Risk:** `WRITE` · **Roles:** Principal, Admin; Operator via row click (see warning above)
+
+1. Click **Edit** on the row (button, last column), or click the row itself.
+   - Wait for: side sheet **Edit Employee**.
+2. Change fields.
+3. Click **Update Employee** (button, sheet footer).
+
+**Done when:** toast "Employee updated".
+
+There is no delete. To end employment, set **Status** to **Terminated**.
+
+<Warning>
+**Approval required (DESTRUCTIVE).** Setting **Status** to **Terminated** deactivates the employee record. Stop and get approval before clicking **Update Employee** with that change.
+</Warning>
+
+### Import employees from a CSV
+**Risk:** `WRITE` · **Roles:** Principal, Admin
+**Inputs from Clarwiz:** a CSV file in the template's format.
+
+1. Click **Import CSV** (button above the table).
+   - Wait for: dialog **Import employees from CSV**.
+2. Optional: **Download template** (button) to get the column layout.
+3. Click **Choose CSV file** (button; hidden file input aria-label "CSV file") and pick the file.
+   - Wait for: the report. `All {n} rows are valid and ready to import.` or `{n} rows have problems. Fix the file and choose it again — nothing has been imported.` Pills `{n} rows`, `{n} valid`, `{n} invalid`; lines `Missing required: …`, `Not allowed (sensitive): …`; an issue table **Row**, **Column**, **Problem**.
+4. If there are problems, stop and report the issue table. **Choose another file** retries with a fixed file.
+5. Click `Import {n} employee(s)` (button).
+
+**Done when:** toast `{n} employee(s) imported`. "The server rejected the import:" followed by text means nothing was imported; report it. CSV import always adds new rows; it never updates existing employees.
+
+## Payroll and Tax tab
+What Ariya holds about the client's payroll setup. Edit needs Clients and packets: Operator and Member see "View only…".
+
+**Ready when:** H2 **Payroll & Tax** and card **What we hold**. Loading text "Loading...".
+
+### Update payroll and tax details
+**Risk:** `WRITE` · **Roles:** Principal, Admin
+**Inputs from Clarwiz:** the fields to change.
+
+1. Open `/clients/{slug}?tab=payroll-tax`.
+   - Wait for: "Loading..." to finish and the fields to show stored values. If the fields are all blank on a client that should have data, the load failed; stop and do not save.
+2. **Tax Identification:** **Federal EIN** (placeholder "XX-XXXXXXX"), **State Withholding ID**, **State Unemployment (SUI) ID**. Tick **Operates in multiple states** to show rows **State (e.g. CA)** and **Tax ID**; **Add State** adds a row.
+3. **Payroll Configuration:** **Pay Frequency**, **Payday** (placeholder "e.g. Friday, 15th & last"), **Time Tracking** (**Manual Entry**, **Time Clock**, **Timesheets**, **Other**), **W-2 Employees**, **1099 Contractors**, **Tip Reporting** (**Employee Declared**, **Employer Allocated**, **N/A**), **Employee Types** checkboxes (**Salaried**, **Hourly**, **Tipped**, **Commission**, **Piece Rate**, **Remote/Out-of-State**), **Deductions & Contributions** checkboxes (**Health Insurance**, **Retirement (401k/IRA)**, **Garnishments**, **Union Dues**).
+4. **Banking Information:** **Bank Name**, **Account Number** (password field), **Routing Number**.
+5. **System Access Points:** **Add User** adds a row with **Name**, **Email**, **Access Level** (**Full Admin**, **Payroll Only**, **Reports Only**, **Employee Self-Service**, **HR/Onboarding**, **Time & Attendance**).
+6. Click **Save All Details** (button; reads **Saving...**, then **Saved**).
+
+**Done when:** toast and alert "Details saved." Failure: red alert with server text.
+
+<Warning>
+**Approval required (DESTRUCTIVE)** if your edit removed a state row or a system access user (trash icons, no label). Rows vanish only on screen until **Save All Details**, which replaces everything stored with what is on screen. Get approval before saving such a removal.
+</Warning>
+
+## Import from a document
+One dialog on three tabs: **People & Roles** (`Import people & roles from a document`), **Employees** (`Import employees from a document`), **Payroll & Tax** (`Import payroll & tax details`). AI reads one file and proposes values; nothing is saved until you apply.
+
+### Import values from a document
+**Risk:** `AI` (extract) then `WRITE` (apply) · **Roles:** Principal, Admin (button disabled for Operator and Member)
+**Inputs from Clarwiz:** one file (PDF, Word, Excel, CSV, text or image, up to 10 MB).
+
+1. Open the tab (`?tab=people`, `?tab=employees` or `?tab=payroll-tax`) and click **Import from document** (button; visual: tab header or above the table).
+   - Wait for: dialog with "Upload a document and AI will pull out the values that belong on this tab. Nothing is saved until you review and apply."
+2. Click **Drop a file or click to upload** (button) and pick the file. Remove it with the × (icon button, aria-label "Remove file").
+3. Click **Extract values** (button). It reads **Reading document…** until done; this is one request and can take up to a minute.
+   - Wait for: description `We read {file} with AI. Here is what we could extract for {client}. Check each value before applying.`
+4. Review:
+   - Payroll: each field row has a checkbox `Apply {label}`, a badge **New**, **Changes value** or **Already on file**, an editor `{label} (extracted)`, `On file now: …`, and an evidence quote.
+   - People and Employees: each record has a checkbox `Apply {title}`, a badge **New contact**, **New employee** or `Updates existing (by …)`, a field count, and for unclear matches a select `Match for {title}` with `Add as a new {noun}`.
+   - Untick anything wrong. Edit values where needed.
+5. Read the apply note: People "Nothing changes directly: each person becomes a change request in the approval queue."; Employees "New employees are added. For matched employees only the selected fields are updated."; Payroll "Applying saves the selected values to Tax Identification, Payroll Configuration and System Access. Unsaved edits on this tab are replaced."
+6. Click `Apply {n} {unit}` (button; disabled at 0; reads **Applying…**).
+
+**Done when:** toast `{n} {unit} applied from {file}.` (people: `sent for approval`). Partial: `…; {n} could not be applied.`
+
+| If you see | Why | Do this |
+|---|---|---|
+| "File must be 10MB or smaller." | File too large | Use a smaller file |
+| `No values for this tab were found in {file}.` | Nothing relevant | Report; try another file |
+| "This upload was already applied or discarded." | Dialog was closed or reused after extraction | Start again with a new upload |
+| Toast with server text | Extraction or apply failed (or rate limit) | Report the text |
+
+Bank account numbers, routing numbers and Social Security numbers are never extracted, by policy. **Upload a different file** discards the current extraction. Closing the dialog also discards it.
+
+## Compliance tab
+The client's compliance register: which obligations apply, their status and what to do.
+
+<Warning>
+**Operator:** this tab is editable for you and **Run research** / **Start research** are enabled, but the API refuses the run (Principal and Admin only). Expect a toast "Your profile cannot change Clients and packets. Allowed: Principal, Admin." Do not retry; report back. Member: view only.
+</Warning>
+
+**Ready when:** heading **Compliance register** (inside a card; this tab has no H2 banner). Before the first run: `No register yet for {client}. A run works out which obligations apply…` with **Run research**. Loading: pulsing block (aria-busy). Load error: "Could not load the compliance register." with **Try again**.
+
+### Run compliance research
+**Risk:** `AI` · **Roles:** Principal, Admin (Operator: 403)
+**Inputs from Clarwiz:** optional as-of date, expiry horizon, timeline, mode.
+
+1. Open `/clients/{slug}?tab=compliance`.
+2. Click **Run research** (button; visual: register header card, or the empty-state card).
+   - Wait for: dialog with `Research covers {client} only…`.
+3. Optional: **As of** (date, default today), **Expiry horizon** (**30**, **60**, **90**, **180**; default 90), **Timeline** (**6**, **12**, **18**; default 12), **Mode** (**Auto**, **Client**, **Prospect**; hint explains Auto's choice), **Model**.
+4. Click **Start research** (button; reads **Starting**).
+   - Wait for: toast "Research started. The register updates here when it finishes." The header button reads **Research running** (disabled), chip `Research running since {time}`, and **Behind the scenes** shows a **Live** badge.
+5. Wait. A run takes several minutes (15 to 40 web searches). The page checks every 5 seconds; do not reload or start another run.
+
+**Done when:** toast `Register updated. {n} new, {n} changed, {n} resolved.` or "Register ready." and the page scrolls to **The register**.
+
+| If you see | Why | Do this |
+|---|---|---|
+| "A compliance run is already in progress for this client." | Run already going | Wait for it |
+| "The research run failed." or run error toast, and red callout `The research run from {date}, {time} failed.` | Run failed | Click **Run again** once; report if it fails again |
+| "Could not start the research run." or server text | Start rejected (Operator: 403) | Stop; report |
+| Warning "No local ordinance table is loaded…" in the dialog | Local wage data missing | Report it along with results |
+
+### Read the compliance register
+**Risk:** `READ` · **Roles:** all
+
+1. Open `/clients/{slug}?tab=compliance`.
+2. Header chips: **Mode** (Client or Prospect), `{n} employees`, `HR Intel {n} primary, {n} commentary`, optional **Ordinance table stale**, `Checks {x} of {y} passed` (click for dialog **Register checks**).
+3. **Status counts** tiles (toggle buttons): **Expired**, **Outdated by law change**, **Expiring soon**, **New requirement**, **Coming into force**, **Not evidenced on file**, **Ask on call**, **Needs confirmation**, **In place**, **Not applicable**.
+4. **The register**: tabs (tablist aria-label "Buckets") **Expiring or outdated**, **New and required**, **Needs confirmation**, **In place**, **Not applicable**; click **Show all in this bucket** for the full list. Clicking an item opens its details (**Identity**, **Trigger**, **Evidence**, **Lifecycle**, **What changed**, **Action**, **If missed**, **Citations**).
+5. Also on the page: **Changes since the last run**, **Wage floor by location**, `Next {n} months`, **Discovery call guide** (prospects), **Document acceptance check**, **Recommended services**, **Documents to create or update**, **Open questions**.
+6. `Sources {n}` (button) opens a sources side sheet. **JSON** (button) opens dialog **complianceRegister JSON** with **Copy JSON** (toast "JSON copied", or "Copy was blocked. Select the JSON and copy it by hand.").
+
+**Done when:** you have what Clarwiz asked for.
+
+## Research tab
+Public information about the client, each finding tied to a source. Facts are reviewed, then saved to the company file. Edit needs Clients and packets: Operator and Member see "View only…".
+
+**Ready when:** H2 **Research** and card **AI Research** with **Add Research**. Loading text "Loading research history…".
+
+### Run client research
+**Risk:** `AI` · **Roles:** Principal, Admin
+
+1. Open `/clients/{slug}?tab=research`.
+2. Click **Add Research** (button; visual: **AI Research** card header; reads **Starting…**).
+   - Wait for: toast "Research run started" and the **Latest run** badge **Research queued** then **Researching client**, plus a card **Researching client** that says the page refreshes automatically (every 3 seconds).
+3. Wait. Do not click **Add Research** again; it stays enabled and would start a second run.
+
+**Done when:** **Latest run** badge reads **Ready for review**. **Needs attention** means it failed: the card **Research needs attention** has **Retry** (starts a fresh run). "Failed to start research" means the start was rejected.
+
+### Review and save research facts
+**Risk:** `WRITE` · **Roles:** Principal, Admin
+**Inputs from Clarwiz:** which facts to keep (or "all that look right").
+
+1. Open `/clients/{slug}?tab=research` and scroll to `Review queue ({n})`.
+2. Tick facts (checkbox, aria-label `Select suggestion {fieldPath}`).
+3. Click `Mark reviewed ({n})` (button, aria-label "Mark selected facts reviewed"). Toast `Marked reviewed {n}`.
+4. Click `Save to company file ({n})` (aria-label "Save selected reviewed facts to company file") or `Review + save ({n})` (aria-label "Review and save selected facts to company file") to do both steps at once.
+   - Wait for: dialog **Save reviewed facts to company file?** (or **Review and save facts to company file?**) listing **Current** and **Will save** per item.
+5. Click `Save {n} fact(s)` or `Review + save {n} fact(s)` (button in the dialog).
+
+**Done when:** toast `Saved to company file {n}` or `Reviewed and saved {n}`, and the facts move to `Now in Company File ({n})`. Partial: `{ok} ok, {n} failed: {code}`. Each fact's `Goes to: {destination}` link opens the tab it updates (Company Profile, Notes, Memory, Jurisdictions).
+
+Per-row buttons do the same one fact at a time: **Mark reviewed**, **Review + save**, **Save to company file**. A badge **Needs edit before apply** disables them until the fact is edited.
+
+### Edit a research suggestion
+**Risk:** `WRITE` · **Roles:** Principal, Admin
+
+1. Click **Edit** on the fact row.
+2. Change **Proposed value JSON** (must be valid JSON), **Confidence** (0 to 1), **Rationale**, **Edit reason**.
+3. Click **Save**. **Cancel** discards.
+
+**Done when:** the row shows the new value. Errors: "Proposed value must be valid JSON", "Confidence must be a number from 0 to 1".
+
+### Reject research facts
+**Risk:** `DESTRUCTIVE` (no undo in the app) · **Roles:** Principal, Admin
+
+1. Tick the facts in **Review queue**.
+
+<Warning>
+**Approval required (DESTRUCTIVE).** Stop here and get approval before clicking **Reject**. Rejected facts cannot be brought back from the app.
+</Warning>
+
+2. Click `Reject ({n})` (button, aria-label "Reject selected") or **Reject** on a single row.
+
+**Done when:** toast `Rejected {n}` and the facts move to `Rejected Research Facts ({n})`.
+
+Other research controls: run date buttons in **Run history** (switch run; runs from the compliance register carry a **Compliance register** badge); `[{id}]` source anchors (aria-label `Jump to research source {id}`); **Exact values** (expands JSON).
+
+## Controls reference
+| Visible text | Type | Locator | What it does | Risk |
+|---|---|---|---|---|
+| **Request change** | button | People, request form | Files contact change request | WRITE or DESTRUCTIVE (archive, unlink) |
+| pencil, star, broken chain, box | icon buttons, no label | People, contact row end | Edit, make primary, unlink, archive | WRITE, DESTRUCTIVE |
+| **Confirm role**, **Submit selected** | buttons | Coverage resolver | Files role requests | WRITE |
+| **Add to HubSpot** | button | Seen on case threads | Files contact request (no HubSpot write) | WRITE |
+| **People Directory** | link button | Roles and contacts header | `/people` | READ |
+| **Import from document** | button | People, Employees, Payroll & Tax | Opens import dialog | AI |
+| **Extract values**, `Apply {n} {unit}` | buttons | import dialog | Extract, then apply | AI, WRITE |
+| **Add Employee**, **Edit**, **Update Employee** | buttons | Employees | Add or edit employee | WRITE |
+| **Import CSV** | button | Employees | CSV import dialog | WRITE |
+| **Save All Details** | button | Payroll & Tax | Replaces all stored details | WRITE |
+| **Run research**, **Start research** | buttons | Compliance | Starts register run | AI |
+| `Sources {n}`, **JSON**, **Copy JSON** | buttons | Compliance header | View sources and raw data | READ |
+| **Add Research**, **Retry** | buttons | Research | Starts research run | AI |
+| `Mark reviewed ({n})`, `Save to company file ({n})`, `Review + save ({n})` | buttons | Research review queue | Review and save facts | WRITE |
+| `Reject ({n})`, **Reject** | buttons | Research review queue | Reject facts | DESTRUCTIVE |
+
+## Waits and signals
+- Compliance run: several minutes; page polls every 5 seconds; **Behind the scenes** has a **Live** badge while running; finished on the "Register updated…" or "Register ready." toast.
+- Research run: polls every 3 seconds; finished when **Latest run** reads **Ready for review** (or **Needs attention**).
+- Import from document: **Reading document…** on the button until the review step appears.
+- Change requests return immediately with a toast; the contact changes only after approval on `/approvals`.
+
+## Gotchas
+- People & Roles never edits contacts directly; tell Clarwiz the change is pending approval.
+- The People tab's pending list shows only requests within the latest 100 pending tenant-wide.
+- Contact row icons have no labels; use their position.
+- Employees: a row click opens the edit sheet even when the tab is view-only.
+- Payroll & Tax: never save after a failed load; blank fields would overwrite stored values.
+- Compliance and Research buttons look available to Operators, but the runs are refused by the server.
+- **Add Research** stays enabled during a run; a second click starts a second run.
+
+## Related
+- [Client profile and tab map](/clients/client-profile)
+- [Contacts directory](/clients/people-and-contacts)
+- [Work tabs](/clients/client-tabs-work)
+- [Road Map tabs](/clients/client-tabs-roadmap)
+
+## Source files
+- `packages/web/src/app/(dashboard)/clients/[slug]/components/people-tab.tsx`
+- `packages/web/src/app/(dashboard)/clients/[slug]/components/people-insights.tsx`
+- `packages/web/src/app/(dashboard)/clients/[slug]/components/employees-tab.tsx`
+- `packages/web/src/app/(dashboard)/clients/[slug]/components/employee-import-dialog.tsx`
+- `packages/web/src/app/(dashboard)/clients/[slug]/components/payroll-tax-tab.tsx`
+- `packages/web/src/app/(dashboard)/clients/[slug]/components/section-import/section-import-dialog.tsx`
+- `packages/web/src/app/(dashboard)/clients/[slug]/components/compliance-tab.tsx`
+- `packages/web/src/app/(dashboard)/clients/[slug]/components/compliance-register/`
+- `packages/web/src/app/(dashboard)/clients/[slug]/components/research-tab.tsx`
+- `packages/transport-api/src/routes/contact-change-requests.ts`

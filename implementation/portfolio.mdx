@@ -1,0 +1,476 @@
+---
+title: "Implementation portfolio and start flow"
+sidebarTitle: "Portfolio and start"
+description: "Filter every implementation, bulk-edit milestones, nudge clients by email, and start a new implementation through the four-step hand-off flow."
+keywords: ["implementation", "onboarding", "new client onboarding", "start implementation", "new implementation", "hand-off", "handoff", "sync HubSpot", "nudge client", "follow up with client", "chase client", "blocked clients", "at risk clients", "go-live this month", "shift due dates", "reassign milestones", "generate plan", "first payroll", "reactivate implementation", "milestones"]
+---
+
+<Info>
+**URL:** `/implementation` (portfolio) · `/implementation/new?client={slug}` and `/implementation/{slug}/start` (start flow) · **Reach:** sidebar **Implementation** · **Roles:** Principal ✓ Operator ✓ (Admin ✓, Member ✗) · **Ready when:** the h1 **Implementation** is visible, the 6 pulsing loading bars are gone and the KPI tiles show numbers instead of "–".
+</Info>
+
+The portfolio lists every client between sales hand-off and first payroll. Use it to find clients, act on milestones in bulk, send nudge emails, and start new implementations. The workspace for a single client is on [Implementation workspace](/implementation/workspace).
+
+<Note>
+**Principal vs Operator.** Both can use every control on these pages, with one exception: **Sync HubSpot** only works for a Principal. For an Operator (and an Admin) it fails with the toast "Your profile cannot change Platform Admin, integrations, tenant switching. Allowed: Principal." and **New implementation** stays locked. An Operator starts implementations from `/implementation/new` instead (see [Start a new implementation](#start-a-new-implementation)). A Member who opens any `/implementation` URL sees only "Implementation, HR Assessment, Sales is not available on the Member profile."
+</Note>
+
+## Page map
+
+Portfolio, `/implementation` (no top tab bar):
+
+- **Page header** (top): h1 "Implementation", description "Every client between sales hand-off and first payroll — sorted by what needs you most.", and on the right **Sync HubSpot** and **New implementation**.
+- **KPI tiles** (row under the header; Clients and Board views only): **Active**, **At risk**, **Blocked**, **Awaiting hand-off**, **Go-live this month**.
+- **Filter bar** (under the tiles):
+  - View switch (radiogroup "View"): **Clients**, **Milestones**, **Board**.
+  - Clients and Board views: `Owner: {name}`, `Stage: any`, **Health**, a KPI clear chip, the text "Filters live in the URL · shareable" (wide screens only), search box "Search clients".
+  - Milestones view: `Owner: {name}`, chips **Blocked**, **At risk**, **Due this week**, **Waiting on client**, search box "Search milestones".
+- **Notices** (amber or red strips above the view body).
+- **View body**: Clients table (default), Milestones cards, or Board columns.
+- **Bulk bar** (Milestones view only; fixed at the bottom centre; appears when at least one row is ticked).
+
+Start flow, `/implementation/new` and `/implementation/{slug}/start`:
+
+- **Header**: breadcrumbs "Implementation › Start implementation"; h1 = client name (or "New implementation" while picking a client, "Start implementation" while loading); on the right the draft status text and **Save & exit**.
+- **Step list** (`ol`, aria-label "Start implementation steps"): **Client & owner**, **Payroll & tax**, **Services**, **Review & generate plan**.
+- **Step body**: the form for the current step.
+- **Footer** (bottom): **Back**, "Step `{n}` of 4", and the submit button (`Continue to {next step}` or **Generate plan**).
+
+## URL parameters
+
+Defaults are left out of the URL. Build a URL from these to open a filtered view directly.
+
+| Parameter | Values | Default | Notes |
+|---|---|---|---|
+| `view` | `clients`, `milestones`, `board` | `clients` | |
+| `kpi` | `active`, `at_risk`, `blocked`, `awaiting_handoff`, `go_live_month`, `all` | `active` | Clients and Board views |
+| `owner` | `me`, `everyone`, `unassigned`, or a user id | `me` | Clients and Board views |
+| `stage` | `-1` to `9` | any | `-1` = Sales & Close |
+| `health` | comma list of `red`, `yellow`, `green` | any | |
+| `q` | search text | empty | |
+| `sort` | `priority`, `blocked`, `first_payroll`, `name`, `stage`, `health` | `priority` | |
+| `dir` | `asc`, `desc` | | |
+| `page` | number | 1 | 25 rows per page |
+| `attention` | comma list of `blocked`, `at_risk`, `due_week`, `waiting_client` | `due_week` | Milestones view; `attention=` (empty) means no chips |
+| `mowner` | user id | Everyone | Milestones view owner |
+| `groups` | number, max 100 | 20 | Milestones view: client groups loaded |
+| `group` | `arc`, `stage` | `arc` | Board view grouping |
+
+Example: `/implementation?owner=everyone&kpi=blocked` lists blocked implementations for the whole team.
+
+## Recipes
+
+### Find implementations by filter
+
+**Risk:** `READ` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** any of owner, stage, health, KPI, search text.
+**Preconditions:** none.
+
+1. Open `/implementation` with the parameters you need (see [URL parameters](#url-parameters)). Alternative: click sidebar **Implementation**.
+   - Wait for: the loading bars (aria-busy "true", aria-label "Loading") to disappear and the KPI tile numbers to replace "–".
+2. To change owner, click `Owner: {name}` (popover trigger; visual: filter bar, right of the view switch). It starts as **Owner: Me**.
+3. In the popover, click **Me**, **Everyone**, **Unassigned**, or type a name in the search box (input, placeholder and aria-label "Search people") and click the person (listbox option).
+4. To filter by stage, click `Stage: any` (dropdown; visual: next to Owner) and click **Any stage**, **Sales & Close**, or `{n} · {Stage label}` (for example "0 · Intake" to "9 · First Payroll").
+5. To filter by health, click **Health** (dropdown with checkboxes) and tick **Red**, **Yellow** and/or **Green**. Press Esc to close it.
+6. To filter by KPI, click a KPI tile (toggle button; visual: row of tiles under the header). Clicking the pressed tile again clears it (`kpi=all`).
+7. To search, type in the search box (placeholder and aria-label "Search clients"; visual: right end of the filter bar).
+   - Wait for: 250 ms after the last keystroke, then for the table to refresh.
+
+**Done when:** the URL holds the chosen parameters and the table footer reads `Showing {start}–{end} of {total} implementations · sorted by …`.
+
+| If you see | Why | Do this |
+|---|---|---|
+| "No implementations match these filters" | Filters too narrow, or Owner is still **Me** | Switch Owner to **Everyone**, then clear other filters |
+| "No one matches “`{q}`”." in the owner popover | No person matches the typed name | Check the spelling; search by first name |
+| "Showing the 1,000 most recently updated implementations. Narrow the filters to see the rest." | Result was truncated | Add a stage, health or search filter |
+| `Implementation data is unavailable while the database catches up: {message}` | Degraded data | Wait one minute, reload, report if it persists |
+| "Unable to load implementations." | Load error | Reload once; report if it repeats |
+
+### List blocked clients across the team
+
+**Risk:** `READ` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** none.
+
+1. Open `/implementation?owner=everyone&kpi=blocked`.
+   - Alternative: click **Owner: Me** → **Everyone**, then click the **Blocked** tile.
+2. Read the **Blocked** column (`{n}d` = days blocked, "—" = not blocked).
+
+**Done when:** the URL contains `owner=everyone&kpi=blocked` and the **Blocked** tile is pressed (aria-pressed "true").
+
+### Sort the clients table
+
+**Risk:** `READ` · **Roles:** Principal, Operator
+
+1. Open `/implementation` (Clients view).
+2. Click a sortable column header (button inside the header cell): **Client**, **Stage**, **Health**, **Blocked**, **First payroll** or **Priority**. Headers display in uppercase.
+3. Click the same header again to flip the direction.
+
+**Done when:** the URL holds `sort=` and `dir=`, the header cell's `aria-sort` matches, and the footer reads `sorted by {name of sort}`.
+
+### Open a client implementation
+
+**Risk:** `READ` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** client name or slug.
+
+1. If you know the slug, open `/implementation/{slug}` directly and stop here.
+2. Otherwise open `/implementation?owner=everyone&kpi=all&q={client name}`.
+   - Wait for: the table to refresh (search applies 250 ms after typing).
+3. Click the client's row anywhere except the **Next action** cell (visual: table row; "Open ›" appears at the right end on hover).
+
+**Done when:** the URL is `/implementation/{slug}` (active implementations) or `/implementation/{slug}/start` (rows badged **Awaiting hand-off**).
+
+In the Board view, click the client's card instead (cards are links with the same targets).
+
+### Follow the next action for a client
+
+**Risk:** `READ` · **Roles:** Principal, Operator
+
+1. Find the client's row (see [Find implementations by filter](#find-implementations-by-filter)).
+2. Click the chip in the **Next action** column (link, title = the action label; red, blue or amber).
+
+**Done when:** the browser opens the chip's own target: a milestone (`?milestone={id}`), tracker settings (`?panel=settings&focus={field}`), the start flow (`/start`), or Stage 6 (`?stage=6`). The chip does not follow the row's target.
+
+### Review milestones that need attention
+
+**Risk:** `READ` · **Roles:** Principal, Operator
+
+1. Open `/implementation?view=milestones`. Alternative: click **Milestones** in the view switch (radio; visual: left end of the filter bar).
+   - Wait for: the summary strip `{n} milestone(s) need(s) attention` to appear.
+2. Toggle attention chips **Blocked**, **At risk**, **Due this week**, **Waiting on client** (toggle chips; an active chip shows an × with aria-label `Remove {label} filter`). **Due this week** is on by default.
+3. To change owner, click `Owner: {name}` and pick a person (default here is **Everyone**).
+4. Read the client cards (one `section` per client, aria-label = client name). Columns: Milestone, Stage, Status, Due, Blocked, Owner.
+5. To open one milestone, click **Open** on its row (link to `/implementation/{slug}?milestone={id}`).
+6. To load more clients, click `+ {n} more client(s) · {m} milestone(s)` (button at the bottom of the list).
+
+**Done when:** the summary strip and cards match the chosen filters. Empty result: "Nothing needs attention" / "No open milestones match these filters."
+
+### Use the board view
+
+**Risk:** `READ` · **Roles:** Principal, Operator
+
+1. Open `/implementation?view=board` (or `&group=stage` for one column per stage).
+2. Optionally switch grouping with **By arc** / **By stage** (radiogroup "Group board by").
+3. Read the columns (`section`, aria-label for example "A · Sales & Close", "B · Setup & Compliance", "C · Build & Migration", "D · Go-Live"), each with a count. An empty column shows "Nothing here."
+4. Click a card to open that client.
+
+**Done when:** columns are visible. The board is read-only: there is no drag and drop.
+
+### Reassign milestones in bulk
+
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** which milestones (client and title), new owner.
+
+1. Open `/implementation?view=milestones` and filter so the milestones are visible.
+2. Tick each milestone (checkbox, aria-label `Select {milestone title}`), or tick a whole client (checkbox, aria-label `Select all milestones for {client}`; shows mixed when partly ticked).
+   - Wait for: the bulk bar (toolbar, aria-label "Bulk actions"; visual: floating bar at the bottom centre) with `{n} selected`.
+3. Click **Reassign** (popover button in the bulk bar).
+4. Type the name in the search box (placeholder "Search people") and click the person, or click **Unassigned**. The change applies on click; there is no Save.
+   - Wait for: a toast.
+
+**Done when:** toast `{n} updated`.
+
+| If you see | Why | Do this |
+|---|---|---|
+| `{n} updated · {m} failed` (with up to 3 reasons) | Some rows were rejected; failed rows stay ticked | Read the reasons, report them |
+| "Bulk update failed" | Network failure | Retry once |
+
+### Shift milestone due dates in bulk
+
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** which milestones, number of days (negative = earlier).
+
+1. Open `/implementation?view=milestones` and tick the milestones (as in [Reassign milestones in bulk](#reassign-milestones-in-bulk)).
+2. Click **Shift due dates** (popover button in the bulk bar).
+3. Clear and type the number in **Shift by days** (number input, id "shift-days"; range −365 to 365; default 3; 0 is invalid). Help text: "Negative moves dates earlier. Milestones with no due date are skipped."
+4. Click **Apply** (button; disabled while the value is invalid).
+
+**Done when:** toast `{n} updated`. Milestones without a due date are skipped.
+
+### Nudge clients by email
+
+**Risk:** `EXTERNAL` (sends email from the signed-in user's Gmail and creates an Operations case) · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** which milestones; approved recipients, subject and message if Clarwiz wants changes.
+**Preconditions:** the signed-in user's Gmail must be connected for sending (see [Integrations](/settings/integrations#connect-your-google-workspace-account)).
+
+1. Open the nudge dialog one of these ways:
+   - Milestones view: click **Nudge** on a row (button; only shown when the milestone can be nudged).
+   - Milestones view, several: tick rows, then click **Nudge clients** in the bulk bar.
+   - Workspace: see [Nudge the client about a milestone](/implementation/workspace#nudge-the-client-about-a-milestone).
+   - Wait for: "Preparing the email…" to be replaced by the form. Title is `Nudge {client}` (one draft) or `Nudge clients · {i} of {n} · {client}` (several).
+2. Check **To** (input, id "nudge-to"; required; addresses separated by comma, semicolon or space). Click a button under "Other contacts:" to fill it, or type addresses.
+3. Check **Cc** (input, id "nudge-cc"; optional).
+4. Check **Subject** (input, id "nudge-subject"; required) and **Message** (textarea, id "nudge-body"; required). Edit only if Clarwiz supplied wording.
+
+Do not press Cmd/Ctrl+Enter anywhere in this form: it sends the email immediately, with no confirm.
+
+<Warning>**Approval required (EXTERNAL).** Stop here and get approval before clicking **Send nudge** or **Send & next**. Report the To, Cc, Subject and Message to Clarwiz. Sending emails the client from the user's Gmail and opens an Operations case. There is no undo.</Warning>
+
+5. Click **Send nudge** (one draft) or **Send & next** (several drafts; visual: dialog footer, right). It is disabled until To, Subject and Message are valid.
+   - Wait for: "Sending…" to finish.
+6. With several drafts, repeat steps 2-5 for each, or click **Skip** to skip one, or **Stop** to end. Closing the dialog (×, Esc, click outside) also acts as **Stop**.
+
+**Done when:** one draft: toast "Nudge sent · case created" (action **Open case** goes to `/service-desk?case={id}`). Several drafts: toast `{sent} sent · {skipped} skipped · {failed} failed`.
+
+| If you see | Why | Do this |
+|---|---|---|
+| "Gmail is not connected for sending." with **Connect Gmail** | The user's Gmail is not connected | Stop. Connecting needs Google OAuth: hand off to a human |
+| "No contact with an email on file. Add a contact or type an address." | No client contact has an email | Ask Clarwiz for the address, or add a contact at `/clients/{slug}?tab=people` |
+| "Some of these items are not waiting on the client — check the wording before sending." | A ticked milestone is not waiting on the client | Report to Clarwiz before sending |
+| "Email sent, but the nudge could not be recorded on the milestone." | Email went, logging failed | Do not resend. Report it |
+| "Couldn’t send the email" or another error | Send failed | Use **Copy email** (toast "Email copied") if Clarwiz wants the text; report |
+| "Nothing to nudge — the selected milestones were not found." | Rows vanished after a refresh | Reload and reselect |
+
+### Sync HubSpot
+
+**Risk:** `WRITE` (pulls HubSpot companies into Ariya; never writes to HubSpot) · **Roles:** Principal only (fails for Operator and Admin)
+
+1. Open `/implementation`.
+2. Click **Sync HubSpot** (button; visual: page header, top right, left of **New implementation**).
+   - Wait for: the spinner on the button to stop, then a toast.
+
+**Done when:** toast "HubSpot synced — you can start a new implementation". **New implementation** becomes enabled for this browser tab session only.
+
+| If you see | Why | Do this |
+|---|---|---|
+| "HubSpot is not configured for this workspace" | No HubSpot connection | Report; use `/implementation/new` to start instead |
+| `HubSpot sync {status}` | Sync did not complete | Retry once; report |
+| "Your profile cannot change Platform Admin, integrations, tenant switching. Allowed: Principal." | Signed in as Operator or Admin | Use `/implementation/new` to start an implementation |
+| "Unable to sync HubSpot." or another message | Network or server error | Retry once; report |
+
+### Start a new implementation
+
+**Risk:** `WRITE` · **Roles:** Principal, Operator (different entry points)
+**Inputs from Clarwiz:** client name.
+**Preconditions:** the client is in the HubSpot Implementation stage (or has status implementing). Only those clients are listed.
+
+Principal path:
+
+1. Open `/implementation` and run [Sync HubSpot](#sync-hubspot).
+2. Click **New implementation** (button; visual: page header, top right). While locked it is disabled and its wrapper has the title "Sync HubSpot first".
+   - Wait for: the dialog "New implementation".
+3. Click the **Client** combobox (button, id "new-implementation-client"; text "Select a client…").
+4. Type the client name in the search box. Click the client, or press Enter when exactly one matches. Picking the client routes immediately: there is no OK button.
+   - Wait for: "Checking for an existing implementation…" to finish.
+
+Operator path (also works for a Principal):
+
+1. Open `/implementation/new?client={slug}` if you know the slug, or `/implementation/new` to pick.
+2. On `/implementation/new`, click **Client** (combobox, id "start-client", placeholder "Search clients…") and pick the client. The URL becomes `/implementation/new?client={slug}`.
+
+Where you land:
+
+| Client state | Destination |
+|---|---|
+| No tracker yet | `/implementation/new?client={slug}`: continue with [Complete the hand-off and generate the plan](#complete-the-hand-off-and-generate-the-plan) |
+| Tracker awaiting hand-off | `/implementation/{slug}/start`: continue with the same recipe |
+| Active tracker | `/implementation/{slug}`: already running; nothing to start |
+| Cancelled tracker | Amber box: see [Reactivate a cancelled implementation](#reactivate-a-cancelled-implementation) |
+
+**Done when:** the browser is on one of the destinations above.
+
+| If you see | Why | Do this |
+|---|---|---|
+| Combobox reads "No accounts in the Implementation stage" / "No HubSpot accounts are in the Implementation stage. Move the company to Implementation in HubSpot, then sync again." | No eligible client | Stop. Report: the company must be moved to Implementation in HubSpot (EXTERNAL, human task) |
+| Client missing from the list | Not in the Implementation stage | Same as above |
+| "Couldn’t load clients." / "Couldn’t check this client." | Load error | Close the dialog, retry once |
+| **New implementation** disabled | Sync not run in this tab, or a sync is running | Run [Sync HubSpot](#sync-hubspot) (Principal) or use the Operator path |
+
+### Reactivate a cancelled implementation
+
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** client name.
+
+1. Start as in [Start a new implementation](#start-a-new-implementation), or open `/implementation/{slug}`.
+2. You see one of:
+   - In the New implementation dialog: amber box "This client’s implementation was cancelled. Reactivate it to pick up where it left off."
+   - In the start flow: `{client} has a cancelled implementation.` / "Reactivate it to pick up where it stopped — its milestones and history come back with it."
+   - In the workspace: h3 "This implementation was cancelled".
+3. Click **Reactivate** (button).
+   - Wait for: a toast.
+
+**Done when:** toast "Implementation reactivated" (dialog) or `{client} is back in the implementation queue` (start flow), and the browser navigates to the workspace or start flow.
+
+| If you see | Why | Do this |
+|---|---|---|
+| "Couldn’t reactivate this implementation." | Server error | Retry once; report |
+
+### Complete the hand-off and generate the plan
+
+**Risk:** `WRITE` (step 1 creates the tracker; step 4 creates every milestone) · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** owner; client type (existing or new payroll); first check date; go-live target (optional); prior payroll provider; who handles state tax IDs; states with employees; services purchased.
+**Preconditions:** you are on `/implementation/new?client={slug}` or `/implementation/{slug}/start`.
+
+Never press Enter in a text field unless a step says so: Enter submits the step (same as Continue).
+
+Step 1, **Client & owner**:
+
+1. Check **Client** (combobox, id "start-client"). If it shows a lock icon and "The implementation tracker already exists for this client.", it is fixed.
+2. Click **Implementation owner** (owner-picker trigger, id "start-owner"; placeholder "Choose an owner"). It defaults to you on a new tracker.
+3. Type the owner's name in "Search people" and click the person. There is no Unassigned option.
+4. Click **Continue to Payroll & tax** (button; visual: footer, right).
+   - Wait for: the URL to become `/implementation/{slug}/start?step=2`. On a new client this creates the tracker.
+
+Step 2, **Payroll & tax** ("These four answers decide which milestones get generated and when they're due."):
+
+5. Under **Client type**, click **Existing payroll** or **New payroll** (radio). Existing payroll adds the prior-provider extraction milestones (Stage 6).
+6. Fill **First check date** (date input, id "start-first-check"). This fills **Go-live target** with +21 days unless it was edited by hand.
+7. Change **Go-live target** (date input, id "start-go-live") only if Clarwiz gave a hard date.
+8. Fill **Prior payroll provider** (text input with suggestions, id "start-prior-provider"; placeholder "e.g. Gusto" or "None — new payroll"). "From HubSpot." in the help text means it was pre-filled.
+9. Under **State tax ID path**, click **Client already has IDs**, **Ariya registers** or **Client is handling** (radio cards).
+10. Click **States with employees** (chip input, id "start-states", placeholder "Add state…"), type a state code or name, then press Enter, Comma or Tab to add the highlighted match. Repeat per state. To remove one, click its × (aria-label `Remove {State name}`).
+11. Leave "Advanced (admin) — automation eligibility, SLA profile, playbook version" collapsed unless Clarwiz gave values for **Automation eligibility** (select, id "start-automation"; Manual / Draft / Suggested / Approval required / Automatic) or **SLA profile** (id "start-sla").
+12. Click **Continue to Services**.
+
+Step 3, **Services**:
+
+13. Click each purchased service card (checkbox cards; HubSpot suggestions carry the tag "From HubSpot"). Clicking a card also confirms the election.
+14. If only core payroll was bought, click **Confirm core payroll only** (link-button; shown only while the election is unconfirmed).
+15. Click **Continue to Review & generate plan**.
+
+Step 4, **Review & generate plan**:
+
+16. Read the summary sections (Client & owner, Payroll & tax, Services). If a box reads `{n} thing(s) to fix before the plan can be generated`, click **Fix** on each item, correct it, and return with the step list.
+17. Click **Generate plan** (button; visual: footer, right).
+   - Wait for: the spinner to stop, then a toast.
+
+**Done when:** toast `Plan generated for {client}` and the URL becomes `/implementation/{slug}`.
+
+| If you see | Why | Do this |
+|---|---|---|
+| "Choose the client this implementation is for." | No client picked | Pick the client |
+| "Required — the owner gets every milestone by default." | No owner | Pick an owner |
+| "Could not start the implementation." | Tracker create failed | Retry once; report |
+| "Required — every milestone due date counts back from this." / "Enter a real date." | First check date missing or invalid | Ask Clarwiz for the date |
+| "Required — choose who handles state tax IDs." | No tax path chosen | Ask Clarwiz |
+| "Add at least one state — Ariya registers in each one." / "Add at least one state with employees." | No state chips | Add the states |
+| "Confirm the service election, even if it is core payroll only." | Services not confirmed | Tick services or click **Confirm core payroll only** |
+| "Fix the items above, then generate the plan." / "Could not generate the plan." | Validation or server error | Fix listed items; retry once |
+| "No client found for `{slug}`. Back to Implementation" | Wrong slug | Check the slug with Clarwiz |
+
+### Resume or save a hand-off draft
+
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+
+1. Open `/implementation/{slug}/start`. It reopens the saved step (step 2 at the earliest). Rows badged **Awaiting hand-off** in the portfolio also lead here.
+2. To go back to an earlier step, click it in the step list (only steps already reached are clickable) or click **Back**.
+3. To leave, click **Save & exit** (button; visual: header, top right).
+   - Wait for: the draft status to read `Draft saved {n}s ago` (or m/h) before you leave by any other route.
+
+**Done when:** the URL is `/implementation` after **Save & exit**, or the draft status reads `Draft saved …`.
+
+| If you see | Why | Do this |
+|---|---|---|
+| "Draft not saved — will retry" (red) | Autosave failed | Wait; do not leave until it reads `Draft saved …` |
+
+## Controls reference
+
+Portfolio:
+
+| Visible text | Type | Locator | What it does | Risk |
+|---|---|---|---|---|
+| **Sync HubSpot** | button | header, top right | Pulls HubSpot into Ariya; unlocks New implementation for this tab | `WRITE` (Principal only) |
+| **New implementation** | button | header, top right; wrapper title "Sync HubSpot first" while locked | Opens the New implementation dialog | `READ` |
+| **Active** / **At risk** / **Blocked** / **Awaiting hand-off** / **Go-live this month** | toggle tiles | aria-pressed | Sets `kpi`; pressing the active tile sets `kpi=all` | `READ` |
+| **Clients** / **Milestones** / **Board** | radio buttons | radiogroup aria-label "View" | Switches view | `READ` |
+| `Owner: {name}` | popover trigger | search input aria-label "Search people"; options role "option" | **Me**, **Everyone**, **Unassigned**, people | `READ` |
+| `Stage: any` | dropdown | filter bar | **Any stage**, **Sales & Close**, "0 · Intake" … "9 · First Payroll" | `READ` |
+| **Health** | dropdown with checkboxes | filter bar | **Red**, **Yellow**, **Green** | `READ` |
+| `{KPI label}` × | chip button | aria-label `Clear {KPI label} filter` | Sets `kpi=all` | `READ` |
+| (search) | text input | placeholder "Search clients" or "Search milestones" | Filters after 250 ms | `READ` |
+| **Blocked** / **At risk** / **Due this week** / **Waiting on client** | toggle chips | aria-pressed; × aria-label `Remove {label} filter` | Milestones attention filters | `READ` |
+| Column headers **Client**, **Stage**, **Health**, **Blocked**, **First payroll**, **Priority** | buttons | `th[aria-sort]` | Sort; click again to flip | `READ` |
+| Next action chip | link | title = action label | Deep-links to the action | `READ` |
+| **‹ Prev** / **Next ›** | buttons | table footer | Page through 25 rows | `READ` |
+| **Nudge** | button | Milestones row | Opens the nudge dialog | `EXTERNAL` on send |
+| **Open** | link | Milestones row | `/implementation/{slug}?milestone={id}` | `READ` |
+| **By arc** / **By stage** | radio | radiogroup "Group board by" | Board grouping | `READ` |
+
+Bulk bar (toolbar aria-label "Bulk actions"):
+
+| Visible text | Type | Locator | What it does | Risk |
+|---|---|---|---|---|
+| **Reassign** | popover with owner picker | bulk bar | Applies on pick; includes **Unassigned** | `WRITE` |
+| **Shift due dates** | popover form | field id "shift-days"; **Apply** | Moves due dates by N days | `WRITE` |
+| **Nudge clients** | button | bulk bar | Opens the nudge dialog for all ticked | `EXTERNAL` on send |
+| × | icon button | aria-label "Clear selection" | Clears ticks | `READ` |
+
+New implementation dialog:
+
+| Visible text | Type | Locator | What it does | Risk |
+|---|---|---|---|---|
+| **Client** | combobox button | id "new-implementation-client" | Picking routes immediately | `READ` |
+| **Reactivate** | button | amber box | Reactivates a cancelled tracker | `WRITE` |
+
+Nudge dialog:
+
+| Visible text | Type | Locator | What it does | Risk |
+|---|---|---|---|---|
+| **To** | input | id "nudge-to" | Recipients (required) | — |
+| **Cc** | input | id "nudge-cc" | Optional | — |
+| **Subject** | input | id "nudge-subject" | Required | — |
+| **Message** | textarea | id "nudge-body" | Required | — |
+| "Other contacts:" buttons | buttons | under To | Fill To | — |
+| **Send nudge** / **Send & next** | button | footer | Sends the email | `EXTERNAL` |
+| **Cancel** / **Stop** / **Skip** | buttons | footer | Close, end the batch, skip one | `READ` |
+| **Copy email** | button | error alert | Copies the draft | `READ` |
+| Cmd/Ctrl+Enter | keyboard | anywhere in the form | **Sends the email** | `EXTERNAL` |
+
+Start flow:
+
+| Visible text | Type | Locator | What it does | Risk |
+|---|---|---|---|---|
+| **Save & exit** | button | header, right | Flushes the draft, goes to `/implementation` | `WRITE` |
+| **Back** | button | footer, left | Previous step; on step 1 goes to `/implementation` | `READ` |
+| `Continue to {step}` / **Generate plan** | submit button | footer, right | Next step; step 1 on a new client creates the tracker; **Generate plan** creates milestones | `WRITE` |
+| Step list buttons | buttons | aria-label "Start implementation steps" | Jump to a reached step | `READ` |
+| **Fix** / **Edit** | buttons | step 4 | Jump to the field or section | `READ` |
+| **Confirm core payroll only** | link-button | step 3 | Confirms no add-ons | `WRITE` (autosave) |
+
+## Waits and signals
+
+- Portfolio loading: 6 pulsing bars (aria-busy "true", aria-label "Loading"); KPI numbers show "–" until counts load.
+- Search applies 250 ms after the last keystroke.
+- **Sync HubSpot** shows a spinner; wait for the toast before clicking **New implementation**.
+- New implementation dialog: "Loading clients…" in the combobox, then "Checking for an existing implementation…" after picking.
+- Nudge dialog: "Preparing the email…", then "Sending…".
+- Start flow: two pulsing blocks while loading. Autosave fires 800 ms after the last edit and on every step change. The draft status (header, right) appears only once a tracker exists: "Draft autosaves", then "Saving draft…", then `Draft saved {n}s ago` (or m/h), or "Draft not saved — will retry" in red.
+- Toasts are transient (top or bottom corner). Read them right after the action.
+
+## Gotchas
+
+- The **New implementation** unlock lasts only for the current browser tab session. A new tab or session needs **Sync HubSpot** again. The **New implementation** button in the empty state ("No implementations match these filters") is not gated.
+- Operator and Admin cannot run **Sync HubSpot**. Use `/implementation/new`.
+- Owner defaults to **Me**, so an empty list often means "nothing owned by me". Set `owner=everyone`.
+- The clients table is at least 1122 px wide and scrolls sideways on narrow screens.
+- Clicking the **Next action** chip goes to the chip's target, not the row's.
+- Bulk selection drops rows that disappear after a refresh.
+- Cmd/Ctrl+Enter in the nudge dialog sends the email with no confirm.
+- In the start flow, Enter in a text field submits the step. In "Add state…", Enter adds a chip only when text is typed; with an empty input it submits.
+- Clicking a service card while the election is unconfirmed both selects it and confirms the election.
+- Step 1 **Continue** on a new client creates the tracker straight away.
+- In-app help (? panel) says **Sync HubSpot** just updates the client list; the app also unlocks **New implementation** for this tab only, and keeps it disabled while a sync runs.
+- In-app help for the start flow mentions only **Implementation owner** on step 1; on `/implementation/new` without `?client=` you must also pick **Client**, and Continue creates the tracker.
+- In-app help says "Nothing goes out until you click **Send**"; the button is **Send nudge** or **Send & next**, and Cmd/Ctrl+Enter also sends.
+
+## Related
+
+- [Implementation workspace](/implementation/workspace)
+- [Integrations](/settings/integrations)
+- [Implementation catalog](/settings/catalogs-and-defaults#implementation-catalog)
+
+## Source files
+
+- `packages/web/src/app/(dashboard)/implementation/components/portfolio/portfolio-page.tsx`
+- `packages/web/src/app/(dashboard)/implementation/components/portfolio/clients-table.tsx`
+- `packages/web/src/app/(dashboard)/implementation/components/portfolio/milestones-view.tsx`
+- `packages/web/src/app/(dashboard)/implementation/components/portfolio/board-view.tsx`
+- `packages/web/src/app/(dashboard)/implementation/components/portfolio/bulk-bar.tsx`
+- `packages/web/src/app/(dashboard)/implementation/components/portfolio/new-implementation-dialog.tsx`
+- `packages/web/src/app/(dashboard)/implementation/components/start/start-flow.tsx`
+- `packages/web/src/app/(dashboard)/implementation/components/start/step-client-owner.tsx`
+- `packages/web/src/app/(dashboard)/implementation/components/start/step-payroll-tax.tsx`
+- `packages/web/src/app/(dashboard)/implementation/components/start/step-services.tsx`
+- `packages/web/src/app/(dashboard)/implementation/components/start/step-review.tsx`
+- `packages/web/src/components/implementation/nudge-flow.tsx`
+- `packages/web/src/lib/implementation/url-state.ts`
+- `packages/transport-api/src/server.ts` (integrations gate on HubSpot sync)

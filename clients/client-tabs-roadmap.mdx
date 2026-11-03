@@ -1,0 +1,274 @@
+---
+title: "Client Road Map, Roadmap Report and Implementation tabs"
+sidebarTitle: "Road Map tabs"
+description: "Work a client's approved HR Road Map, draft deliverables, export the road map PDF, run and finalize a roadmap progress report, and check or start the client's implementation."
+keywords: ["road map", "roadmap", "HR road map", "elevated HR", "initiative", "complete task", "add initiative", "draft deliverable", "export roadmap PDF", "roadmap progress report", "roadmap report", "progress report", "work record", "implementation", "onboarding", "hand-off", "go-live", "reactivate implementation", "discovery assessment"]
+---
+
+<Info>
+**URL:** `/clients/{slug}?tab=roadmap`, `?tab=roadmap-report`, `?tab=implementation` · **Reach:** client page → tab bar ([tab map](/clients/client-profile#tab-map)) · **Roles:** Principal ✓ Operator ✓ (Road Map editable but **Start research** returns 403; **Roadmap Report** hidden; Implementation full) · **Ready when:** Road Map: "Loading roadmap..." gone and either the title **12-Month Elevated HR Road Map** or the card **Start a Discovery Assessment** is visible. Roadmap Report: H2 **Roadmap Report**. Implementation: card **Implementation** without the loading pulse.
+</Info>
+
+The client's HR plan, the Principal-only progress report against it, and the client's onboarding status.
+
+<Note>
+Always open these with `?tab=`. Without it the client page jumps to the tab you last used ([Always pass ?tab=](/clients/client-profile#always-pass-the-tab-parameter)).
+</Note>
+
+## Road Map tab
+Shows only an **approved** (active, completed, paused) road map. With none, or one still in draft, presented, revised or lost, the tab shows **Start a Discovery Assessment** instead. Edit needs Contacts, employees, compliance and client Road Map: Principal, Admin and Operator can edit; Member is view-only and sees "No approved Road Map for this client yet." when there is none.
+
+Layout with a road map, top to bottom:
+1. **Overview card:** badge **Client Road Map**, a status badge (**Active**, **Completed**, **Paused**, **Approved**…), title **12-Month Elevated HR Road Map**; buttons **Edit Road Map** (reads **Done Editing** in edit mode), **History**, **Export PDF**; tiles **Progress**, **Active phase**, **Open initiatives**, **Next deliverable**; quarter headers; phase cards with **Open workspace** and a wand icon (title "Draft deliverable").
+2. **Phase Workspace** card: **Draft next deliverable**, **Open documents** (opens `?tab=documents`); **Service guidance**; **Phase initiatives**; **Phase intelligence** (**Start research**, **Open dossier**); **Document execution** (**Draft** per item).
+3. **Ariya Road Map Intelligence:** **Refresh**; **Research this client** (**Start research**, **Open dossier**); **Ariya HR Advisor** (textarea and **Ask advisor**); suggestion cards with **Accept initiative**.
+4. Collapsible **Road Map source documents** ("Import or stage intelligence context").
+
+### Open the road map or start an assessment
+**Risk:** `READ` · **Roles:** all
+
+1. Open `/clients/{slug}?tab=roadmap`.
+   - Wait for: "Loading roadmap..." to disappear.
+2. If the title **12-Month Elevated HR Road Map** shows, read the tiles and phases.
+3. If the card **Start a Discovery Assessment** shows:
+   - **Start assessment** (button) opens `/sales/hr-roadmap/{clientId}`.
+   - **Resume assessment** (button; shown when one is in progress) opens `/sales/hr-roadmap/{clientId}?tab={step}` where the step is `research`, `assessment`, `discovery-call` or `roadmap`.
+   - Those pages belong to Sales → HR Roadmap; follow the Sales playbook from there.
+
+**Done when:** you know whether the client has an approved road map.
+
+### Complete or reopen an initiative
+**Risk:** `WRITE` · **Roles:** Principal, Admin, Operator. Edit mode is not needed.
+
+1. Open `/clients/{slug}?tab=roadmap`.
+2. Find the task in a phase card or in **Phase initiatives**.
+3. Click the round check icon (icon button, aria-label "Complete initiative" or "Reopen initiative"; visual: left of the task name) or the **Complete** / **Reopen** button on the row.
+
+**Done when:** the icon fills (or empties) and **Progress** changes.
+
+### Add an initiative
+**Risk:** `WRITE` · **Roles:** Principal, Admin, Operator
+**Inputs from Clarwiz:** phase, initiative name.
+
+1. Click **Edit Road Map** (button; visual: overview card header).
+2. In the phase card, click **Add initiative** (button; edit mode only).
+3. Type the name (input, placeholder "New task name..." or "New initiative...").
+4. Click **Add** or press Enter. **Cancel** discards.
+5. Click **Done Editing**.
+
+**Done when:** toast "Task added" and the task appears in the phase.
+
+### Edit phases and initiatives
+**Risk:** `WRITE` · **Roles:** Principal, Admin, Operator
+
+1. Click **Edit Road Map**.
+2. Change a phase name, phase **Service guidance**, task name, **Linked doc type** (select; **No linked doc** or a document type), due date or initiative guidance.
+3. Click outside the field (or press Tab). Each field saves on blur with no toast and no error message.
+4. Click **Done Editing** (it does not save anything by itself).
+5. Reload `/clients/{slug}?tab=roadmap` and check the values.
+
+**Done when:** the reloaded page shows the new values.
+
+### Delete an initiative
+**Risk:** `DESTRUCTIVE` · **Roles:** Principal, Admin, Operator
+
+1. Click **Edit Road Map**.
+
+<Warning>
+**Approval required (DESTRUCTIVE).** Stop here and get approval before clicking the trash icon. The task is deleted immediately with no confirmation.
+</Warning>
+
+2. Click the trash icon on the task row (icon button, no label; edit mode only).
+
+**Done when:** toast "Task removed".
+
+### Draft a road map deliverable
+**Risk:** `READ` (handoff) · **Roles:** all
+
+1. Click **Draft** on a task in **Document execution**, **Draft next deliverable** in **Phase Workspace**, the wand icon on a phase card (title "Draft deliverable"), or **Draft deliverable** in the advisor panel.
+   - It opens `/generate?template={templateId}&client={slug}&source=hr-roadmap`.
+2. Continue on [Generate page](/documents/generate-page).
+
+**Done when:** URL starts with `/generate?template=` and contains `source=hr-roadmap`.
+
+### Export the road map as PDF
+**Risk:** `WRITE` (creates or refreshes the client's road map document) · **Roles:** Principal, Admin, Operator
+
+1. Click **Export PDF** (button; visual: overview card header; reads **Preparing…**).
+   - Wait for: toast "Preparing PDF…" then "PDF downloaded".
+
+**Done when:** the PDF downloads. Failure toast: "Could not generate the PDF".
+
+### Ask the advisor and apply a recommendation
+**Risk:** `WRITE` (apply) · **Roles:** Principal, Admin, Operator. **Ask advisor** is a local template, not AI.
+
+1. In **Ariya HR Advisor**, type the question (textarea, placeholder "Ask about a client HR issue, compliance question, policy decision, or best Ariya action...").
+2. Click **Ask advisor** (button; reads **Reviewing...** briefly).
+3. Read the draft panel. Click **Apply to Road Map** to add it as a task and save a client memory.
+
+**Done when:** toast "Advisor recommendation added to Road Map".
+
+<Warning>
+**Operator:** the task is added, but the memory write is refused. Expect the toast "Road Map updated, but advisor memory was not saved". Do not retry.
+</Warning>
+
+### Accept a suggested initiative
+**Risk:** `WRITE` · **Roles:** Principal, Admin, Operator
+
+1. In **Ariya Road Map Intelligence**, click **Accept initiative** on a suggestion card (reads **Adding...**). The X on a card (icon button, no label) only hides it on this page.
+
+**Done when:** toast "Roadmap initiative added". Errors: "Failed to add roadmap initiative", "Create a roadmap phase before adding this suggestion".
+
+### Start client research from the road map
+**Risk:** `AI` · **Roles:** Principal, Admin (Operator: 403)
+
+<Warning>
+**Operator:** **Start research** is enabled but the API refuses it. Expect the toast "Unable to start research". Do not retry.
+</Warning>
+
+1. Click **Start research** (button in **Research this client** or **Phase intelligence**).
+
+**Done when:** toast "Client research started". Progress shows only on the Research tab ([Run client research](/clients/client-tabs-people-hr#run-client-research)). **Open dossier** opens `?tab=research`.
+
+### Import a road map from a PDF or add source documents
+**Risk:** `AI` (extract), `WRITE` (save) · **Roles:** Principal, Admin, Operator. Available only when the client already has an approved road map; for a client without one, upload the PDF in the [Roadmap Report start dialog](#run-a-roadmap-progress-report).
+
+1. Click **Road Map source documents** (collapsible row at the bottom).
+2. Choose the file in **PDF** (file input). Optional: set **Start date**.
+3. Click **Extract** (button; reads **Extracting...**).
+   - Wait for: toast "Roadmap draft extracted" and a draft preview.
+4. Click **Save** on the draft (reads **Saving...**). The X discards the draft.
+
+**Done when:** toast "Roadmap imported".
+
+To add supporting files for intelligence: use **Add files** (multi-file input). Toast `{n} source document(s) saved for Road Map intelligence`.
+
+### View road map version history
+**Risk:** `READ` · **Roles:** all
+
+1. Click **History** (button, overview card header). **Version history** appears. Empty: "No snapshots yet — …" (a snapshot is taken when the road map is first approved).
+
+## Roadmap Report tab
+Principal only. Compares everything Ariya did for the client against the road map, lets you correct verdicts, then finalizes: updates road map statuses and produces the client PDF. Hidden for Admin, Operator and Member; opening `?tab=roadmap-report` as them shows Overview.
+
+**Ready when:** H2 **Roadmap Report** and a bar reading "No report has been run for this client yet." or `Last report {date} · {status}`.
+
+### Run a roadmap progress report
+**Risk:** `AI` · **Roles:** Principal
+
+1. Open `/clients/{slug}?tab=roadmap-report&start=1` (or click **Roadmap progress report** in the client header). With no run active, the start dialog opens and `start=1` is removed. Otherwise click **Run analysis** or **Run a new analysis** (button in the bar).
+   - Wait for: dialog **What should this report be checked against?**
+2. Pick one radio option:
+   - A road map on file (title = road map name; description such as `From the discovery assessment · {n} items · starts {date} · {status}`).
+   - **Upload the client's existing roadmap (PDF)** or **Upload a newer version of the roadmap (PDF)**: choose the file, optional **Roadmap start date (optional)**, click **Read the PDF** (AI). Wait for `{name} · {n} phases, {n} items…` and toast "Roadmap saved to the Road Map tab."
+   - **This client has no roadmap** (produces a work record instead).
+3. Click **Run analysis** (or **Run work record** for the no-roadmap option).
+   - Wait for: toast "Ariya is comparing this client's work against the roadmap." (or "…compiling this client's work record."). Section with aria-label "Analysis progress" shows "Waiting to start" then "Analysing…" with a step list (icons labelled **Done**, **Running**, **Skipped**, **Not started**). The page checks every 3 seconds.
+
+**Done when:** the pill reads **Ready for review** and the review panel appears. **Failed** shows the error in the last-report bar.
+
+| If you see | Why | Do this |
+|---|---|---|
+| "This client has no HR roadmap on file. Upload the existing roadmap, or confirm a work record without one." | No road map | Pick the upload option or **This client has no roadmap** |
+| "A report for this client is already in progress or waiting for review." | Run exists | Review or discard the existing one |
+| "Could not read the roadmap PDF." / "Could not save the roadmap." | PDF step failed | Report |
+
+### Review and finalize the report
+**Risk:** `WRITE` (updates road map statuses, creates a document and PDF) · **Roles:** Principal
+
+1. In the review panel, edit **Overview for the client** (textarea; saves on blur).
+2. Per item: tick the checkbox (`{item}: done` or `{item}: not done`), set the verdict (select, aria-label `Verdict for {item}`: **Done**, **In progress**, **Pending**, **No longer applies**), edit `Where it stands: {item}` (textarea; saves on blur). The X (aria-label `Remove "{title}" from the report`) drops an item.
+3. Read **Open questions to confirm before sharing** ("Not included in the client PDF"), **Roadmap items**, **Additional support outside the roadmap** or **Completed work** / **Work in progress**, **Deliverables**.
+4. Click **Finalize and create PDF** (button).
+   - Wait for: dialog **Finalize this report?** describing how many item statuses will change.
+5. Click **Finalize and create PDF** in the dialog. **Cancel** backs out.
+
+**Done when:** toast "Report finalized." or `Report finalized. {n} roadmap item(s) updated.`, then "Preparing PDF…" and "PDF downloaded". Errors: "Could not save the change.", "Could not finalize the report."
+
+### Discard a report
+**Risk:** `DESTRUCTIVE` · **Roles:** Principal
+
+1. Click **Discard** (button; in the review panel or the progress section).
+   - Wait for: dialog **Discard this report?** "The analysis and any corrections are thrown away. The roadmap is not changed."
+
+<Warning>
+**Approval required (DESTRUCTIVE).** Stop here and get approval before clicking **Discard**. The analysis and corrections are lost.
+</Warning>
+
+2. Click **Discard** in the dialog.
+
+**Done when:** toast "Report discarded."
+
+### Download a previous report PDF
+**Risk:** `READ` · **Roles:** Principal
+
+1. Click **Download latest PDF** in the bar, or **Download PDF** on a row under **Previous reports**.
+
+**Done when:** the PDF downloads.
+
+## Implementation tab
+Onboarding status for the client. Principal, Admin and Operator can use it; hidden for Member.
+
+**Ready when:** card **Implementation** (a pulse block while loading). Error: "Implementation status is unavailable. Refresh to try again."
+
+### Check or start the client implementation
+**Risk:** `READ` (navigation), `WRITE` (reactivate) · **Roles:** Principal, Admin, Operator
+
+1. Open `/clients/{slug}?tab=implementation`.
+2. Read the key values: **status**, **milestones done**, **readiness**, **first payroll**, **after go-live services**, and the card **After go-live** (link **Manage in workspace**).
+3. Click the primary button, which depends on the state:
+   - **Start implementation** ("No implementation yet. Start one to generate the plan from HubSpot.") → `/implementation/new?client={slug}`.
+   - **Complete hand-off** → `/implementation/{slug}/start`.
+   - **Open workspace** → `/implementation/{slug}`.
+   - **Reactivate** ("This client’s implementation was cancelled. Reactivate it to pick up where it stopped.") → reactivates in place. Toast "Implementation reactivated" or "Could not reactivate the implementation".
+   - No button with "Already onboarded — this client is live on payroll, so there is no implementation to run."
+4. Continue on the Implementation playbook pages for the pages it opens.
+
+**Done when:** the target page opens, or the reactivate toast shows.
+
+## Controls reference
+| Visible text | Type | Locator | What it does | Risk |
+|---|---|---|---|---|
+| check circle, **Complete**, **Reopen** | icon button, buttons | aria-label "Complete initiative" / "Reopen initiative" | Toggle task | WRITE |
+| **Edit Road Map**, **Done Editing** | button | overview card | Enter or leave edit mode | READ |
+| **Add initiative**, **Add** | buttons | phase card, edit mode | Create task | WRITE |
+| trash | icon button, no label | task row, edit mode | Delete task, no confirm | DESTRUCTIVE |
+| **Draft**, **Draft next deliverable**, wand, **Draft deliverable** | links | phase areas, advisor panel | `/generate?…&source=hr-roadmap` | READ |
+| **Export PDF** | button | overview card | Builds and downloads PDF | WRITE |
+| **History** | button | overview card | Version history | READ |
+| **Start research** | button | intelligence panels | Client research run | AI |
+| **Ask advisor**, **Apply to Road Map** | buttons | Ariya HR Advisor | Local template; apply adds task and memory | WRITE |
+| **Accept initiative** | button | suggestion cards | Adds task | WRITE |
+| **Extract**, **Save** | buttons | Road Map source documents | PDF to draft, then import | AI, WRITE |
+| **Run analysis**, **Run work record** | buttons | Roadmap Report start dialog | Starts report | AI |
+| **Read the PDF** | button | start dialog upload option | Reads and saves road map | AI, WRITE |
+| **Finalize and create PDF** | button | review panel and dialog | Writes statuses, creates PDF | WRITE |
+| **Discard** | button | review panel and dialog | Throws away report | DESTRUCTIVE |
+| **Start implementation**, **Complete hand-off**, **Open workspace** | buttons | Implementation card | Navigate to implementation pages | READ |
+| **Reactivate** | button | Implementation card | Reactivates cancelled implementation | WRITE |
+
+## Waits and signals
+- Road Map: "Loading roadmap..." then content. Edit-mode field saves give no feedback; reload to verify.
+- Export PDF: "Preparing PDF…" then "PDF downloaded".
+- Roadmap Report: polls every 3 seconds; done at **Ready for review**.
+- Implementation: pulse block while loading.
+
+## Gotchas
+- The cross-client HR Road Map view counts tasks on unapproved road maps; this tab shows only approved ones.
+- Completing a task does not need **Edit Road Map**; adding a task does. In-app help says the check button is used under Edit Road Map.
+- **Done Editing** does not save; fields save on blur.
+- **Ask advisor** looks like AI but is a fixed local template.
+- **Start research** here shows progress only on the Research tab.
+- **Road Map source documents** is only on the page when an approved road map exists.
+
+## Related
+- [Client profile and tab map](/clients/client-profile)
+- [HR Road Map across clients](/clients/clients-list#review-hr-road-map-work-across-clients)
+- [Research tab](/clients/client-tabs-people-hr#research-tab)
+- [Generate page](/documents/generate-page)
+
+## Source files
+- `packages/web/src/app/(dashboard)/clients/[slug]/components/roadmap-tab.tsx`
+- `packages/web/src/app/(dashboard)/clients/[slug]/components/roadmap-report-tab.tsx`
+- `packages/web/src/app/(dashboard)/clients/[slug]/components/roadmap-report/start-dialog.tsx`
+- `packages/web/src/app/(dashboard)/clients/[slug]/components/implementation-summary-card.tsx`

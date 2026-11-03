@@ -1,0 +1,223 @@
+---
+title: "Approvals and compliance"
+sidebarTitle: "Approvals and compliance"
+description: "Review, approve, reject and apply contact-change requests, and find, sync, complete or waive client compliance items."
+keywords: ["approvals", "contact change", "approve contact change", "reject contact change", "apply change", "compliance", "compliance items", "overdue compliance", "mark compliance done", "waive", "sync obligations", "deadlines", "due dates"]
+---
+
+<Info>
+
+**URL:** `/approvals` and `/compliance` · **Reach:** top tabs **Approvals** and **Compliance** (the tab bar shows on `/requests`, `/approvals`, `/compliance`, not on `/`) · **Roles:** Principal ✓ Operator ✓ (no role gating in either page; HR Intel links on `/compliance` are Principal and Admin only) · **Ready when:** `/approvals`: h1 **Approvals** and the left card **Contact change review** shows rows or an empty text. `/compliance`: h1 **Compliance** and the card title `Compliance Items ({n})` with the table loaded.
+
+</Info>
+
+Two separate review pages. `/approvals` is the **contact-change** review queue (not the Approvals card on Your day). `/compliance` tracks client compliance obligations. Neither page sends email or updates HubSpot.
+
+<Note>Unverified: server permission per role for contact-change decisions. The page calls are fixed to the tenant "ariya".</Note>
+
+## Page map
+
+**Approvals — `/approvals`**
+- Header: h1 **Approvals**, button **Refresh** (top right).
+- Left card **Contact change review**: status buttons **Pending**, **Approved**, **Rejected**, **Applied**, **Failed**, then request rows (buttons).
+- A drag handle between the panes (aria-label "Resize approvals list").
+- Right card **Request detail**: Requester, Client id, Updated, Reason, **Field changes** table (Field / Current / Proposed), **Audit events**, then:
+  - for a pending request: **Decision note** box with **Reject** and **Approve**;
+  - for an approved request: **Apply approved change** box with **Apply Local Change**.
+
+**Compliance — `/compliance`**
+- Header: h1 **Compliance**, button **Sync outstanding items** (top right).
+- Optional "HR Intel source handoff" box (only when the URL has `source=hr-intel`).
+- Info card "Compliance operator boundary".
+- Stat buttons: **Overdue**, **Due 7 Days**, **Due 14 Days**, **Due 30 Days**, **Completed**.
+- Card `Compliance Items ({n})`: filter bar (search "Search rules, clients...", selects **Client**, **Rule**, **Due Date**, **Status**, **Category**, filter chips, **Clear all**) and a table with columns **Rule**, **Client**, **Category**, **Source**, **Due Date**, **Days**, **Status**, actions (**✓ Mark done**, **Waive**).
+- Footer `{n} clients evaluated.`
+
+## Recipes
+
+### Review a contact change request
+**Risk:** `READ` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** request id (optional), or the contact or client name
+
+1. Open `/approvals?request={id}` to preselect a request, or open `/approvals`.
+   - Wait for: "Loading approval queue..." to go.
+2. Click a status button (**Pending** is the usual one) at the top of **Contact change review**.
+3. Click the request row (button; visual: left list).
+   - Wait for: "Loading request detail..." to be replaced by the detail.
+4. Read **Reason**, the **Field changes** table (Field / Current / Proposed) and **Audit events**.
+
+**Done when:** the right card shows the request detail.
+
+| If you see | Why | Do this |
+|---|---|---|
+| `No {status} contact requests.` / "New requests will appear here." | Nothing in this status | Try another status button or report. |
+| "Choose a request to review." / "No request selected." | Nothing selected | Click a row. |
+
+### Approve a contact change
+**Risk:** `WRITE` (Ariya only) · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** which request; optional approval note
+
+1. Open the pending request (see [Review a contact change request](#review-a-contact-change-request)).
+2. Optional: type a note in the **Decision note** box (textarea, placeholder "Add approval context or rejection reason...").
+3. Click **Approve** (button; shows "Approving..."; visual: bottom right of the detail card).
+
+**Done when:** toast "Contact change approved." and the request leaves the **Pending** list. The change is not yet applied to contacts; see [Apply an approved contact change](#apply-an-approved-contact-change).
+
+### Reject a contact change
+**Risk:** `DESTRUCTIVE` (no undo on this page) · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** which request; the rejection reason (required)
+
+1. Open the pending request.
+2. Type the reason in the **Decision note** box (textarea, placeholder "Add approval context or rejection reason..."). Required.
+
+<Warning>**Approval required (DESTRUCTIVE).** Stop here and get approval before clicking **Reject**. This page has no control to undo a rejection.</Warning>
+
+3. Click **Reject** (red button; shows "Rejecting...").
+
+**Done when:** toast "Contact change rejected." and the request leaves **Pending**.
+
+| If you see | Why | Do this |
+|---|---|---|
+| "A rejection reason is required" | Note is empty | Type the reason and click **Reject** again. |
+| Red alert / toast with another message | Server refused | Report the message. |
+
+### Apply an approved contact change
+**Risk:** `WRITE` (Ariya contacts only; HubSpot is not touched) · **Roles:** Principal, Operator
+
+1. Open `/approvals` and click **Approved** (status button).
+2. Click the request row.
+3. Optional: type in the box (textarea, placeholder "Optional apply note...") under **Apply approved change**.
+4. Click **Apply Local Change** (button; shows "Applying...").
+
+**Done when:** toast "Contact change applied locally." (or "Contact change was already applied.") and the list switches to **Applied**.
+
+### Reload the approval queue
+**Risk:** `READ` · **Roles:** Principal, Operator
+
+1. Click **Refresh** (button; visual: top right of `/approvals`).
+
+**Done when:** the list re-renders.
+
+### Find compliance items
+**Risk:** `READ` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** client slug or name, due window, status (any of these)
+
+1. Open `/compliance?client={slug}` to pre-filter one client, or open `/compliance`.
+   - Wait for: the table skeleton to go.
+2. To filter by due date, use the **Due Date** select ("All Dates", "Overdue", "Due Today", "Due Next 7 Days", "Due Next 14 Days", "Due Next 30 Days", "Due This Month"). For overdue items choose **Overdue** here, not the stat button.
+3. Optional: **Status** select ("All Statuses", "Pending", "Completed", "Waived"), **Client** ("All Clients"), **Rule** ("All Rules"), **Category** ("All Categories"), or type in the search box (placeholder "Search rules, clients...").
+4. Optional: click a stat button **Due 7 Days**, **Due 14 Days**, **Due 30 Days** or **Completed** to set filters in one click.
+5. To remove one filter, click the × on its chip (`{Filter}: {value}`; the × has no label). To remove all, click **Clear all**.
+
+**Done when:** the table shows the matching rows.
+
+| If you see | Why | Do this |
+|---|---|---|
+| "No compliance items yet. Sync outstanding items to evaluate client obligations." | Nothing tracked yet | See [Sync outstanding compliance items](#sync-outstanding-compliance-items). |
+| "No items match the current filters." | Filters too narrow | Click **Clear all**. |
+| Clicking **Overdue** (stat) shows every item | Known bug: that button sets a status the filter ignores | Use **Due Date** → **Overdue**. |
+
+### Sync outstanding compliance items
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+
+1. Open `/compliance`.
+2. Click **Sync outstanding items** (button; shows "Syncing…"; visual: top right).
+   - Wait for: a toast; this re-evaluates every client and can take a while.
+
+**Done when:** toast `Synced {n} clients — {k} new item(s) created ({t} tracked total).` or `Synced {n} clients — already up to date ({t} tracked).`
+
+| If you see | Why | Do this |
+|---|---|---|
+| Toast "Sync failed" | Server error | Retry once, then report. |
+
+### Sync one client from an HR Intel handoff
+**Risk:** `WRITE` · **Roles:** Principal, Operator (the page is usually reached from HR Intel, which only Principal and Admin can open)
+
+1. The page is open with an "HR Intel source handoff" box (URL has `source=hr-intel` and `client={slug}`).
+2. Click **Sync client obligations** (button in the box; shows "Syncing...").
+
+**Done when:** a sync toast appears and the table updates for that client.
+
+Other links in the box: **Back to client** (`/clients/{slug}`), **Back to HR Intel** (Principal and Admin only), **Manage trusted sources** (`/admin/trusted-sources`).
+
+### Mark a compliance item complete
+**Risk:** `WRITE` (no client communication) · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** rule and client; optional evidence notes
+
+1. Find the row (see [Find compliance items](#find-compliance-items)).
+2. Click **✓ Mark done** (button on the row; only on open rows).
+   - Dialog "Mark item complete" opens; its description is the rule.
+3. Optional: type in **Evidence notes** (placeholder `e.g. "Training completed for 12 employees"`).
+4. Click **Mark complete** (button; shows "Processing..."). **Cancel** backs out.
+
+**Done when:** toast "Marked complete" and the row status changes.
+
+| If you see | Why | Do this |
+|---|---|---|
+| Toast "Failed to mark complete" | Server error | Retry once, then report. |
+
+### Waive a compliance item
+**Risk:** `DESTRUCTIVE` (no undo on this page; no client communication) · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** rule and client; the reason (required)
+
+1. Find the row.
+2. Click **Waive** (button on the row; only on open rows).
+   - Dialog "Waive compliance item" opens.
+3. Type the reason in **Reason** (placeholder "Why is this being waived?"). Required.
+
+<Warning>**Approval required (DESTRUCTIVE).** Stop here and get approval before clicking **Waive**. The page has no control to undo a waiver.</Warning>
+
+4. Click **Waive** (red button in the dialog; shows "Processing..."). **Cancel** backs out.
+
+**Done when:** toast "Item waived".
+
+### Open the source law for an item
+**Risk:** `READ` (opens a new tab) · **Roles:** Principal, Operator
+
+1. In the row's **Source** column click the law name or **Open source** (link).
+   - It opens in a **new tab**. Switch back to the Ariya tab when done.
+
+## Controls reference
+| Visible text | Type | Locator | What it does | Risk |
+|---|---|---|---|---|
+| Refresh | button | `/approvals` header | Reloads the queue | `READ` |
+| Pending / Approved / Rejected / Applied / Failed | buttons | Contact change review | Status filter | `READ` |
+| (request row) | button | left list | Selects the request | `READ` |
+| (drag handle) | separator | aria-label "Resize approvals list" | Resizes panes | `READ` |
+| Decision note | textarea | placeholder "Add approval context or rejection reason..." | Note; required to reject | — |
+| Reject / Rejecting... | button (red) | Decision note box | Rejects | `DESTRUCTIVE` |
+| Approve / Approving... | button | Decision note box | Approves | `WRITE` |
+| Optional apply note... | textarea | Apply approved change box | Note | — |
+| Apply Local Change / Applying... | button | Apply approved change box | Applies to Ariya contacts | `WRITE` |
+| Sync outstanding items / Syncing… | button | `/compliance` header | Re-evaluates all clients | `WRITE` |
+| Sync client obligations / Syncing... | button | HR Intel handoff box | Evaluates one client | `WRITE` |
+| Back to client / Back to HR Intel / Manage trusted sources / Open client / HR Intel / Trusted sources | links | handoff box and boundary card | Navigation | `READ` |
+| Overdue / Due 7 Days / Due 14 Days / Due 30 Days / Completed | stat buttons | above the table | Set filters (Overdue is broken) | `READ` |
+| Search rules, clients... | input | filter bar | Text filter | `READ` |
+| Client / Rule / Due Date / Status / Category | selects | filter bar | Filters | `READ` |
+| `{Filter}: {value}` × | chip, unlabeled × | filter bar | Clears one filter | `READ` |
+| Clear all | button | filter bar | Clears filters | `READ` |
+| (law name) / Open source | link, new tab | Source column | Opens the law | `READ` |
+| ✓ Mark done | button | row | Opens "Mark item complete" | — |
+| Mark complete | button | dialog | Completes the item | `WRITE` |
+| Waive | button | row, then dialog | Waives the item | `DESTRUCTIVE` |
+
+## Waits and signals
+- `/approvals`: "Loading approval queue..." (list), "Loading request detail..." (detail). Buttons show "Approving...", "Rejecting...", "Applying...".
+- `/compliance`: table skeleton while loading; "Syncing…" on sync; dialogs show "Processing..." while saving.
+- Toasts: "Contact change approved.", "Contact change rejected.", "Contact change applied locally.", "Contact change was already applied.", "Marked complete", "Item waived", sync toasts above.
+
+## Gotchas
+- The **Overdue** stat button on `/compliance` shows all items. Use **Due Date** → **Overdue**.
+- Source links open a new tab.
+- The **Approvals** tab is contact changes only. Memory and document approvals are on [Your day](/command-center/your-day#approve-and-deliver-a-document).
+- **Apply Local Change** updates Ariya contacts only; HubSpot is not touched.
+- The compliance research dialog and report used under Sales are not on this page.
+
+## Related
+- [Your day](/command-center/your-day)
+- [Work Queue and Management](/command-center/work-queue-and-management)
+
+## Source files
+- `packages/web/src/app/(dashboard)/approvals/page.tsx`
+- `packages/web/src/app/(dashboard)/compliance/page.tsx`

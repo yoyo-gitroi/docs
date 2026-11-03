@@ -1,0 +1,304 @@
+---
+title: "Known issues and hazards"
+sidebarTitle: "Known issues"
+description: "Bugs, dead routes, UI and API mismatches, and one-click hazards found while writing this playbook from the Ariya code."
+keywords: ["known issues", "bugs", "hazards", "403", "no confirm", "dead route", "drift"]
+---
+
+<Info>
+**For:** Clarwiz (what to expect) and Ariya engineers (what to fix) · **Found by:** reading the code on the `staging` branch · **Status:** not yet confirmed in a live environment
+</Info>
+
+The recipes already route around these. This page collects them in one place so Clarwiz knows why a recipe is shaped the way it is, and so the Ariya team can fix them.
+
+## Top hazards for a browser agent
+
+| Hazard | Where | What the playbook does |
+|---|---|---|
+| **Send reply** has no confirm, only a 5-second undo, and leaving the page during that window sends at once | [Email and replies](/operations/email-and-replies) | Approval stop before **Send**; stay on the page for the undo window |
+| **Send & create case** on a new email sends immediately with no undo; Enter in To, Cc or Subject submits the form | [Email and replies](/operations/email-and-replies) | Approval stop; never press Enter in those fields |
+| Single keys in the Operations inbox (`e`, `1`, `2`, `3` and others) act instantly with no dialog; row quick actions only show on hover | [Inbox](/operations/inbox) | Never press single-letter keys outside a text field |
+| The request typed on Documents is held in page memory; reloading before the chat opens loses it, and **Blockers** cards vanish on reload | [Create a document](/documents/create-a-document) | Do not reload; answer in the message box if the card is gone |
+| **Generate now**, `/generate` and packet runs create template-default documents with no AI writing; `/generate` silently picks the first client when the URL has none | [Generate page](/documents/generate-page) | Always pass `client=`; fill fields after generating |
+| Client links without `?tab=` reopen that user's last-used tab | [Client profile](/clients/client-profile) | Always open `/clients/{slug}?tab=…` |
+| Operators see some enabled controls that the server refuses with 403 (HR Advisor select, Profile Workspace **Save**, compliance **Run research**, External Documents) | [Clients](/clients/clients-list) | Expect the 403; do not retry; switch account only if allowed |
+| The contacts API route is not mounted, so `/contacts`, `/contacts/{id}` and CRM Hygiene likely fail behind "No contacts yet." | [People and contacts](/clients/people-and-contacts) | Use the client's People tab instead |
+| Several irreversible actions have no confirm: memory delete, road map task trash, jurisdiction ×, question ×, campaign **Cancel**, template **Archive**, roadmap **Approve** and **Mark lost**, integration **Disconnect**, Tracker Status "Cancelled" | Many pages | Approval stop before each one |
+| **Sync HubSpot** fails for Operator and Admin, so **New implementation** never unlocks for them | [Implementation portfolio](/implementation/portfolio) | Use `/implementation/new` instead |
+| Some settings pages have no route guard, so an Operator can edit compliance rules and roadmap blueprints by URL | [Catalogs and defaults](/settings/catalogs-and-defaults) | Do settings work as the Principal only |
+| Meeting preps and some research results never refresh by themselves; roadmap drafts are lost unless **Accept draft** is clicked | [Sales](/sales/today-and-accounts) | Click **Refresh** or **Check for result**; accept drafts before leaving |
+| The Sales sidebar is icon-only below 1536 px wide | [Sales](/sales/today-and-accounts) | Find items by `title` or link target, or use a wider window |
+| Some icon buttons have no accessible name (Team Deactivate and Activate, Drive config save icons, compliance Active toggle, roadmap trash icons, People-tab icons) | Several pages | Recipes give a visual cue for each |
+| "Invitation sent" does not prove delivery; email failures are only logged on the server | [General and team](/settings/general-and-team) | Report it as "invite queued", not "delivered" |
+
+## All findings by area
+
+Each bullet names the playbook page it affects. Source references point into the Ariya repo.
+
+
+### Documents
+
+- `/documents/create-a-document`: the opening request is handed from the landing to the chat page in memory only (`pending-ask.ts`). A reload or hard navigation between **Send** and the chat page loses it, leaving an empty chat.
+- `/documents/create-a-document`: Blockers cards with choice questions offer no free-text option; when no choice fits, the only route is to ignore the card and answer in the composer.
+- `/documents/create-a-document`: Blockers cards are not restored after reload or reopening a chat (only user/assistant messages are reloaded), so pending questions silently disappear.
+- `/documents/create-a-document`: the document assistant refuses the three official PDF forms (`generate_draft` accepts only `db` render-source templates), but nothing in the chat UI says so up front. UNVERIFIED in a live run.
+- `/documents/create-a-document`: there is no refusal UI; refusals arrive as prose, the generic banner "The assistant could not finish this request.", or a status line.
+- `/documents/documents-home`: `?source=operations` (Operations **Deliverables** link) is ignored by the page.
+- `/documents/documents-home`: `?client={slug}` with a slug not in the list leaves the picker reading "Select a client…" while the binding is still applied; **Send** then fails with a server error.
+- `/documents/documents-home`: the landing client picker (and the template drawer picker) cannot be cleared; only a reload resets it.
+- `/documents/documents-home`: document search matches the client slug, not the client display name.
+- `/documents/documents-home`: the card delete bin is opacity 0 until hover.
+- `/documents/documents-home`: StarterChips ("Incident report", "Offer letter", …) exist in code but are not rendered.
+- `/documents/documents-home`: `/documents/assistant` redirect keeps only `client` and `case`; `view=chats` and anything else is dropped.
+- `/documents/documents-home`: help guide `documents-list` says the drawer may show "Preview failed"; code text is `Preview failed ({status})`.
+- `/documents/chat-workspace`: the client cannot be changed inside a chat; **Switch client (new chat)** / **Choose client** just navigate to `/documents` and open no picker.
+- `/documents/chat-workspace`: rail **Delete chat** deletes immediately with no confirmation and is hover-only.
+- `/documents/chat-workspace`: the doc agent auto-approves its own tool approvals and can write to the client profile (`update_client_profile`) without user confirmation.
+- `/documents/chat-workspace`: help guide mentions "An attached image is too large (max ~4.5MB)"; the web code allows images up to 20MB and has no such message (server text UNVERIFIED).
+- `/documents/chat-workspace`: a second tab sending to the same chat gets "Your last message was not sent because the assistant was still busy. Send it again."
+- `/documents/chat-workspace`: the preview iframe is `sandbox=""` srcDoc; DOM-based agents may not be able to read the draft text.
+- `/documents/document-editor`: Google Docs export ("Open in Google Docs" / "Google Docs") is commented out in the editor, chat preview and library drawer while the API endpoint still exists; no UI path exports to Google Docs.
+- `/documents/document-editor`: **E-signature delivery** is permanently disabled ("Coming soon; no external send path").
+- `/documents/document-editor`: **Complete Document**, **Enrich with AI** and **Polish** still render for DB-only/legacy documents but their endpoints return HTTP 410 ("Endpoint removed — …").
+- `/documents/document-editor`: plain-text documents say "Regenerate it to make changes." but no Regenerate button exists anywhere.
+- `/documents/document-editor`: PDF-form values are saved only by **Save fields**; autosave, toolbar **Save** and downloads do not save them and there is no unsaved-changes warning.
+- `/documents/document-editor`: **Approve & Deliver** closes the linked request with no undo in the editor; toast says "delivered locally".
+- `/documents/document-editor`: help guide names the chat icon "Edit this document in chat"; when a source chat exists it is "Open the chat this document came from".
+- `/documents/document-editor`: the toolbar scrolls horizontally on narrow screens, which can push **Share** and **Save** off-screen.
+- `/documents/templates`: several templates share a title (for example "HR Incident Report" for `hr-incident-report` and `incident-report`), and the slug is shown only on the studio page, not on cards or in the drawer.
+- `/documents/templates`: **Use in chat** passes only prose (`Draft a {title} for {client}: `), not a template id, so the assistant may pick a different template; the pre-fill is lost on reload.
+- `/documents/templates`: there is no Publish button; the view-only capability label still reads "Templates: upload, edit, version, publish". Locking a version is the only publish equivalent.
+- `/documents/templates`: help guide `documents-templates` quotes "You need admin access to change templates — ask an owner or admin to make this change."; code says "Your profile cannot change templates — ask a Principal or Admin to make this change."
+- `/documents/templates`: help guide says the wizard button is **Save Template**; code button is `Save v{n} as template`.
+- `/documents/templates`: wizard drafts are page-memory only and lost on reload or navigation.
+- `/documents/templates`: Settings mirrors (`/settings/templates*`, `/settings/brand-assets`, `/settings/packets`) are hidden from non-Principal/Admin navigation, but no client-side route guard was found (UNVERIFIED).
+- `/documents/templates`: `/settings/templates` uses a different list component from the gallery (no drawer, no **Use in chat**, no **Generate now**).
+- `/documents/brand-and-packets`: brand **Create a copy** on a platform set does not copy it; it opens a blank set with default values.
+- `/documents/brand-and-packets`: brand sets do not affect existing documents or the letterhead of new ones (that comes from Settings → General); the page itself says wiring is pending.
+- `/documents/brand-and-packets`: brand set **Delete** and packet delete both act immediately with no confirmation.
+- `/documents/brand-and-packets`: the brand-card eye (preview) button has no aria-label or title.
+- `/documents/brand-and-packets`: packet run results are not persisted; navigating away (including clicking **Open** in the same tab) loses the list.
+- `/documents/brand-and-packets`: help guide `documents-packets` lists only `/documents/packets`; `/settings/packets` is the same page.
+- `/documents/generate-page`: `/generate` is hidden from Documents navigation but is still the target of client **Generate Document**, Roadmap **Draft**, **Draft with context**, Requests, Sales **Generate assessment**, HR Intel and case **Generate from case** (assistant off).
+- `/documents/generate-page`: with no `client=` the page auto-selects the first client returned by the API, and **Generate** for a non-client-scoped template falls back to `clients[0]` silently, risking a document for the wrong client.
+- `/documents/generate-page`: `request_id`, `source=hr-roadmap`, `source=request` and `source=hr-assessment` are passed by callers but ignored.
+- `/documents/generate-page`: only code-registry templates are listed; tenant/DB-only templates (customized or workspace-authored) are missing, and field labels can differ from the editor/gallery for the same template.
+- `/documents/generate-page`: the **Research + fill** prompt tells the model to "preserve unknown facts as placeholders", which conflicts with the no-placeholder rule used by the document assistant.
+- `/documents/generate-page`: "HR operator templates" and "All code templates" show the same list; per-section Polish controls are not rendered (props unused); `generate-layout.ts` is dead code.
+- `/documents/generate-page`: `/template` (Templates DB-only POC) is reachable by direct URL with no role gating.
+- `/documents/generate-page`: no in-app help guide exists for `/generate`.
+
+### Templates and catalog
+
+- `/documents/catalog/business#hr-incident-report-incident-report`: two active templates share the title "HR Incident Report" (`hr-incident-report` and the database-only `incident-report`). Title matching and catalog search depend on alphabetical order; an agent picking by visible title can land on either. The playbook heading for `incident-report` had to be disambiguated with its slug.
+- `/documents/choosing-a-template#discipline-and-incidents`: client-workspace document opportunities and evidence hints still suggest `incident-report-rdk`, a retired client-specific (Riverboat Delta King) layout, while Operations case rules suggest `hr-incident-report`.
+- `/documents/catalog/business#employee-handbook-assessment`: a repair script marks `employee-handbook-assessment` (and eight other database-only templates) as "GONE — deactivate", but migration 0100 re-seeded them as active. A title match on "handbook assessment" lands on this older row, not its successor `employee-handbook-discovery-assessment`. Live active state unverified.
+- `/documents/catalog/business#non-disclosure-agreement`: the assistant's template word search does not rank `nda` in its top 5 for the word "NDA" (the token matches inside other words and ties sort alphabetically). Only "non-disclosure agreement" works reliably.
+- `/documents/choosing-a-template`: platform templates have no aliases in any seed and no API edits aliases, so all routing is title or word overlap. Several common phrases route to the wrong template first: "onboarding" → `contractor-onboarding-packet-1099`; "HR roadmap" → module-generated `elevated-hr-roadmap`; "service agreement" → `client-service-agreement`; "termination letter" ties `personal-engagement-letter`; "quarterly business review" ties `performance-review`; "job offer" ties `job-description`.
+- `/documents/catalog/pdf-forms`: the assistant refuses the three PDF forms with a message telling the user to "migrate this template to the database first", which is not possible (PDF forms are code-only by design). The message misleads users; it should point to Documents → Templates.
+- `/documents/how-templates-work#generate-action-versus-the-assistant`: the Generate action on Documents → Templates (and `/generate`) does not call the LLM for Handlebars templates. Users who press Generate expecting written content get defaults plus client prefill only.
+- `/documents/generate-page`: the `/generate` page builds its catalog and forms from the code backup registry (96 templates). It lacks the 13 database-only templates (all policy templates, `hr-assessment`, `incident-report`, `implementation-billing-memo`, the `elevated-*` templates) and the 3 PDF forms, and it lacks the team-member dropdowns migration 0120 added to 8 database forms. Field labels can therefore differ from Documents → Templates and the editor.
+- `/documents/how-templates-work#client-scope-and-tenant-scope`: `/generate` silently falls back to the first client in the list when the chosen template has no client-prefill fields; an agent that skips the client picker creates a document for the wrong client.
+- `/documents/how-templates-work#client-scope-and-tenant-scope`: the Document Assistant requires a bound client for every template, including tenant-internal pieces (flyers, business card, board update, cap table). There is no way to draft an internal document without attaching it to some client.
+- `/documents/how-templates-work#fields-and-sections`: `protectedFields` ("fields the AI chat assistant must NOT modify") are declared on 28 templates, but no enforcing code was found in core, transport-api or web.
+- `/documents/how-templates-work#template-versions-and-forks`: `internal-docs/18-document-agent-pipeline.md` describes template statuses (approved / system_generated / draft) that are not implemented anywhere; templates have no draft/publish state.
+- `/documents/choosing-a-template#other-places-that-suggest-templates`: `shared/src/hr-document-types.ts` claims every HR Roadmap linked-doc value is a registered template slug, but 14 values (`pip`, `separation-agreement`, `handbook-addendum`, `policy`, `safety-manual`, `onboarding-checklist`, `offboarding-checklist`, `idp`, `training-plan`, `incident-report`, `verbal-warning`, `audit-guide`, `compliance-audit`, `hr-proposal`) are not registered code slugs; Draft falls back to the nearest template or `hr-roadmap`.
+- `/documents/catalog/business#isolved-billing-memo`: migration 0140 updates sample data in `isolved-billing-memo`, which no migration or seed creates. Either a stale reference or a template that exists only in some live databases.
+- `/documents/catalog/business#invoice`: a stale tenant `invoice` row shadowed the platform `invoice` on one environment (handoff doc, "Open — needs a decision"); resolution prefers tenant rows, so the stale form wins silently.
+- `/documents/how-templates-work#brand-application`: Handlebars documents always render with the tenant brand kit; a client's own brand (`clients.config.brand`) is ignored except by the legacy renderer and the PDF footer. Product intent unverified.
+- `/documents/how-templates-work#export-formats`: DOCX export is plain paragraphs only (HTML stripped to text, no tables or styling), so table-heavy templates (invoice, pricing quote, cap table, risk register) lose their structure in DOCX.
+- `/documents/catalog/data`: template metadata advertises `xlsx` (and `png`) exports for data templates, but no xlsx export endpoint exists; the metadata is descriptive only.
+- `/documents/catalog/sales`: the DB has category `sales` (7 platform rows plus tenant `billing-memo` as "Sales"), but the TS template category type lists only business, print, social, data and marketing.
+- `/documents/catalog/business#status-report`: the Health dropdown options start with emoji (green, yellow and red circles), which screenshot-driven agents may misread; text locators should use "Green — on track" etc.
+- `/documents/how-templates-work#blockers-and-follow-up-questions`: `POST /api/documents/:id/complete` returns 410 "Endpoint removed — use the Enrich draft button in the editor."; any UI or help text still pointing to a "complete" action is dead.
+- `/documents/how-templates-work#packets`: no packets are seeded; the Packets tab is empty on a fresh install. Packet create/edit/delete is role-gated (Principal, Admin), but packet generate has no role check.
+- `/documents/how-templates-work#client-scope-and-tenant-scope`: Slack refuses every `client`-scope template ("not yet on the agentic document-builder path"), so the policy templates, employee handbook, pay increase notice and HR Roadmap documents cannot be created from Slack.
+- `/documents/catalog/pdf-forms`: creating a PDF form from the Documents UI is code-verified only, not checked in a live run.
+- Not a template issue, found while compiling: `documents/create-a-document.mdx` (another writer's page) compiles with one inline-math node under remark-math, which usually means an unescaped pair of `$` signs; check it renders as intended.
+
+### Command Center and Operations
+
+- `/command-center/your-day` — `/?user={userId}` is refused for every role (`SWITCH_ROLES` is empty, `packages/core/src/my-day/index.ts:52-53`); API returns 403 "You can only open your own day." and the page shows "Your day could not be loaded." The person switcher never renders. Help guide `command-center-home` still tells admins and owners to "Open the person picker".
+- `/command-center/your-day` — Help guide lists four Overview tiles; the app also renders an **Approvals** tile and an **Approvals** card (Remember / Not right / Approve & deliver / Review / Send back) that the guide never mentions. Guide says the toast is "Done"; code shows `Done: {title}`.
+- `/command-center/your-day` — The Command Center tab bar (Action Queue / Approvals / Compliance) is hidden on `/` (`hideWorkspaceNav`), so those pages are unreachable by clicking from the home page; the agent must use URLs or Cmd+K.
+- `/command-center/action-queue` — `/requests?client={slug}` opens the **New Request** sheet with the client preselected instead of filtering the list (`requests/page.tsx:157-162`). Work Queue rows link here, so an agent "opening a client's requests" lands in a create form.
+- `/command-center/action-queue` — **Create Request** failure shows no toast or error; the button just re-enables.
+- `/command-center/action-queue` — **Assign to Me** on `/requests/{id}` assigns to the literal string `backoffice`, not the current user (`requests/[id]/page.tsx:199-207`).
+- `/command-center/action-queue` — **Generate** / **Generate Document** on `/requests/{id}` link to `/generate?client=…&request_id=…&source=request`, but `/generate` does not read `request_id` or `source=request` (per documents source notes). The generated document is likely not linked to the request, so **Submit for Review** stays replaced by "Create a document before submitting for review". Unverified end to end.
+- `/command-center/action-queue` — Pagination chevron buttons on `/requests` have no accessible label.
+- `/command-center/action-queue` — The error "Please add a comment explaining what needs to change." is effectively unreachable because `Confirm: Request Revision` is disabled until a comment is typed.
+- `/command-center/approvals-and-compliance` — `/approvals` API calls are hard-coded to tenant `ariya` (`approvals/page.tsx:36`); other tenants would see the wrong queue or errors.
+- `/command-center/approvals-and-compliance` — The **Overdue** stat button on `/compliance` sets Status = "overdue", which the filter logic ignores, so it shows ALL items (`compliance/page.tsx:218-220, 479`). Workaround: **Due Date → Overdue**.
+- `/command-center/approvals-and-compliance` — Filter chip × buttons on `/compliance` have no accessible label.
+- `/command-center/approvals-and-compliance` — No UI to undo a contact-change rejection or a compliance waiver; the playbook treats both as DESTRUCTIVE. Server-side role permissions for these actions are unverified.
+- `/command-center/work-queue-and-management` — `/work-queue?bucket=no_primary_contact` (linked from the Management tile **Clients with no contact**) ignores the `bucket` param; the page opens unfiltered.
+- `/command-center/work-queue-and-management` — `/work-queue` and `/management` are in no sidebar or tab bar; only direct URLs, Management links and readiness-checklist buttons reach them.
+- `/operations/inbox` — Help guide `service-desk-inbox` presents **Mine / Everyone** as available to everyone; code renders the switch and **Person** picker only for Principals (`page.tsx:213`, `queue-rail.tsx:156`).
+- `/operations/inbox` — Help guide `ops-triage` says the card after **Make a case** offers **View** and **Undo**; promote passes no undo (`page.tsx:579-583`), so only **View** appears.
+- `/operations/inbox` — Single-key shortcuts act instantly with no confirmation when focus is outside a field: `e` marks a triage email done, `1`/`2`/`3` park the case. Help guide `ops-shortcuts` omits that `e` on a triage thread has no dialog.
+- `/operations/inbox` — `Enter` on a focused button activates it, and the desk's `Enter`/`o` shortcut is skipped in that case; an agent pressing Enter to "open" can click **Send reply** if it has focus.
+- `/operations/inbox` — Row quick actions are hover/keyboard-focus only and do not exist in compact density; the density choice persists, so an agent may find no quick actions.
+- `/operations/inbox` — The top-centre bucket overlay can cover header controls (Owner, With) for several seconds after any move.
+- `/operations/case` — Help guide `ops-merge` says "Click **Undo** on the confirmation" to undo a merge; the merge toast has no Undo (`page.tsx:1016, 1052`). Guide says admins can unmerge; code allows only Principal (`operationsAllCases`) or the assignee. An Operator who merges a case they do not own cannot reverse it.
+- `/operations/case` — Help guide `service-desk-case` routes `/service-desk/[caseId]`, which only redirects to `/service-desk?case=…&view=expanded`.
+- `/operations/case` — Help guide `ops-reply` says to **Stage for reply** an Ariya document but omits that it must first be **Link**ed in the Documents tab; `?stage=` also only works for already-linked documents.
+- `/operations/case` — The client picker links on selection (no Save), so a mis-click immediately relinks the case.
+- `/operations/email-and-replies` — Reply-disabled reasons ("Connect your Gmail account in Operations settings…", "…Reconnect it in Operations settings.") and the conversation **Connect Gmail** / **Reconnect Gmail** links point to `/service-desk/settings`, which has no Gmail controls (`conversation.tsx:30`, `inbox-page-state.ts:194-199`). The real control is the Operations header **Connect Gmail**.
+- `/operations/email-and-replies` — The **New email** drawer is a `<form onSubmit>`: pressing Enter in To, Cc or Subject sends the email immediately once To, Subject and Message are filled. No confirmation, no undo.
+- `/operations/email-and-replies` — During the 5-second send hold, clicking any in-app link that leaves the desk sends the reply immediately (`use-undoable-send.ts`); closing the tab instead drops it after a leave-page warning. Moving case with `j`/`k` does not cancel the send.
+- `/operations/email-and-replies` — Reply recipients, attachments and the "then" choice are memory-only; a page reload loses them while the draft text survives (localStorage), so a reloaded draft may go to the default recipient.
+- `/operations/email-and-replies` — Closing the New email drawer (Discard, Esc, outside click) silently clears all fields; there is no draft.
+- `/operations/settings` — Empty state "No learned rules yet" says "Use Don't triage again from the Triage Inbox to teach Pilot what to skip." No control is labelled "Don't triage again" (actual: **Hide similar emails from now on…** / **Suppress similar…**) and "Pilot" is an old product name.
+- `/operations/settings` — Load error toast says "make sure you have admin access" though the route is open to all roles and Operators see a read-only view.
+- `/operations/settings` — **Save & scan** and learned-rule **Pause** / **Reactivate** are shown to every role while domain lists are read-only for non-admins; server permission for Operators is unverified.
+- `/operations/settings` — Removing a domain/keyword chip is immediate with no confirmation.
+- `/operations/settings` — Help modal step 5 says Ariya "will immediately begin scanning your last 30 days"; the callback page only says "Ariya will now monitor your inbox." Whether a scan starts automatically is unverified.
+
+### Clients, people and contacts
+
+- **Dead API route:** `/contacts` and `/contacts/{id}` call `/api/contacts`, `/api/contacts/unlinked`, `/api/contacts/{id}`, `/api/contacts/change-requests` and `/api/contacts/unlinked/export`, but `packages/transport-api/src/routes/contacts.ts` is not mounted in `server.ts` (only `/contact-change-requests` at :216). Lists show "No contacts yet." (errors swallowed), detail shows "Contact not found", change-request submits and Export CSV fail. Page: /clients/people-and-contacts
+- **UI/API mismatch (Operator):** `/clients` row **HR Advisor** select is not role-gated; Operator and Member get the 403 text in a red box. `packages/web/src/app/(dashboard)/clients/page.tsx:1081`. Page: /clients/clients-list
+- **UI/API mismatch + invisible errors:** Profile Workspace **Save** is not role-gated (403 for Operator/Member), and all its errors (403, "Add a name or email to save this contact.") render in the portfolio card that is hidden on `?view=profile-workspace`. A failed save just leaves the row in place. Page: /clients/clients-list
+- **Inconsistent approval path:** Profile Workspace contact save creates contacts directly (`POST /api/clients/{slug}/contacts`), while the client People & Roles tab routes every contact change through approval. Page: /clients/clients-list
+- **No error state:** `/clients` has no catch on `api.clients.list()`; on failure the table shows skeleton rows forever (`clients/page.tsx:548`). Page: /clients/clients-list
+- **Misleading empty state:** "No customers yet. Run a read-only HubSpot import or add a customer manually." also shows when search or filters match nothing. Page: /clients/clients-list
+- **Dead param:** Profile Gaps badge links to `/clients/{slug}?action=complete-profile#client-profile-fields`; nothing handles `action` or that anchor, and the saved-tab redirect may drop it. Page: /clients/clients-list
+- **Saved-tab redirect from list links:** client links from an unfiltered `/clients` omit `?tab=`, so the client page redirects to the user's last-used tab instead of Overview. Page: /clients/client-profile
+- **No stage editor:** inline name/industry/stage edit exists in `clients/page.tsx` but its column is not rendered (:1413). The `/clients/new` partial-success toast "Client created, but the stage could not be saved. Set it from the client list." points to a control that does not exist. Page: /clients/new-client
+- **Help drift (clients-list):** guide says HubSpot companies need lifecycle "Customer"; code checks `ariyaClientStatus === 'active'` (`routes/clients.ts:433`). Page: /clients/clients-list
+- **UI/API mismatch (Operator):** External Documents tab has no view-only wrapper; upload, re-read, date correction and remove are enabled for Operator/Member but the API (`/api/clients/{slug}/external-documents`, clientsPackets edit) returns 403. Page: /clients/client-tabs-work
+- **UI/API mismatch (Operator):** Compliance tab is editable for Operator (clientHrRecords) but **Run research** / **Start research** posts to `/api/clients/{slug}/research/runs` (clientsPackets) and returns 403. Page: /clients/client-tabs-people-hr
+- **UI/API mismatch (Operator):** Road Map tab **Start research** returns 403 ("Unable to start research"); **Apply to Road Map** adds the task but the memory write fails ("Road Map updated, but advisor memory was not saved"). Page: /clients/client-tabs-roadmap
+- **View-only bypass:** Employees tab row click opens the Edit sheet even when the tab is view-only (sheet is a portal outside the disabled fieldset). Operator can save (API is clientHrRecords) despite the "View only" notice; Member gets 403 inside the sheet. Page: /clients/client-tabs-people-hr
+- **UI/API mismatch (Operator):** `/people/{id}` `Save selected ({n})` posts to `/api/clients/{slug}/communications/google-workspace/import` (clientsPackets edit) and returns 403 for Operator; the button is enabled. Page: /clients/people-and-contacts
+- **Hard-coded tenant:** `/people/{id}` builds `/api/clients/{slug}/communications…?tenant_id=ariya` for list, Gmail search and import (`app/(dashboard)/people/[id]/page.tsx:81,106,133`). Wrong for any tenant other than ariya. Page: /clients/people-and-contacts
+- **Silent no-op:** `/people/{id}` **Scan Gmail** does nothing when the person has no client relationship (returns early with no message). Page: /clients/people-and-contacts
+- **No error state:** `/people` shows "No people records yet." when the load fails. Page: /clients/people-and-contacts
+- **Misleading placeholder:** `/people` search placeholder "Search people, emails, roles, or clients..." but client names are not searched. Page: /clients/people-and-contacts
+- **Help drift (client-cases-documents):** guide says **Draft with context** / **Draft** open the document chat; they open `/generate?…` (page title "Generate Document"). Page: /clients/client-tabs-work
+- **Help drift (client-detail):** guide says Delete client is for "admins and owners" (code: Principal/Admin) and the header shows "industry" (code: server summary line). Page: /clients/client-profile
+- **Help drift (client-roadmap):** guide puts completing tasks under **Edit Road Map**; the check button and Complete/Reopen work without edit mode; only Add initiative needs it. Page: /clients/client-tabs-roadmap
+- **Unreachable control:** Road Map **Re-engage** link (lost roadmaps, `roadmap-tab.tsx:854`) never renders on the client tab, because lost roadmaps return the "Start a Discovery Assessment" card first (:1803). Page: /clients/client-tabs-roadmap
+- **Feature gated by state:** Road Map **Road Map source documents** (PDF import) renders only when an approved road map exists, so a client with none cannot import its existing road map from this tab (only via the Roadmap Report start dialog). Page: /clients/client-tabs-roadmap
+- **No feedback:** Road Map edit-mode fields save on blur with no toast or error UI; failures are silent. Page: /clients/client-tabs-roadmap
+- **Count mismatch:** `/clients?view=hr-road-map` counts tasks on unapproved road maps; the client Road Map tab shows only approved ones and lands on "Start a Discovery Assessment". Page: /clients/clients-list
+- **No confirmation on destructive actions:** memory Delete, note Archive, jurisdiction chip ×, Road Map task trash delete immediately. Page: /clients/client-tabs-work, /clients/client-profile, /clients/client-tabs-roadmap
+- **Double runs:** Research **Add Research** stays enabled while a run is in flight. Page: /clients/client-tabs-people-hr
+- **Misleading error label:** People & Roles shows `Contact coverage could not be loaded: {submit error}` on the resolver card after a failed submit (shared state variable). Page: /clients/client-tabs-people-hr
+- **Data-loss risk:** Payroll & Tax shows blank fields when the load fails, and **Save All Details** (PUT) would replace stored values with blanks. Page: /clients/client-tabs-people-hr
+- **Duplicate aria-label:** Notes tab edit button and edit textarea both use aria-label "Edit note". Page: /clients/client-tabs-work
+- **Unlabelled icon buttons:** Granola candidate approve/reject, People & Roles row pencil/star/unlink/archive, Road Map edit-mode trash and suggestion X, Payroll & Tax row trash, jurisdiction chip × (title only), DataTable pagination chevrons. Agents must locate them by position. Pages: /clients/client-tabs-work, /clients/client-tabs-people-hr, /clients/client-tabs-roadmap, /clients/client-profile, /clients/clients-list
+- **Hover-only controls:** Memory row action icons are invisible (opacity 0) until hover/focus on normal-width screens. Page: /clients/client-tabs-work
+- **Source-notes correction:** the service-tier filter chip reads `Elevated tier` (code: `readableSlug(value) + ' tier'`, `clients/page.tsx:784`), not "Elevated HR tier" as the extract notes said. Pages use the code text. Page: /clients/clients-list
+
+### Implementation and Settings
+
+- `/implementation/portfolio` — **Sync HubSpot** on the portfolio calls `POST /api/integrations/hubspot/sync`, which sits behind the `platformAdmin` gate (`transport-api/src/server.ts`, integrations gate). Operators and Admins (who have `implementationHrSales: edit`) get the toast "Your profile cannot change Platform Admin, integrations, tenant switching. Allowed: Principal." and **New implementation** never unlocks for them. Workarounds: `/implementation/new` directly, or the ungated empty-state **New implementation** button. The gate and the UI disagree on who may start implementations.
+- `/implementation/portfolio` — the **New implementation** gate is client-only (sessionStorage `implementation:hubspot-synced-at`), per tab; the empty-state button and `/implementation/new` bypass it entirely, so the gate is inconsistent.
+- `/implementation/portfolio` — Cmd/Ctrl+Enter anywhere in the nudge dialog sends a real email from the user's Gmail with no confirm. Easy for an agent to trigger accidentally while editing the message.
+- `/implementation/portfolio` — in the start flow, Enter in any text field submits the step (= Continue); on step 1 of `/implementation/new` that creates the tracker. In the "Add state…" chip input, Enter with empty text also submits.
+- `/implementation/portfolio` — in-app help (`guides.ts` `implementation-portfolio`) says Sync HubSpot only updates the client list; it also unlocks New implementation for the tab only. Help for `implementation-start` mentions only Implementation owner on step 1; `/implementation/new` without `?client=` also needs Client and Continue creates the tracker.
+- `/implementation/workspace` — Tracker settings **Status = Cancelled** + **Save settings** cancels the implementation without the confirm dialog the ⋯ menu uses.
+- `/implementation/workspace` — milestone sheet Due date input saves on every change event; typing a date digit by digit can save intermediate dates.
+- `/implementation/workspace` — milestone sheet has no default close button (`showCloseButton={false}`); only the icon button aria-label "Close" in its top line.
+- `/implementation/workspace` — **Google Drive setup → Generate** creates real Drive folders (EXTERNAL) but sits next to Ariya-only Generate buttons with no confirm or distinction.
+- `/implementation/workspace` — help-guide drift (`guides.ts` `implementation-workspace`): "Send" vs **Send nudge**/**Send & next**; billing memo final button is **Generate billing memo**/**Update billing memo**, not "Generate"; DocuSign needs **Preview Stage 0/4** first and the button reads `Review in DocuSign ({n} docs)`; More menu items are "Pause implementation"/"Resume implementation"/"Cancel implementation…"; paperwork is two tiles (Google Drive setup, Signing package).
+- `/settings/general-and-team` — `(dashboard)/settings/layout.tsx` has no RequireAccess; Operators who type `/settings` see the full General form and only fail on Save ("Your profile cannot change Workspace settings. Allowed: Principal, Admin."). `/settings/team` shows "Admin access required".
+- `/settings/general-and-team` — Team row Deactivate (UserX) and Activate (UserCheck) icon buttons have no aria-label or title; Deactivate also renders on the user's own row and fails server-side ("Cannot deactivate yourself").
+- `/settings/general-and-team` — invite email delivery failures are only `console.error`ed in `transport-api/src/routes/team.ts`; the UI still says "Invitation sent".
+- `/settings/general-and-team` — General shows "Loading settings..." forever when the user has no tenantId.
+- `/settings/integrations` — both **Disconnect** buttons (Google Workspace, Google Drive) act immediately with no confirm; Drive disconnect breaks folder provisioning for the whole tenant.
+- `/settings/integrations` — Google Drive path/ID save icon buttons have no accessible name; fields cannot be cleared (empty disables save).
+- `/settings/integrations` — OAuth callback pages exchange the code once on load; a reload shows an error. State is per tab (sessionStorage), so finishing consent in another tab fails with "Google Workspace connection state could not be verified."
+- `/settings/integrations` — help drift (`guides.ts` `settings-integrations`): HubSpot CRM and Google Drive listed without a Principal-only note; save icon referenced but unlabeled; Pre-live, HRIS, HR Intel, Slack and Other integrations sections omitted.
+- `/settings/catalogs-and-defaults` — `/settings/compliance` has no client gate and `/api/compliance/*` uses the `clientHrRecords` gate (Operator = edit), so an Operator typing the URL can create, edit and deactivate tenant compliance rules although the Settings tab is hidden from them.
+- `/settings/catalogs-and-defaults` — Blueprint Templates on `/settings/roadmaps` have no client gate and `/api/roadmaps/*` uses `clientHrRecords` (Operator = edit), so Operators can edit/delete blueprint templates by URL. Calls hard-code `?tenant_id=ariya` (`roadmaps/page.tsx:55` etc.); `withTenantImpersonation` in `lib/api.ts` rewrites it to the current tenant, so it works but is fragile.
+- `/settings/catalogs-and-defaults` — Blueprint template create errors are swallowed silently; all blur-saves on roadmaps fail silently.
+- `/settings/catalogs-and-defaults` — **Customize this section** (question library) forks platform defaults with no UI to revert.
+- `/settings/catalogs-and-defaults` — no-confirm deletes: question ×, custom milestone **Remove**, Target Documents **Remove**, vendor trash. Compliance Active toggle (no label) deactivates instantly.
+- `/settings/catalogs-and-defaults` — `/settings/vendors` auto-seeds iSolved, ADP and Paychex whenever the list loads empty, including after the last vendor is removed. Operators: list loads and add may succeed (non-admin vendor_domain path in `ops-platform-config.ts`), remove fails with generic "Failed to remove vendor"; add errors (bad/personal/own domain) are flattened to "Failed to add vendor".
+- `/settings/catalogs-and-defaults` — Sub-services empty state tells the user to run `pnpm --filter @ariya/core db:seed-sub-services`, which a browser user cannot do.
+- `/settings/catalogs-and-defaults` — help drift: roadmaps guide (titled "Discovery questions") says "Everyone can read them" but the tab is hidden from Operator/Member and Blueprint Templates are omitted; catalog guide treats "Tenant override label" as a field name (it is a placeholder, only in Service/Stage/Arc label sections) and omits billing memo lock, Task Templates, Migration artifacts, Target Documents; sub-services guide says "description" but the field is "What it is".
+
+### Sales and HR Roadmap
+
+- `/sales/**` sidebar: below 1536px the item labels, group labels and count pills are `display:none` (`_ui/sales-sidebar.tsx`); the pill's `aria-label="{n} waiting"` is hidden too, so DOM/a11y agents lose badge counts and must target links by `title`/`href`.
+- `/sales/**` sidebar: **Account books** and **Campaigns** vanish when `abmEnabled === false`, but the routes stay live; agents following the sidebar will think the feature is gone.
+- `/sales` (Today): prep status never auto-updates; the agent must press **Refresh** per row. A `Prep for …` on a meeting without contact email does a full page load to the account instead of starting prep.
+- `/sales` (Today): attention link `{n} meetings today` opens `kpi=meeting_this_week` (week, not today).
+- `/sales` help drift: guide `sales-today` says "nothing is written back"; prep buttons call the external Clarwiz (Klarvis) webhook with the contact email. Guide shows the prep button as "Prep for Day HH:MM"; code uses the day-of-month number beyond ~6 days (`Prep for 21 15:00`).
+- `/sales/accounts`: the **Generate** link in the `Nothing next yet` state only navigates to `?section=now`; it does not generate. `Prep for …` is sometimes a link (missing details or Clarwiz off), not a button.
+- `/sales/accounts/{id}`: **Open in HubSpot** URL hard-codes `app-na2.hubspot.com/contacts/246234256/...` (one portal and region), so it is wrong for any other HubSpot portal.
+- `/sales/accounts/{id}`: email draft fields save on blur only; the 5-second send hold is cancelled silently if the page unmounts (`next-action-parts.tsx:89`), so an agent that navigates right after **Send** never sends.
+- `/sales/accounts/{id}`: the NBA templates sheet tells users to change a template's category in Documents → Templates and links to `/documents/templates/{templateId}`, but Operators have `templates: none` and cannot make that change.
+- `/sales/account-books`: help drift: guide lists next-step buttons as Review, Find contacts, Find emails, Start campaign; code also shows `Fill this book`, `Research running` (plain text), `Finding contacts`/`Finding emails`, `{sent} sent · {n} replies`, `Archived` (plain text).
+- `/sales/account-books`: status filter defaults to `open`; locked/archived books are invisible without `status=all`. No delete-book action exists.
+- `/sales/account-books/{id}`: "Research finished" toast only fires if the page is open when the run ends; failed runs have no retry button. `?step=contacts` and `?step=emails` render the same screen.
+- `/sales/account-books/{id}` help drift: guide `sales-account-book` quotes `"This book is locked"`; code says `This book is {status}. Research and contact searches are switched off.` / `This book is not open, so research is switched off.` Guide calls the button **Research selected**; it reads `Research {n}` once rows are ticked. Guide `sales-book-contacts` has `routes: []` so the ? panel never matches `?step=contacts`.
+- `/sales/campaigns/{id}`: **Cancel** drops all queued mail with no confirm dialog. Header actions are absent for anyone but the sender, with only a banner explaining why.
+- `/sales/campaigns/templates`: **Archive** acts immediately with no confirm, has no try/catch (a failure gives no error toast), and Sales has no unarchive control.
+- `/sales/campaigns/new`: launch is two requests (create, then launch); a failed launch can leave an orphan **Draft** campaign.
+- `/sales/campaigns` help drift: guide `sales-campaigns` says click "**Start a campaign**" on step 5; that text is a card heading, the button is **Start campaign**.
+- `/sales/hr-roadmap/{clientId}`: Discovery Call and Roadmap panel requests hard-code `?tenant_id=ariya` (`discovery-call-tab.tsx:65,88,105`, `roadmap-draft-panel.tsx:73`); likely empty or wrong data in any other tenant (runtime effect unverified).
+- `/sales/hr-roadmap/{clientId}`: Granola candidate approve/reject are icon-only buttons with no text or aria-label; Research and Granola form labels are not associated with inputs (`FormField` without `htmlFor`).
+- `/sales/hr-roadmap/{clientId}`: **Approve**, **Mark lost** (shown even on approved roadmaps) and question remove × are one-click with no confirm and no undo; **Lock to latest call** has no unlock.
+- `/sales/hr-roadmap/{clientId}`: the generated roadmap draft lives only in browser state until **Accept draft**; draft generation has no success toast. If the questionnaire is not locked the Roadmap panel renders nothing (no explanation).
+- `/sales/hr-roadmap/{clientId}`: tab selection is not in the URL; without `?tab=` the page opens on the user's last-used tab. Guide `sales-hr-roadmap` says it opens on **Research**.
+- `/sales/hr-roadmap/{clientId}` help drift: guide `sales-hr-roadmap-client` says Domain and Company name are both required; only Domain gates **Run compliance research**. Guide mentions "✓ or ✗" buttons; code renders bare icons.
+- `/sales/hr-roadmap`: worklist rows are clickable `tr` elements (router.push), not links; default stage filter `draft` hides most clients.
+- `/sales/manager`: guide says "Owners and admins only" but the web route has no gate; an Operator (mapped to `sales_agent`) opens it and gets amber `Sales manager view is restricted to owner, admin, and sales_leader roles`.
+- `/sales/prospects`, `/sales/pipeline`, `/sales/work-queue`, `/sales/documents`, `/sales/handoffs`: `resolveDimensionRole` is called without the tenant role mapping (`transport-api/src/routes/sales.ts` manager route; `core/src/entities/sales-workflow.ts:332`), so Principal is always `owner` and Operator always `sales_agent`; any tenant role mapping is ignored. Operators see only own/assigned prospects.
+- `/sales/handoffs`: Operators never get **Convert to local client** (`sales_agent` has `crmMutation: requires_approval`); the UI only says `Conversion requires explicit approval from an owner or admin.` Results/errors are tiny row text, not toasts.
+- `/sales/work-queue`: the action dialog has no close button; server errors render in the amber box behind the dialog; the reschedule default is computed in UTC.
+- `/sales/prospect-studio`: every error, including validation, is shown under the title **Sales data unavailable**; all research/materials are page state and lost on navigation.
+- `/sales/prospects`, `/sales/pipeline`, `/sales/work-queue`, `/sales/documents`, `/sales/manager` are hidden from all nav; `SalesWorkflowLinks` and `SalesCockpitGrid` in `sales/_components.tsx` are dead code. `/sales/pipeline` and `/sales/documents` have no help guide.
+- `/sales/**`: `ViewOnlyBanner` in `sales/layout.tsx` can never render (no role has `view` on `implementationHrSales`).
+
+### Sign in, global UI, Intelligence and Admin
+
+- `/crm-hygiene` (and the `/contacts` unlinked queue): `packages/transport-api/src/routes/contacts.ts` is never imported or mounted in `packages/transport-api/src/server.ts`, so `/api/contacts/unlinked*` should 404. Expect `Failed to load CRM hygiene data: Not Found` and `Domain breakdown unavailable: Not Found` (code-derived, not observed at runtime). Pages: /intelligence/data-and-sources.
+- `/data-health` is the Admin profile's default landing page (`lib/landing.ts`), but `GET /api/integrations/data-health` sits behind the `platformAdmin` capability, so a brand-new Admin lands on `Failed to load Data Health: Your profile cannot view Platform Admin, integrations, tenant switching. Allowed: Principal.` Pages: /intelligence/data-and-sources, /start/roles-and-access.
+- `/usage` hard-codes tenant `ariya` in its API paths (`/api/tenants/ariya`, `/api/tenants/ariya/usage`). In any other tenant, or with `?tenant_id=`, it silently shows zeros and empty texts with no error. Page: /intelligence/intelligence.
+- `/memory` approves and archives tenant-scope proposals through `/api/admin/tenants/ariya/memory/{id}`, whatever tenant is active. A Principal of tenant `pilot`, or a Principal using `?tenant_id=`, writes against `ariya`. Page: /intelligence/intelligence.
+- `/admin/skills/{id}` always shows `Defined in packages/core/src/skills/library/{name}.ts. Edit the source file and rebuild @ariya/core.`, even for a master skill just created in the DB through `/admin/skills/new`, which redirects there. There is no UI to edit an existing master skill. Page: /admin/platform-admin.
+- `/admin/skills` **Archive** and **Restore** failures are not caught; nothing is shown on error. Page: /admin/platform-admin.
+- Granola **Review** links to `/clients/{slug}?tab=granola`; `granola` is not a client tab key, so the client page opens on Overview or the remembered tab. Page: /intelligence/intelligence.
+- Command palette `Run {Skill}` entries link to `/playground?skill={name}`, but Playground ignores `skill`, so nothing is prefilled. Page: /start/global-ui.
+- `/intelligence` lane `Evaluation and staging gate` and needs-review `Trusted source freshness` link Admins to `/admin/trusted-sources`, whose API refuses non-Principals (`Principal access required`). Page: /intelligence/intelligence.
+- A Principal in a customer tenant sees **Platform Admin** in the sidebar and **Trusted Sources** in the Intelligence tabs, but every `/api/admin/*` call fails with `Principal access required`. Page: /start/roles-and-access.
+- `/getting-started` steps 1 and 2 (`/data-health`, `/crm-hygiene`) fail for Operators and Members; step 2 also fails for everyone because of the unmounted contacts API. The page has no nav entry. Page: /start/login-and-session.
+- No return URL after a redirect to `/login`; the agent must reopen its target. Page: /start/login-and-session.
+- `/login` does not redirect a signed-in user. A second sign-in silently replaces the session cookie. Page: /start/login-and-session.
+- The session check runs only on a full page load. An expired session (24 hours) shows up as scattered `Invalid or expired token` errors in panels until the next reload. Page: /start/login-and-session.
+- A 429 lockout loses the server's `Too many failed attempts. Try again in 15 minute(s).`; the client shows the generic `Too many requests…` text. Page: /start/login-and-session.
+- There is no MFA screen. MFA-required tenants can only sign in with Google SSO, which blocks unattended agents. Page: /start/login-and-session.
+- `/intelligence` and `/hr-intel` render the Operations tab bar (Inbox, Deliverables, AI Insights, Settings), not the Intelligence tabs. No tab is active unless `?source=operations`. Page: /intelligence/intelligence.
+- All status tiles on `/intelligence` are hard-coded text presented like live health. Page: /intelligence/intelligence.
+- The command palette placeholder says `Search clients, documents, tools, settings...`, but it only lists pages. With an empty query it shows at most 8 rows per section. `My Connections` never appears (de-duplicated as `Integrations`). Page: /start/global-ui.
+- The alerts bell always shows a red dot. Counts are not wired. Page: /start/global-ui.
+- The help sheet auto-opens `How Ariya fits together` on the first dashboard load in a fresh browser profile and covers the page. A saved last path containing `?help=` reopens it after sign-in. Page: /start/global-ui.
+- Below 768px the sidebar is forced collapsed and cannot be expanded, which hides **Sign out** and the user name. Page: /start/global-ui.
+- Tenant switching has no UI. `?tenant_id=` is dropped by every sidebar or tab link, and writes land in the switched tenant without any banner. Page: /admin/platform-admin.
+- Native `window.confirm`, `window.prompt` and `window.alert` dialogs are used on `/admin/skills`, `/admin/team`, `/admin/trusted-sources` and `/admin/platform-settings`. They are outside the DOM. Page: /admin/platform-admin, /intelligence/data-and-sources.
+- No confirm before: the `/admin/profiles` profile select (saves on pick), memory **Archive** on `/memory`, the tenant memory inspector and Platform Memory, **Sync HubSpot**, Granola **Sync**, account session revokes, and platform-feedback **Create Linear issue** / **Create GitHub issue**. Pages: several.
+- `/admin/team` **Save policy** gives no success feedback and reports errors through native alerts. Ticking **Require SSO** or **Require MFA** can lock out password sign-in. Page: /admin/platform-admin.
+- `/admin/platform-settings` label-edit save and cancel icon buttons have no aria-label or title, and the pencil appears only on hover. Page: /admin/platform-admin.
+- Platform Memory promote and add fields have placeholders only, with no labels. The skill form labels have no `htmlFor`. Page: /admin/platform-admin.
+- The Trusted Sources **Country** and **Topic** filters reload on every keystroke with no debounce. The **Edit source** card renders at the bottom of the page. Page: /intelligence/data-and-sources.
+- The Data Health `HubSpot CRM` card shows sub-section titles (`Manual HubSpot sync`, `HubSpot review queue`, …) whose action buttons are not rendered. Page: /intelligence/data-and-sources.
+- `/internal-ops` cockpit load errors render only inside the collapsed `Source rows and gates` section. The top of the page shows only empty states. Page: /admin/internal-ops.
+- Internal request data-class checkboxes sit inside a nested clickable label. Possible double-toggle (unverified). Page: /admin/internal-ops.
+- `/granola` uses the compact header, so it has no **?** button and no alerts menu. The per-row client choice is lost on reload. Page: /intelligence/intelligence.
+- `/memory` ignores `?tab=`; the remembered tab wins. Page: /intelligence/intelligence.
+- The Playground reopens the last session from localStorage and executes real agent turns, which may write data. Page: /intelligence/intelligence.
+- Members see the **Approvals** tab although their capability is `none`. Page: /start/roles-and-access.
+- Account **Default landing page** = `Command Center` is treated as "no choice", so the last path wins. `/management` and `/data-health` are not selectable. Page: /admin/account-and-feedback.
+- Platform-feedback detail: all action buttons share one loading flag. The launcher defaults to bottom-left and can cover page content. Pages: /admin/account-and-feedback, /start/global-ui.
+- The proxy login action on `/settings/team` is hidden when the URL carries `tenant_id`/`tenantId`. Page: /admin/platform-admin.
+- `/style-guide` has no access gate. Page: /admin/platform-admin.
+- Only the `start-here` and `granola` guides exist for this area. Intelligence, HR Intel, Usage, Data Health, CRM Hygiene, Admin, Internal Ops and Account all fall back to `How Ariya fits together`. Pages: all in this set.
+- The Granola guide says attached meetings show on the client's **Meetings** tab and that **Review** checks them, but code's Review targets `?tab=granola`. The guide calls the list "Notes"; the card is `Inbox`. The guide quotes `Unable to connect Granola.`; code shows the server message and uses that text only as a fallback. Page: /intelligence/intelligence.
+- `/admin` cards say governance is "edited with review gates" and offers "Review before save", but `/admin/governance` is a read-only catalog that says governance lives in the source tree. This also conflicts with the project rule that the DB is canonical for governance rules. Page: /admin/platform-admin.
+- The `/admin/team` tab label is `Platform Team`, but the page h1 is `Ariya Team`. Page: /admin/platform-admin.
+- The source notes said the `/internal-ops/requests` header **Draft new request** goes to `/requests/new`. Code links to `/internal-ops/requests/new`, so the playbook uses the code (note error, not an app bug). Page: /admin/internal-ops.
+- `components/layout/topbar.tsx` (an unlabeled bell button) and `components/governance/sales-cx-governance-review.tsx` are not used by any page.

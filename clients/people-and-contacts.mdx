@@ -1,0 +1,172 @@
+---
+title: "Contacts directory and person profiles"
+sidebarTitle: "People and contacts"
+description: "Search client contacts across all clients, open a person profile, find role coverage gaps, save Gmail messages to a person's history, and understand the HubSpot contacts pages that currently do not load."
+keywords: ["contacts", "people", "people directory", "find a contact", "contact list", "person profile", "role coverage", "missing primary contact", "HR payroll contact", "scan Gmail", "communication history", "HubSpot contacts", "unlinked contacts", "contact change request", "new contact", "archive contact"]
+---
+
+<Info>
+**URL:** `/people`, `/people/{id}` (also `/contacts`, `/contacts/{id}`, see warning) · **Reach:** Workspace sub-nav **Contacts**, or client **People & Roles** tab → **People Directory** · **Roles:** Principal ✓ Operator ✓ (read; saving Gmail messages returns 403 for Operator) · **Ready when:** H1 **Contacts** with description "Manage current-client contacts, role coverage, and person profiles." and the table loaded.
+</Info>
+
+The cross-client contact directory. It is read-only: contact changes are made from a client's **People & Roles** tab as change requests ([People and Roles tab](/clients/client-tabs-people-hr#people-and-roles-tab)).
+
+<Warning>
+The sub-nav item **Contacts** opens `/people`, not `/contacts`. The separate `/contacts` pages (HubSpot contact browser) call API routes that are not mounted on the server, so they show empty lists, "Contact not found", and failed submits. Use `/people` and the client **People & Roles** tab instead. See [HubSpot contacts pages](#hubspot-contacts-pages-not-working).
+</Warning>
+
+## Page map: `/people`
+- H1 **Contacts**, description as above.
+- Tiles: **Current contacts**, **Client-linked** (both switch scope to current clients), **Role gaps** (link to `/clients?view=profile-workspace&profile_gap=primary_contact`), **Profile-ready**, **Missing method**.
+- Card **Role coverage queue** with links **Primary contact** and **HR/Payroll contact** (open the Profile Workspace category).
+- Scope buttons **Current clients** and **All contacts**; text "Open a row to review the person profile and contact history."
+- Table: **Person**, **Clients** (badges link to `/clients/{slug}?tab=people`, `+N`, or **Unassigned**), **Client roles** (or **Needs role**), **Contact method** (email link, phone, or **Missing contact method**), **Profile status** (**Ready** or a list such as "Missing client, role, contact method").
+
+## Recipes
+
+### Find a person
+**Risk:** `READ` · **Roles:** all
+**Inputs from Clarwiz:** name, email, phone, title or role.
+
+1. Open `/people`.
+   - Wait for: tiles and table rows.
+2. Click **All contacts** (scope button) if the person may not belong to a current client; **Current clients** is the narrower scope.
+3. Type in the search box (input, placeholder "Search people, emails, roles, or clients..."). It searches name, email, phone, title and roles. It does not search client names, despite the placeholder.
+4. Read the row, or click it to open the profile.
+
+**Done when:** the person's row is visible.
+
+| If you see | Why | Do this |
+|---|---|---|
+| "No people records yet." | No match, or the load failed (errors are not shown) | Try **All contacts**, a shorter search; reload once |
+| Need people at one client | Client names are not searchable here | Open `/clients/{slug}?tab=people` instead |
+
+### Open a person profile
+**Risk:** `READ` · **Roles:** all
+
+1. On `/people`, click the person's row. It does a full page load to `/people/{id}?from=/people`.
+   - Wait for: "Loading person profile..." to be replaced by H1 = person name and the line `{title or Person profile} · {n} client relationship(s)`.
+2. Read **People Setup** (**Name**, **Role / title**, **Email**, **Phone**, **Profile status** **Ready** or **Needs setup**, **Source**) and **Client Relationships** (client link; badges **Confirmed role**, **Needs role review**, **Profile-derived**).
+3. Right panel (resizable; handle labelled "Resize side panel"): **Service Context** and **Communication History**.
+
+**Done when:** H1 is the person's name. "Person not found" as H1 means a wrong id. **Contacts** (button, top) goes back.
+
+### Fix the client role or details of a person
+**Risk:** `READ` (handoff) · **Roles:** all
+
+1. On the person profile, in **Client Relationships**, click **People setup** (button on the client row).
+   - It opens `/clients/{slug}?tab=people&from=/people/{id}`.
+2. Continue with [People and Roles tab](/clients/client-tabs-people-hr#people-and-roles-tab) (edit, confirm role, archive). Changes there are requests that need approval.
+
+**Done when:** the client's **People & Roles** tab is open.
+
+### Find clients missing a primary or HR payroll contact
+**Risk:** `READ` · **Roles:** all
+
+1. On `/people`, click **Primary contact** or **HR/Payroll contact** in **Role coverage queue**, or the **Role gaps** tile.
+   - It opens `/clients?view=profile-workspace&profile_gap=primary_contact` (or `hr_payroll_contact`).
+2. Continue with [Fill missing profile data](/clients/clients-list#fill-missing-profile-data-profile-workspace).
+
+The empty-state button **Add client people** opens `/clients?contact_filter=needs-coverage` ([Find clients with contact gaps](/clients/clients-list#find-clients-with-contact-gaps)).
+
+### Save Gmail messages to the history of a person
+**Risk:** `EXTERNAL` (reads your Gmail) then `WRITE` · **Roles:** Principal, Admin. Operator: scanning works, saving returns 403.
+**Inputs from Clarwiz:** person; which client relationship; which messages to keep.
+
+1. Open `/people/{id}`.
+2. In **Communication History**, choose the client (select, placeholder "Select client"; defaults to the first relationship).
+
+<Warning>
+**Approval required (EXTERNAL).** Stop here and get approval before clicking **Scan Gmail**. It searches the signed-in user's Gmail for this person's email (last 180 days, up to 12 messages).
+</Warning>
+
+3. Click **Scan Gmail** (button; disabled when the person has no email; reads **Scanning...**).
+   - Wait for: a list headed "Gmail matches ready for review" with a checkbox per message.
+4. Tick the messages to keep.
+5. Click `Save selected ({n})` (button; reads **Saving...**).
+
+**Done when:** toast `{n} communication(s) saved.` and the messages appear under **Saved communications**.
+
+<Warning>
+**Operator:** `Save selected ({n})` is enabled but the API refuses it. Expect the red box "Your profile cannot change Clients and packets. Allowed: Principal, Admin." Do not retry.
+</Warning>
+
+| If you see | Why | Do this |
+|---|---|---|
+| "Add an email address before scanning Gmail for this person." | No email on the person | Add the email via the client's People & Roles tab (request) |
+| "Unable to scan Gmail." or server text (red box) | Gmail not connected or the search failed | Stop; connecting Gmail is an OAuth step for a human |
+| Nothing happens on **Scan Gmail** | The person has no client relationship | Report; a client link is needed first |
+
+Empty states: "No saved communications yet.", "Loading communication history..."
+
+## HubSpot contacts pages (not working)
+`/contacts` and `/contacts/{id}` are a HubSpot contact browser with no navigation entry. Their API routes (`/api/contacts…`) are not mounted on the server, so expect:
+- `/contacts`: H1 **Contacts**, description "Browse synced HubSpot contacts across client accounts.", tabs `All Contacts {n}`, `Unlinked {n}`, **Needs Review** (`?tab=all`, `unlinked`, `review`; the last tab used is remembered). Lists show "No contacts yet." because errors are swallowed.
+- `/contacts/{id}`: "Loading contact..." then H1 **Contact not found** (or "Not Found").
+- **New contact**, **Edit**, **Archive**, **Restore** open a change-request dialog whose submit fails with a red alert.
+- **Export CSV** on the Unlinked tab fails.
+
+Do not retry these. Use `/people` to read contacts and the client **People & Roles** tab to request changes. Report to Clarwiz that the contacts pages are unavailable.
+
+### What the pages contain (for when the API is mounted)
+**Risk:** `READ` (browse), `WRITE` (change request), `DESTRUCTIVE` (archive request) · **Roles:** no role gating in the UI
+
+- **All Contacts** tab: card `Contacts ({n})`, search (placeholder "Search contacts...", waits 250 ms after typing), filters **Client** ("All clients") and **Lifecycle** ("All stages": **Subscriber**, **Lead**, **MQL**, **SQL**, **Opportunity**, **Customer**), **Clear all**, table **Name** (link to `/contacts/{id}`), **Role**, **Email**, **Client**, **Stage**, **Updated**, **Load more**.
+- **Unlinked** tab: `Unlinked HubSpot contacts ({n})`, **Export CSV** (reads **Exporting...**; downloads a `hubspot-unlinked-contacts` CSV), search "Search unlinked contacts...", **Lifecycle**, **Load more**.
+- **Needs Review** tab: text plus links **HubSpot sync health** (`/admin/integrations`) and **Open unlinked queue**.
+- `/contacts/{id}` header: **Contacts** (back; defaults to `/people`), `{n} pending` badge (jumps to pending changes), **Edit**, **Archive** or **Restore**, **HubSpot** (opens HubSpot in a new tab). Cards **Person profile** (**Name**, **Lifecycle**, **Role**, **Client**, **Email**, **Phone**, **Notes**), **Service context** (**Client**, **Role**, **Reachability**), **Sync metadata** (**HubSpot contact ID**, **Updated**, **Created**), **History** ("Loading history…", "No history yet…").
+
+Change-request dialog (titles **New contact (proposes change request)**, **Edit contact (proposes change request)**, **Archive contact**, **Restore contact**):
+1. Fill **Name** (input, id "ccr-name", placeholder "Full name"; required to create; marked "(sensitive — owner approval)" on HubSpot contacts), **Email** (id "ccr-email", placeholder "name@example.com"), **Phone** (id "ccr-phone"), **Role / title** (id "ccr-role", placeholder "HR Director"), **Notes** (id "ccr-notes", placeholder "Internal notes — not synced to HubSpot.").
+2. Fill **Reason** (id "ccr-reason"; placeholder "Context for the reviewer", "Why archive? (e.g., left the company)" or "Why restore?").
+
+<Warning>
+**Approval required (DESTRUCTIVE)** for **Archive contact**: stop and get approval before clicking **Submit change request**.
+</Warning>
+
+3. Click **Submit change request** (button; reads **Submitting…**; disabled for create without a name, or edit with no change).
+
+Done when the dialog closes. Errors show in a red alert with server text and possibly `Policy reason: {CODE}`. The request is only pending; approval happens on `/approvals`. No HubSpot write happens.
+
+## Controls reference
+| Visible text | Type | Locator | What it does | Risk |
+|---|---|---|---|---|
+| search | input | placeholder "Search people, emails, roles, or clients..." | Filters people (not by client name) | READ |
+| **Current clients**, **All contacts** | buttons | above table | Scope | READ |
+| tiles | buttons, link | top of `/people` | Scope or Profile Workspace | READ |
+| **Primary contact**, **HR/Payroll contact** | links | Role coverage queue | Profile Workspace category | READ |
+| client badge | link | **Clients** column | `/clients/{slug}?tab=people` | READ |
+| row | row click | table | `/people/{id}?from=/people` | READ |
+| **Add client people** | button | empty state | `/clients?contact_filter=needs-coverage` | READ |
+| **Contacts** | button | person profile top | Back to `/people` | READ |
+| **People setup** | button | Client Relationships row | Client People & Roles tab | READ |
+| client select | select | placeholder "Select client" | Client for Gmail scan | READ |
+| **Scan Gmail** | button | Communication History | Searches user's Gmail | EXTERNAL |
+| `Save selected ({n})` | button | Communication History | Saves messages to history | WRITE |
+
+## Waits and signals
+- `/people`: no spinner text; wait for tiles and rows. A failed load looks like an empty directory.
+- `/people/{id}`: "Loading person profile..." then H1.
+- **Scan Gmail**: button reads **Scanning...** until results show (a few seconds).
+
+## Gotchas
+- The sub-nav says **Contacts** but opens `/people`; the H1 on `/people` is also **Contacts**. Do not confuse it with the `/contacts` route.
+- `/people` search placeholder mentions clients but client names are not searched (in-app help states this correctly).
+- Opening a row is a full page load, not an in-app navigation; wait for the new page.
+- Gmail scanning needs the user's Google account connected. If a Google sign-in or consent screen appears, stop and hand off to a human.
+- Nothing on these pages sends email or writes to HubSpot. Email links open the local mail client; **HubSpot** buttons only open hubspot.com.
+
+## Related
+- [People and Roles tab](/clients/client-tabs-people-hr#people-and-roles-tab)
+- [Clients portfolio](/clients/clients-list)
+- [Client profile and tab map](/clients/client-profile)
+
+## Source files
+- `packages/web/src/app/(dashboard)/people/page.tsx`
+- `packages/web/src/app/(dashboard)/people/[id]/page.tsx`
+- `packages/web/src/app/(dashboard)/contacts/page.tsx`
+- `packages/web/src/app/(dashboard)/contacts/[id]/page.tsx`
+- `packages/web/src/components/contacts/contact-change-request-dialog.tsx`
+- `packages/transport-api/src/server.ts`
+- `packages/transport-api/src/routes/contacts.ts`
+- `packages/transport-api/src/routes/contact-change-requests.ts`

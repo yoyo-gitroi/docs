@@ -1,0 +1,375 @@
+---
+title: "Global UI patterns"
+sidebarTitle: "Global UI"
+description: "Recognise and operate the parts of Ariya that appear on every page: sidebar, tab bar, command palette, help panel, dialogs, toasts, filters, feedback launcher, and the universal wait rules."
+keywords: ["sidebar", "navigation", "command palette", "cmd k", "search or jump", "help panel", "page guide", "toast", "confirm dialog", "popup", "filter", "pagination", "keyboard shortcuts", "platform feedback", "report a bug", "loading", "is it saved", "error message"]
+---
+
+<Info>
+**URL:** every page under the app frame (everything except `/login`, `/reset-password`, `/accept-invite`, `/handoff`) · **Reach:** n/a · **Roles:** Principal ✓ Operator ✓ · **Ready when:** the full-screen `Loading...` spinner is gone, the left sidebar shows **Ariya HR**, and the page h1 is visible.
+</Info>
+
+Read this page once before any recipe. It explains the shared frame, the shared widgets and how to tell that a page has loaded, a save has worked, or something has failed.
+
+## Page map
+
+Top to bottom, left to right, on every app page:
+
+- **Pilot banner**: amber strip across the very top, text `Pilot / Not Production` (shown as uppercase). Present on pilot and staging builds; absent in production builds. Decoration only.
+- **Left sidebar** (fixed, about 256px wide; about 64px when collapsed):
+  - Ariya mark with **Ariya HR** and `Operator workspace.` (link, title "Go to Command Center", opens `/`).
+  - Chevron icon button (title "Collapse sidebar" or "Expand sidebar").
+  - **Search or jump...** button with a `⌘K` chip (title "Search or jump"); opens the command palette.
+  - Heading **Workspaces** (shown uppercase): Command Center, Clients, Implementation, Operations, Documents, Sales, Intelligence, Internal Ops (each only if your role allows; see [Roles and access](/start/roles-and-access)).
+  - Heading **Admin & Setup** (shown uppercase): Settings, Platform Admin. The whole group is hidden for Operator and Member.
+  - Bottom: initials square (title "Account"), your name and profile label (`Principal`, `Admin`, `Operator`, `Member`), and the log-out icon button (title "Sign out").
+- **Main column**:
+  - **Proxy banner** (violet, `PROXY LOGIN`), only during proxy login. See [Sign in and session](/start/login-and-session#recognise-and-exit-a-proxy-login).
+  - **Page header**:
+    - Thin top bar, right-aligned: **?** button (aria-label "Open page guide", title "Page guide (?)"), bell button (aria-label "Open alerts menu", always shows a red dot), and a pill with the tenant name (or `—`).
+    - Breadcrumbs: home icon › crumbs.
+    - h1 page title, a description line under it, page action buttons on the right.
+    - Compact pages (for example `/granola`) have no top bar and no breadcrumbs: only the title and actions in a sticky row, so there is no **?** button there.
+  - **Workspace tab bar** under the header: an uppercase group label on the left (for example `INTELLIGENCE`) and tabs (icon + label) on the right. The `nav` element has aria-label `{Group label} navigation`, for example "Platform Admin navigation". The active tab is a dark filled pill. Some pages have no tab bar.
+  - Page content.
+- **Platform feedback launcher** (only on builds where it is enabled): small fixed icon cluster, bottom-left by default.
+- **Toasts**: bottom-right, stacked, about 4 seconds each, no close button.
+
+## Recipes
+
+### Open a page from the sidebar
+**Risk:** `READ` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** the destination (for example "Documents").
+**Preconditions:** signed in.
+
+1. Prefer the direct URL when the recipe gives one. Otherwise continue.
+2. If the sidebar shows icons only, hover an icon to read its tooltip (each icon link keeps `title` = its label), or expand the sidebar first ([Collapse or expand the sidebar](#collapse-or-expand-the-sidebar)).
+3. Click the item (link, label text such as **Documents**; visual: left sidebar under **Workspaces** or **Admin & Setup**).
+   - Wait for: the URL to change, the item to turn bold with a left accent bar, and the new h1.
+
+**Done when:** the URL and h1 match the destination.
+
+| If you see | Why | Do this |
+|---|---|---|
+| The item is missing | Your role cannot use it | Check [Roles and access](/start/roles-and-access). Do not type the URL as a workaround unless Clarwiz asks. |
+| `{Capability label} is not available on the {Profile} profile.` | You opened a gated page by URL | Report; switch to the account that has access. |
+
+### Collapse or expand the sidebar
+**Risk:** `WRITE` (layout preference saved to your user) · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** none.
+**Preconditions:** window at least 768px wide.
+
+1. Click the chevron icon button (title "Collapse sidebar" or "Expand sidebar"; visual: top of the sidebar, right of **Ariya HR**).
+   - Wait for: the sidebar width to change.
+
+**Done when:** labels show (expanded) or only icons show (collapsed).
+
+<Note>Below 768px window width the sidebar is forced collapsed and the chevron cannot expand it. Collapsed hides your name and the **Sign out** button. Widen the browser window if you need labels.</Note>
+
+### Switch tabs in the workspace tab bar
+**Risk:** `READ` · **Roles:** Principal, Operator (tabs are filtered by role)
+**Inputs from Clarwiz:** the tab label.
+**Preconditions:** the page has a tab bar.
+
+1. Find the bar under the page header (nav, aria-label `{Group label} navigation`).
+2. Click the tab by its label (for example **Usage**).
+   - Wait for: the tab to become a dark filled pill and the h1 to change.
+
+**Done when:** the target h1 is visible.
+
+<Note>A tab pointing to the page you are already on is rendered as a button (with a `data-href` attribute), not a link. It still works when clicked.</Note>
+
+### Jump to a page with the command palette
+**Risk:** `READ` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** a page name or keyword.
+**Preconditions:** signed in.
+
+1. Press Cmd+K (Mac) or Ctrl+K (others), or click **Search or jump...** (button, title "Search or jump"; visual: top of the sidebar).
+   - Wait for: an overlay with header `Command palette` and an input with placeholder "Search clients, documents, tools, settings..." that has focus.
+2. Type part of the page name (for example `usage`). Matching is a case-insensitive substring over label, URL, description and keywords.
+   - Wait for: grouped rows to update. Each row shows icon, label, description and (on wider screens) the URL on the right.
+3. Press ArrowDown or ArrowUp to highlight a row, then Enter. Or click the row (link).
+   - Wait for: the palette to close and the page to load.
+
+**Done when:** the destination page is loaded.
+
+| If you see | Why | Do this |
+|---|---|---|
+| "No matching surfaces." | No page matches | Use fewer letters, or the sidebar. |
+| The page is not listed with an empty query | Each section shows at most 8 rows until you type | Type a few letters of the name. |
+| You searched for a client or document name and nothing matched | The palette lists pages only, not records | Open `/clients` or `/documents` and search there. |
+
+<Note>Sections are `Favorites`, `Frequent`, `Skills`, `Navigation`, `Utilities`, `Admin`, `Settings`. `/` appears as **Command Center** (not "Your day"); `/settings/integrations` appears as **Integrations**. Principals also see entries labelled `Run {Skill Name}`; these open `/playground` but do not prefill the skill. Escape or a click on the backdrop closes the palette; the X button has aria-label "Close command palette".</Note>
+
+### Favorite a command palette entry
+**Risk:** `READ` (stored in this browser only) · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** the page label.
+**Preconditions:** palette open.
+
+1. Type the page name to find its row.
+2. Click the star button on that row (aria-label `Favorite {label}`, aria-pressed toggles; visual: right end of the row).
+
+**Done when:** the star is filled and the entry appears under `Favorites` with an empty query.
+
+### Open and close the help panel
+**Risk:** `READ` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** none.
+**Preconditions:** none.
+
+1. Click **?** (button, aria-label "Open page guide", title "Page guide (?)"; visual: top-right of the page header). Or press `?` while focus is not in a text field. Or open the page URL with `?help={guideId}` appended.
+   - Wait for: a right-side sheet with a guide title. The URL gains `?help={guideId}`.
+2. Read the sections `What's on this page`, `How to`, `If something doesn't work`, `Tips`, `Related`.
+3. To browse every guide, click **All guides**; search with the input (placeholder "Search pages, tasks or problems", aria-label "Search guides"). **Back to guide** returns.
+4. Close with the X button (screen-reader text "Close"; visual: top-right of the sheet) or press Escape.
+
+**Done when:** the sheet is closed and `?help=` is gone from the URL.
+
+<Warning>The help panel opens **by itself** on the first dashboard page in a fresh browser profile, showing `How Ariya fits together`. Close it before your first click. Most pages in Intelligence, Platform Admin, Internal Ops and Account have no guide of their own and show this same start guide. When a guide and this playbook disagree, follow this playbook.</Warning>
+
+### Check the alerts menu
+**Risk:** `READ` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** none.
+**Preconditions:** page has the full header (not a compact page).
+
+1. Click the bell (icon button, aria-label "Open alerts menu"; visual: top-right of the page header, left of the tenant pill).
+   - Wait for: a dropdown headed `Alerts`, sub `Review queues and health checks that may need attention.`
+2. Click one item: **Action Queue** (`/requests`), **Approvals** (`/approvals`), **Compliance** (`/compliance`), **Integration health** (`/settings/integrations`).
+
+**Done when:** the chosen page loads.
+
+<Note>The red dot on the bell is always shown and does not mean anything is waiting. The menu footer says `Live notification counts are not wired yet; this menu links to the current review surfaces.`</Note>
+
+### Answer an in-app confirm dialog
+**Risk:** depends on the action (often `DESTRUCTIVE`) · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** approval for the action, when the policy requires it.
+**Preconditions:** a modal opened after you clicked an action.
+
+1. Read the title (a question such as `Deactivate user?`, default `Are you sure?`) and the description.
+2. A red triangle icon and red confirm button mark a destructive action.
+3. If the dialog shows a label `Type {WORD} to confirm`, type that word exactly into the input; the confirm button stays disabled until it matches.
+
+<Warning>**Approval required (DESTRUCTIVE or EXTERNAL).** If the action deletes, archives, removes, cancels, deactivates or sends, stop here and get approval before clicking the confirm button.</Warning>
+
+4. Click the confirm button (its text is the verb, for example **Deactivate**, **Remove**, **Delete**; default **Confirm**). To back out, click **Cancel** or press Escape.
+   - Wait for: the button to show `Processing...`, then the dialog to close.
+
+**Done when:** the dialog is closed and the page shows the page-specific success signal (usually a green toast).
+
+### Answer a native browser dialog
+**Risk:** depends on the action · **Roles:** Principal
+**Inputs from Clarwiz:** approval, when required; the note text for prompts.
+**Preconditions:** you clicked an action on `/admin/skills`, `/admin/team`, `/admin/trusted-sources` or `/admin/platform-settings`.
+
+1. Expect a browser-native dialog (not part of the page DOM). Your automation must accept or dismiss it; clicks on the page do nothing while it is open.
+2. Read its message, for example `Archive this skill? It will stop being applied to agent runs.` or `Review note for {name}`.
+3. For a prompt, replace or keep the default text.
+4. Accept (OK) to proceed, or dismiss (Cancel) to back out. Get approval first if the action is destructive or external.
+
+**Done when:** the dialog is gone and the page's own success signal appears. Some of these pages report errors only through another native alert.
+
+### Fill a prompt dialog
+**Risk:** depends on the action · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** the text to enter.
+**Preconditions:** an in-app modal with a title and one input or text area opened.
+
+1. Read the title and label.
+2. Click the input and type the text. In a single-line input, Enter submits.
+3. Click the confirm button (default **Confirm**; disabled while a required field is empty) or **Cancel**.
+   - Wait for: `Processing...`, then the dialog closes.
+
+**Done when:** the dialog closes and the page shows its success signal.
+
+### Pick a client in a client picker
+**Risk:** `READ` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** client name or slug.
+**Preconditions:** a button showing `Select a client…` or a client name.
+
+1. Click the picker button (visual: shows the current client or placeholder `Select a client…`).
+   - Wait for: a popover with a search input (placeholder "Search clients…", aria-label "Search clients") and a list (role "listbox").
+2. Type part of the client name or slug (matches anywhere in the name or slug).
+3. Click the matching option (role "option"). If exactly one option matches, Enter picks it.
+
+**Done when:** the picker button shows the client name.
+
+| If you see | Why | Do this |
+|---|---|---|
+| "No client matches that." (or a page-specific empty text) | No match | Try the slug or fewer letters; confirm the client exists on `/clients`. |
+
+<Note>Plain dropdowns (Base UI selects) are not native `select` elements: click the trigger, then click an option (role "option") in the popup. Some admin pages still use native `select` elements; those are noted on their pages. Checkboxes are buttons with role "checkbox" inside a label; clicking the label text toggles them.</Note>
+
+### Filter a list with the filter bar
+**Risk:** `READ` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** search text and filter values.
+**Preconditions:** the list has a filter bar.
+
+1. Type into the search input (placeholder "Search..." or a page-specific one).
+2. For each filter, click its select (label above it; first option `All {Label}`) and pick a value.
+   - Wait for: the list to update. Each active filter appears as a chip `{Label}: {value}` with an X icon button.
+3. To remove one filter click its chip's X; to remove all click **Clear all**.
+
+**Done when:** the list shows the filtered rows or the page's empty-state text.
+
+### Page through a long list
+**Risk:** `READ` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** none.
+**Preconditions:** a pagination bar is visible (hidden when there is only one page).
+
+1. Read `{first}–{last} of {total} {label}` and `Page {n} of {m}`.
+2. Click **Next** or **Previous**.
+
+**Done when:** the range text changes. Some pages use a **Load more** button instead; click it until it disappears.
+
+### Send platform feedback
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** kind, severity, title, description.
+**Preconditions:** the launcher is visible (only on builds where it is enabled).
+
+1. Click the launcher (icon button, aria-label "Send platform feedback"; visual: small fixed button, bottom-left by default).
+   - Wait for: a panel (role "dialog", aria-label "Send platform feedback") with heading `Send platform feedback`.
+2. **Kind** (native select): pick `Bug`, `Data issue`, `Idea` or `Question` (default `Bug`).
+3. **Severity** (native select): `Low`, `Medium`, `High`, `Critical` (default `Medium`).
+4. **Title** (input, placeholder "Short summary", max 160 characters): type the title.
+5. **Description** (textarea, placeholder "What happened, what you expected, and any useful context.", max 4000): type the description. Never include credentials.
+6. Optional: keep **Include a screenshot** ticked and click **Capture screenshot**. After capture you can click **Annotate screenshot** (tools `Select`, `Arrow`, `Rectangle`, `Draw`, `Text`, `Undo annotation`, `Clear annotations`; then **Save annotation** or **Cancel**) or **Recapture**.
+7. Click **Submit feedback** (disabled until Title and Description are filled).
+   - Wait for: the panel to show `Feedback saved` and `The report is now in Pilot feedback triage.`
+8. Click **New feedback** to close the panel.
+
+**Done when:** `Feedback saved` was shown. The report is listed on `/platform-feedback` (see [Account and feedback](/admin/account-and-feedback#review-platform-feedback)).
+
+| If you see | Why | Do this |
+|---|---|---|
+| `Screenshot capture failed ({code}). Text-only feedback is still available.` | Capture failed | Untick **Include a screenshot** and submit text only. |
+| "Duplicate platform feedback submitted inside the short-window guard" | Same report sent moments ago | Do not resend. |
+| "Feedback submission failed" or a server message | Server error | Retry once; then report. |
+
+Escape closes the panel and clears it. Focus is trapped inside the panel while open.
+
+### Move or hide the feedback launcher
+**Risk:** `READ` (browser-only) · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** none.
+**Preconditions:** the launcher covers something you need to click.
+
+1. Click the diagonal-arrows icon button (aria-label "Move platform feedback button"). Each click moves it: bottom-left → bottom-right → top-right → top-left.
+2. Or click the eye-off icon button (aria-label "Hide platform feedback button"). A small button "Show platform feedback button" stays at the bottom-left to bring it back.
+
+**Done when:** the target control is no longer covered.
+
+### Recover from a page crash
+**Risk:** `READ` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** none.
+**Preconditions:** the page shows `This page hit an error`.
+
+1. Click **Try again** (button under `The error has been logged for review.`).
+2. If the error remains, reload the page once.
+3. If it still fails, report the URL and the exact text to Clarwiz.
+
+**Done when:** the page renders, or you have reported it.
+
+## Universal wait rules
+
+### How to tell a page finished loading
+1. The URL is the one you opened (watch for a redirect to `/login`).
+2. The full-screen `Loading...` spinner is gone and the sidebar is visible.
+3. The h1 matches the page's **Ready when** text in this playbook.
+4. No `Loading…` or `Loading...` text remains in the content area, no pulsing grey skeleton blocks remain, and spinning refresh icons have stopped.
+5. Each data panel shows rows, numbers, or its empty-state text (a centered icon with a short heading).
+6. No help sheet or dialog is covering the page.
+
+Use the time limits in [Operating rules](/start/operating-rules#waiting-budgets). AI actions (assistant, research, briefs) can take minutes. Some pages show zeros or empty texts instead of an error when their data fails; the page docs list those cases.
+
+### How to tell a save succeeded
+1. Read the bottom-right corner right after the click: a green toast with a check icon and the success text. Toasts disappear after about 4 seconds and have no close button, so read immediately.
+2. The busy label (`Saving...`, `Saving…`, `Processing...`) returns to the normal button text.
+3. The page changes in the expected way: a new or updated row, a changed badge, a cleared form, or a new URL (create pages redirect to the new record).
+4. Some pages show no toast at all (for example HR Intel actions and internal request actions). Use the signal named in that page's **Done when**.
+5. For anything important, reload the page and confirm the change persisted.
+
+### What an error looks like
+
+| Signal | Example text | Meaning |
+|---|---|---|
+| Red toast with an octagon icon, bottom-right | the server's message | The action failed |
+| Amber toast | page-specific warning | Partial success or rejected input |
+| Red or rose box with an alert icon near the form | `Failed to …`, `Unable to …`, `Error: {error}`, `… unavailable: {error}` | Load or save failed |
+| Permission text | `Your profile cannot view {Capability label}. Allowed: {roles}.` (or `cannot change`) | Role lacks access |
+| Permission text | `Principal access required` | Platform Admin API, Principal of an internal tenant only |
+| Permission text | `Tenant access denied` | Tenant switching refused |
+| Gated page card | `{Capability label} is not available on the {Profile} profile.` | Page blocked for your role |
+| Rate limit | `Too many requests. Try again in {n} second(s).` or `Too many requests. Try again in a moment.` | Wait, then retry once |
+| Session | "Invalid or expired token", "Authentication required" | Session ended; see [Recover from an expired session](/start/login-and-session#recover-from-an-expired-session) |
+| Crash | `This page hit an error` / `The error has been logged for review.` | Use **Try again** |
+| Native browser alert | message box outside the page | Admin pages that report errors this way |
+
+## Controls reference
+
+| Visible text | Type | Locator | What it does | Risk |
+|---|---|---|---|---|
+| **Ariya HR** | link | title "Go to Command Center"; top of sidebar | Opens `/` | READ |
+| (chevron) | icon button | title "Collapse sidebar" / "Expand sidebar" | Collapses or expands sidebar | WRITE (layout pref) |
+| **Search or jump...** | button | title "Search or jump"; Cmd+K or Ctrl+K | Opens command palette | READ |
+| `{initials}` | link | title "Account"; bottom-left | Opens `/account` | READ |
+| (log-out icon) | icon button | title "Sign out" | Ends session | WRITE |
+| **?** | button | aria-label "Open page guide", title "Page guide (?)" | Opens help sheet | READ |
+| (bell) | icon button | aria-label "Open alerts menu" | Opens Alerts menu | READ |
+| `{tenant name}` | pill | top-right of header | Shows current tenant | READ |
+| Palette input | input | placeholder "Search clients, documents, tools, settings..." | Filters pages | READ |
+| (star) | button | aria-label `Favorite {label}` | Favorites a palette row | READ |
+| (X) | icon button | aria-label "Close command palette" | Closes palette | READ |
+| **All guides** / **Back to guide** | button | help sheet header | Switches guide view | READ |
+| **Back to the guide for this page** | button | help sheet, when viewing another guide | Returns to page guide | READ |
+| Launcher | icon button | aria-label "Send platform feedback" | Opens feedback panel | READ |
+| **Submit feedback** | button | feedback panel | Saves feedback | WRITE |
+| **Try again** | button | crash screen | Re-renders page | READ |
+
+## Waits and signals
+- Route changes scroll the window to the top.
+- Layout preferences (sidebar collapse, panel widths, last tab per page, last path) save to your user about 600 ms after a change. They are not saved during proxy login.
+- Toasts: success green with check icon, error red with octagon icon, warning amber; about 4 seconds.
+
+## Single-key shortcut hazards
+Some pages act on bare key presses when focus is not inside a text field. A stray letter can change data.
+
+| Where | Keys | Effect |
+|---|---|---|
+| Every page | Cmd+K or Ctrl+K | Opens the command palette, even while typing in a field |
+| Every page except `/service-desk` | `?` | Opens the help sheet |
+| `/service-desk` (Operations) | `j`, `k`, `/`, `?`, `t`, `o` or Enter, `e`, `r`, `1`, `2`, `3`, Escape | Move selection, focus search, open shortcut legend, focus mode, open case, **mark done**, reply, **park the case** with us, client or vendor |
+| `/service-desk` focus mode and post-send panel | Enter, ArrowLeft, `s`, `1` to `4`, `p`, `c` | Track, dismiss, skip, set case type or choice, cycle priority, focus client |
+| Implementation milestone sheet | `j`, `k`, `c` | Next or previous milestone, focus comment |
+| Document editor `/documents/{id}` | Cmd+S or Ctrl+S | Saves all edits |
+
+Rules: click into the target field and confirm it has focus before typing; never send key presses to the page body; prefer clicking buttons over shortcuts.
+
+## Gotchas
+- `/intelligence` and `/hr-intel` show the **Operations** tab bar, not the Intelligence tabs.
+- The command palette lists pages, not clients or documents, despite its placeholder.
+- The feedback launcher sits bottom-left by default and can cover bottom-left page content; move or hide it.
+- Tenant switching has no UI; it is a `?tenant_id=` URL parameter that is dropped on every link click. See [Platform admin](/admin/platform-admin#view-another-tenant).
+- The help panel can reopen on sign-in if the saved last page carried `?help=`.
+
+## Related
+- [Operating rules](/start/operating-rules)
+- [Sign in and session](/start/login-and-session)
+- [Roles and access](/start/roles-and-access)
+
+## Source files
+- `packages/web/src/app/(dashboard)/layout.tsx`
+- `packages/web/src/app/layout.tsx`
+- `packages/web/src/app/error.tsx`
+- `packages/web/src/components/pilot-banner.tsx`
+- `packages/web/src/components/layout/sidebar.tsx`
+- `packages/web/src/components/layout/workspace-top-nav.tsx`
+- `packages/web/src/components/layout/page-header.tsx`
+- `packages/web/src/components/layout/command-palette.tsx`
+- `packages/web/src/components/help-sheet/index.tsx`
+- `packages/web/src/components/confirm-dialog.tsx`
+- `packages/web/src/components/prompt-dialog.tsx`
+- `packages/web/src/components/client-combobox.tsx`
+- `packages/web/src/components/filter-bar.tsx`
+- `packages/web/src/components/pagination-bar.tsx`
+- `packages/web/src/components/platform-feedback/platform-feedback-launcher.tsx`
+- `packages/web/src/components/platform-feedback/platform-feedback-dialog.tsx`
+- `packages/web/src/lib/navigation.ts`
+- `packages/web/src/lib/ui-prefs.tsx`
+- `packages/web/src/app/(dashboard)/service-desk/page.tsx`

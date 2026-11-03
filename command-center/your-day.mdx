@@ -1,0 +1,268 @@
+---
+title: "Your day (Command Center)"
+sidebarTitle: "Your day"
+description: "Read today's work, start the day, tick off or defer to-dos, follow up on waiting items, and act on memory and document approvals."
+keywords: ["command center", "your day", "my day", "start my day", "what's on today", "to do today", "tick off", "move to tomorrow", "waiting on others", "meetings today", "approvals", "approve document", "approve and deliver", "send back", "remember memory", "home page", "dashboard"]
+---
+
+<Info>
+
+**URL:** `/` · **Reach:** sidebar **Command Center** (or the logo button, title "Go to Command Center") · **Roles:** Principal ✓ Operator ✓ (Member: view only, no Approvals) · **Ready when:** the h1 **Command Center** and the card heading **To do today** are visible and the grey skeleton (aria-label "Loading your day") is gone.
+
+</Info>
+
+The personal home page: today's to-dos, who you are waiting on, today's meetings, and items waiting for your approval. Everything here is local to Ariya; no action on this page sends email.
+
+<Note>
+
+**Principal vs Operator.** After sign-in an Operator lands on `/`; a Principal lands on `/management` (unless they picked another landing page). Open `/` directly as a Principal. Both roles see the same controls here, including the **Approvals** card.
+
+</Note>
+
+## Page map
+- **Header:** h1 **Command Center** and the long date. Right side: the pill `Updated {just now | N min ago | N hours ago}` (reads "Updating…" while reloading; amber dot = one source failed), then **Start my day** (primary button).
+- **Left column** (top to bottom; two columns at 1100 px and wider):
+  - Overview card (aria-label "Overview"): stat tiles **Cases with you**, **In Triage**, **Approvals**, **Meetings**, **Waiting on others**, then "What's going on" lines, each ending in a link (**Open**, **Open case**, **Open Cases**, **Prep**, **Open Triage**).
+  - **To do today** card: filter chips (group aria-label "Show"), **Client** and **Area** selects, **Sort** select, the to-do rows, and the **Show done (…)** toggle at the bottom.
+  - **Waiting on others** card (id "waiting"): rows with **Follow up** or **Open**, link **See all in Operations**, **Prev** / **Next**.
+- **Right column:**
+  - **Calendar** card (id "calendar", subtitle "Google Calendar"): today's meetings and **Prep:** links.
+  - **Approvals** card (id "approvals"): link **All memory**, chips (group aria-label "Approval type"), approval rows, **Prev** / **Next**. Not shown to Members.
+- The top tab bar (Action Queue, Approvals, Compliance) is **hidden on this page**. To reach those pages open their URL: `/requests`, `/approvals`, `/compliance`.
+
+## Recipes
+
+### Read the day
+**Risk:** `READ` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** none
+**Preconditions:** signed in
+
+1. Open `/`.
+   - Wait for: the skeleton (aria-busy "true", aria-label "Loading your day") to disappear and the card heading **To do today** to appear.
+2. Read the stat tiles in the Overview card (visual: row of tiles at top left):
+   - **Cases with you** `{n}` with `{n overdue}` or "none overdue".
+   - **In Triage** `{n}` with `{n new since yesterday}` or "nothing new".
+   - **Approvals** `{n}` with "waiting on you" or "all clear".
+   - **Meetings** `{n}` with `next at {time}`, "all done" or "none today".
+   - **Waiting on others** `{n}` with `oldest {n days}` or "nobody".
+3. Read the "What's going on" lines under the tiles.
+4. Read the rows in **To do today**, **Waiting on others**, **Calendar** and **Approvals**.
+
+**Done when:** you have the tile values and row titles to report.
+
+| If you see | Why | Do this |
+|---|---|---|
+| "Your day could not be loaded." with **Try again** | Load failed, or the URL carries `?user=` | Remove any `?user=` from the URL, then click **Try again** (button). |
+| No **Cases with you** / **In Triage** tiles | Those tiles only appear when Operations data exists | Report "no Operations data"; open `/service-desk` if needed. |
+| "Nothing urgent. Nobody is waiting on you right now." | Nothing open | Report it. |
+| "Calendar is not connected." | No calendar link for this user | Report it; do not try to connect. |
+
+### Start my day
+**Risk:** `READ` · **Roles:** Principal, Operator
+**Preconditions:** your own day, at least one open item
+
+1. Open `/`.
+2. Click **Start my day** (link styled as primary button; visual: top right of the page).
+   - Wait for: the URL to change. Cases open in Operations (`/service-desk?...`).
+
+**Done when:** the browser is on the first open item that is not blocked by another item.
+
+| If you see | Why | Do this |
+|---|---|---|
+| No **Start my day** button | Nothing is open, or you are in a read-only view | Report "nothing open today". |
+
+For the Operations version of starting the day see [Start the day in Operations](/operations/inbox#start-the-day-in-operations).
+
+### Filter and sort the to-do list
+**Risk:** `READ` · **Roles:** Principal, Operator
+
+1. In **To do today**, click a filter chip (toggle button with aria-pressed; group aria-label "Show"). Only chips that have items appear: `All {n}`, `Due or overdue {n}`, `Waiting on you {n}`, `Unblocks someone {n}`, `Meeting prep {n}`, `This week {n}`.
+2. Optional: choose a client in the **Client** select (screen-reader label "Client"; first option "All clients"; only shown when there is more than one client).
+3. Optional: choose an area in the **Area** select (screen-reader label "Area"; options "All areas", "Operations", "Implementation", "Documents", "Compliance", "Meetings"; only shown when there is more than one area).
+4. Optional: choose **Sort** (select, label "Sort"): "Nearest first", "Most overdue first" or "Ariya's priority". The choice is remembered in this browser.
+
+**Done when:** the list shows only matching rows.
+
+| If you see | Why | Do this |
+|---|---|---|
+| "Nothing open matches these filters." | Filters exclude everything | Click **Show everything** (link-style button) to clear filters. |
+
+### Mark a to-do done
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** the item title
+
+1. Open `/` and find the row by title in **To do today**.
+2. Click the checkbox square at the start of the row (icon button, aria-label `Mark done: {title}`; visual: empty square left of the title).
+   - Wait for: the row to disappear (optimistic) and a toast.
+
+**Done when:** toast `Done: {title}` appears (it has an **Undo** button).
+
+| If you see | Why | Do this |
+|---|---|---|
+| Toast "That did not save. Try again." or another server message | Save failed; the row comes back | Retry once, then report. |
+| Wrong item ticked | — | Click **Undo** in the toast at once, or use [Bring back a done or moved item](#bring-back-a-done-or-moved-item). |
+
+### Move a to-do to tomorrow
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+
+1. Find the row in **To do today**.
+2. Click **Tomorrow** (button on the row; visual: right end of the row).
+
+**Done when:** toast `Moved to tomorrow: {title}` appears (with **Undo**).
+
+### Bring back a done or moved item
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+
+1. At the bottom of **To do today**, click `Show done ({n}) and moved to tomorrow ({n})` (button, aria-expanded).
+2. On the row, click **Not done** (for a ticked item) or **Bring back** (for an item moved to tomorrow) (link-style button).
+3. Click `Hide done …` to close the list if needed.
+
+**Done when:** the row is back in the open list.
+
+### Follow up on waiting items
+**Risk:** `READ` · **Roles:** Principal, Operator
+
+1. Open `/` and scroll to **Waiting on others** (or click the **Waiting on others** tile, which jumps to `#waiting`).
+2. Read the rows (5 per page). Use **Prev** / **Next** (buttons, aria-label "Previous page" / "Next page") to page.
+3. Click **Follow up** (opens the case) or **Open** (opens the document) on a row.
+4. To see the full list click **See all in Operations** (link → `/service-desk?queue=waiting_client`).
+
+**Done when:** the case or document is open. To send a nudge, follow [Draft a nudge](/operations/email-and-replies#draft-a-nudge).
+
+| If you see | Why | Do this |
+|---|---|---|
+| "Nobody owes you anything right now." | Nothing waiting | Report it. |
+
+### Check the meetings for today
+**Risk:** `READ` · **Roles:** Principal, Operator
+
+1. Open `/` and read the **Calendar** card (right column; or click the **Meetings** tile, which jumps to `#calendar`).
+2. To prepare for a meeting click `Prep: {title}` (link).
+
+**Done when:** you have the meeting list, or the prep page is open.
+
+| If you see | Why | Do this |
+|---|---|---|
+| "No meetings today." | Empty calendar | Report it. |
+| "Calendar is not connected." or another calendar message | No calendar access | Report it; connecting a calendar is out of scope here. |
+
+### Approve or dismiss a client memory
+**Risk:** `WRITE` · **Roles:** Principal, Operator (not Member)
+**Inputs from Clarwiz:** which memory proposal, and whether to keep it
+
+1. Open `/` and find the **Approvals** card (right column; or click the **Approvals** tile, which jumps to `#approvals`).
+   - Wait for: "Loading approvals…" to go.
+2. Optional: click the chip `Client memory {n}` (group aria-label "Approval type").
+3. On the memory row, click **Remember** (button) to keep it, or **Not right** (button) to dismiss it.
+
+**Done when:** toast `Saved to {client} memory.` (Remember) or "Dismissed. Ariya will not use this." (Not right).
+
+| If you see | Why | Do this |
+|---|---|---|
+| "Approvals could not be loaded." with **Try again** | Load failed | Click **Try again**. |
+| "Nothing waiting for approval here." | Nothing in this filter | Click chip `All {n}` or report. |
+| Toast "That did not go through. Try again." or a server message | Save failed | Retry once, then report. |
+
+To see all memory, click **All memory** (link → `/memory`).
+
+### Approve and deliver a document
+**Risk:** `WRITE` (inside Ariya only; no email) · **Roles:** Principal, Operator (not Member)
+**Inputs from Clarwiz:** the document title
+**Preconditions:** the user asked to approve this document
+
+1. In the **Approvals** card, optionally click the chip `Documents {n}`.
+2. To read the document first, click **Review** (link; opens the document).
+3. Back on `/`, click **Approve & deliver** (button on the document row).
+
+**Done when:** toast "Approved and delivered in Ariya." The linked request moves to delivered. Nothing is emailed or e-signed.
+
+| If you see | Why | Do this |
+|---|---|---|
+| Toast "That did not go through. Try again." or a server message | Save failed | Retry once, then report. |
+
+### Send a document back for changes
+**Risk:** `WRITE` (no email) · **Roles:** Principal, Operator (not Member)
+**Inputs from Clarwiz:** what needs to change (required)
+
+1. On the document row in **Approvals**, click **Send back** (button).
+2. Type the change request in the box (textarea, placeholder and label "What needs to change?").
+3. Click the second **Send back** (button under the box; disabled until text is typed). Click **Cancel** to abandon.
+
+**Done when:** toast "Sent back with your note." The document returns to draft and its request to revision.
+
+### Reload the day
+**Risk:** `READ` · **Roles:** Principal, Operator
+
+1. Click the pill `Updated {N min ago}` (button, title "Read the day again from Operations, Implementation, Documents and Calendar"; visual: top right, left of **Start my day**).
+   - Wait for: the pill to change from "Updating…" back to "Updated just now".
+
+**Done when:** the pill reads "Updated just now".
+
+### See the day of a teammate
+**Risk:** `READ` · **Roles:** Principal only (in Operations)
+
+This is **not possible on `/`** for any role: opening `/?user={userId}` shows "Your day could not be loaded." A Principal can see a teammate's work in Operations instead: follow [See a teammate's work](/operations/inbox#see-the-work-of-a-teammate).
+
+## Controls reference
+| Visible text | Type | Locator | What it does | Risk |
+|---|---|---|---|---|
+| `Updated {N min ago}` / Updating… | button (pill) | title "Read the day again from Operations, Implementation, Documents and Calendar" | Reloads day and approvals | `READ` |
+| Start my day | link | top right | Opens first open, unblocked item | `READ` |
+| Cases with you | link tile | Overview card | `/service-desk?queue=needs_action` | `READ` |
+| In Triage | link tile | Overview card | `/service-desk?queue=triage` | `READ` |
+| Approvals | link tile | Overview card | Jumps to `#approvals` | `READ` |
+| Meetings | link tile | Overview card | Jumps to `#calendar` | `READ` |
+| Waiting on others | link tile | Overview card | Jumps to `#waiting` | `READ` |
+| Open / Open case / Open Cases / Prep / Open Triage | link | end of a "What's going on" line | Opens the item, or Cases / Triage in Operations | `READ` |
+| Filter chips (`All {n}` …) | toggle buttons | group aria-label "Show" | Filters to-dos | `READ` |
+| All clients / Area / Sort | selects | labels "Client", "Area", "Sort" | Filter and sort | `READ` |
+| (checkbox square) | icon button | aria-label `Mark done: {title}` | Marks done | `WRITE` |
+| (item title) / Open | link | to-do row | Opens the item | `READ` |
+| Tomorrow | button | to-do row | Moves to tomorrow | `WRITE` |
+| `Show done ({n}) and moved to tomorrow ({n})` / `Hide done …` | button | bottom of To do today | Shows closed rows | `READ` |
+| Not done / Bring back | link-style button | closed row | Reopens the item | `WRITE` |
+| Show everything | link-style button | empty filtered state | Clears filters | `READ` |
+| See all in Operations | link | Waiting on others | `/service-desk?queue=waiting_client` | `READ` |
+| Follow up / Open | link | waiting row | Opens case / document | `READ` |
+| Prev / Next | buttons | aria-label "Previous page" / "Next page" | Pages Waiting and Approvals (5 per page) | `READ` |
+| `Prep: {title}` | link | Calendar card | Opens prep page | `READ` |
+| All memory | link | Approvals card header | `/memory` | `READ` |
+| `All {n}` / `Client memory {n}` / `Documents {n}` | chips | group aria-label "Approval type" | Filters approvals | `READ` |
+| Remember | button | memory row | Saves the memory | `WRITE` |
+| Not right | button | memory row | Dismisses the proposal | `WRITE` |
+| Approve & deliver | button | document row | Approves and delivers inside Ariya | `WRITE` |
+| Review | link | document row | Opens the document | `READ` |
+| Send back | button | document row, then under the textarea | Returns the document to draft with a note | `WRITE` |
+| Cancel | button | send-back box | Closes the box | `READ` |
+| Try again | button | error states | Retries the load | `READ` |
+
+## Waits and signals
+- First load: grey skeleton with aria-label "Loading your day". Ready when **To do today** shows.
+- The pill reads "Updating…" while reloading, then `Updated {…}`. An amber dot on the pill means one source (Operations, Implementation, Documents or Calendar) failed.
+- The day **reloads every time the browser window regains focus**. Rows may reorder; re-find a row by title before clicking.
+- Tick and Tomorrow are optimistic: the row disappears at once, then the page re-reads. Undo is only in the toast.
+- Approvals card: "Loading approvals…" while loading.
+- Empty texts: "Everything for today is done.", "Nothing is due, waiting on you, or scheduled for today.", "Nothing open matches these filters.", "Nobody owes you anything right now.", "No meetings today.", "Nothing waiting for approval here."
+
+## Gotchas
+- The Action Queue / Approvals / Compliance tab bar is not visible on `/`. Use their URLs.
+- The **Approvals** card here (memory and documents) is different from the `/approvals` page (contact changes). See [Approvals and compliance](/command-center/approvals-and-compliance).
+- **Approve & deliver** and **Send back** never email anyone.
+- When viewing another person's day (not currently possible), a banner reads `You are viewing {name}'s day. Nothing here can be changed from this view.` and checkboxes, **Tomorrow** and **Start my day** are hidden.
+- In-app help says admins and owners can open a teammate's day with a person picker; the app has no such picker and refuses every role.
+- In-app help lists four Overview tiles; the app also shows an **Approvals** tile and an **Approvals** card the help does not mention.
+- In-app help says the toast reads "Done"; the app shows `Done: {title}`.
+
+## Related
+- [Action Queue and requests](/command-center/action-queue)
+- [Approvals and compliance](/command-center/approvals-and-compliance)
+- [Operations inbox](/operations/inbox)
+
+## Source files
+- `packages/web/src/app/(dashboard)/page.tsx`
+- `packages/web/src/app/(dashboard)/_components/command-center/command-center.tsx`
+- `packages/web/src/app/(dashboard)/_components/command-center/day-view.tsx`
+- `packages/web/src/app/(dashboard)/_components/command-center/day-state.ts`
+- `packages/web/src/app/(dashboard)/_components/command-center/use-my-day.ts`
+- `packages/web/src/lib/landing.ts`
+- `packages/core/src/my-day/index.ts`

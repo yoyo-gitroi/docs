@@ -1,0 +1,187 @@
+---
+title: "Template catalog"
+sidebarTitle: "Template catalog"
+description: "See every template the repo seeds in one table, with counts, scope, kind and a link to each template's fields and a good request."
+keywords: ["template catalog", "list of templates", "which templates exist", "document types", "template slug", "what documents can Ariya create"]
+---
+
+<Info>
+**Reference page** · **Live source of truth:** sidebar **Documents** → **Templates** tab (`/documents/templates`), one template at `/documents/templates/{slug}` · **Roles:** Principal ✓ Operator ✓ can create documents from these templates; only a Principal (or Admin) can fork, edit, lock or deactivate a template · **Baseline:** what the repo seeds; your tenant may differ.
+</Info>
+
+Use this page to see which templates exist and jump to a template's detail entry. To decide which template a user's words map to, use [Choosing a template](/documents/choosing-a-template).
+
+<Warning>
+The database is canonical. Tenants can fork, rename, recategorise, deactivate and add templates at runtime, so this catalog is the **shipped baseline**, not your tenant's live list. Before you rely on a slug, title or field label, check it in sidebar **Documents** → **Templates**.
+</Warning>
+
+## Counts
+
+| Set | Count | Notes |
+|---|---|---|
+| Platform Handlebars rows seeded | 111 | 108 from the main seed, 3 from HR Roadmap migrations |
+| Of which inactive in the seed | 2 | `implementation-kit`, `implementation-ca-poa` (replaced by PDF forms) |
+| Active platform Handlebars templates | 109 | 108 field templates plus `employee-handbook` (LLM chapters) |
+| Official PDF forms (served from code) | 3 | Never editable; create them from the Documents UI |
+| **Platform templates offered** | **112** | 109 + 3 |
+| Extra row for tenant `ariya` | 1 | `billing-memo` (legacy authored), so tenant `ariya` sees 113 |
+| Shown on the `/generate` page | 96 | Code registry only: no DB-only templates and no PDF forms |
+
+By category (active and inactive platform rows): Business 77, Marketing 21, Sales 7, Data 4, Print 1, Social 1. The 3 PDF forms are category Business but have their own page.
+
+## Legend
+
+- **Kind:** *Handlebars* = HTML template whose fields the assistant fills; *Handlebars + LLM chapters* = the LLM writes whole chapters (`employee-handbook` only); *PDF form* = the publisher's own PDF, values only; *Legacy authored* = fields plus LLM-written prose sections.
+- **Scope:** `client` = the document is about a client; `tenant` = about your own firm. It is a badge in the catalog. The Document Assistant needs a bound client for **both**. Slack refuses `client`-scope templates.
+- **Person to name:** the individual the request must name (employee, candidate, contractor). Employees are typed as free text; there is no employee picker.
+- **Notes:** *Not on `/generate`* = the template exists only in the database, so the `/generate` page does not list it; use the Document Assistant or Documents → Templates.
+
+## Category pages
+
+- [Business](/documents/catalog/business) (77)
+- [Marketing](/documents/catalog/marketing) (21)
+- [Sales](/documents/catalog/sales) (7, plus `billing-memo` for tenant `ariya`)
+- [Data](/documents/catalog/data) (4)
+- [Print and social](/documents/catalog/print-and-social) (2)
+- [PDF forms](/documents/catalog/pdf-forms) (3)
+
+## All templates
+
+| Title | Slug | Category | Kind | Scope | Person to name | Notes |
+|---|---|---|---|---|---|---|
+| [Job Description](/documents/catalog/business#job-description) | `job-description` | Business | Handlebars | tenant | — | — |
+| [Offer Letter](/documents/catalog/business#offer-letter) | `offer-letter` | Business | Handlebars | tenant | Candidate | — |
+| [New Hire Welcome](/documents/catalog/business#new-hire-welcome) | `new-hire-welcome` | Business | Handlebars | tenant | New hire | — |
+| [New Hire Packet](/documents/catalog/business#new-hire-packet) | `new-hire-packet` | Business | Handlebars | tenant | Employee | One document, 3 internal pages |
+| [Employee Information](/documents/catalog/business#employee-information) | `employee-information` | Business | Handlebars | tenant | Employee | — |
+| [Direct Deposit Authorization](/documents/catalog/business#direct-deposit-authorization) | `direct-deposit` | Business | Handlebars | tenant | Employee | — |
+| [30-60-90 day plan](/documents/catalog/business#30-60-90-day-plan) | `ninety-day-plan` | Business | Handlebars | tenant | Employee | — |
+| [Equity Grant Notice](/documents/catalog/business#equity-grant-notice) | `equity-grant` | Business | Handlebars | tenant | Grantee | — |
+| [Contractor Agreement (1099)](/documents/catalog/business#contractor-agreement-1099) | `contractor-agreement` | Business | Handlebars | tenant | Contractor | — |
+| [1099 Contractor Onboarding Packet](/documents/catalog/business#1099-contractor-onboarding-packet) | `contractor-onboarding-packet-1099` | Business | Handlebars | tenant | Contractor | One document, 4 internal sections |
+| [Independent Contractor Commission Agreement](/documents/catalog/business#independent-contractor-commission-agreement) | `independent-contractor-commission-agreement` | Business | Handlebars | tenant | Contractor | — |
+| [Performance Review](/documents/catalog/business#performance-review) | `performance-review` | Business | Handlebars | tenant | Employee | Team-member dropdown |
+| [Promotion Letter](/documents/catalog/business#promotion-letter) | `promotion-letter` | Business | Handlebars | tenant | Employee | — |
+| [Pay Increase Notice](/documents/catalog/business#pay-increase-notice) | `pay-increase-notice` | Business | Handlebars | client | Employee | — |
+| [Compensation Review Framework](/documents/catalog/business#compensation-review-framework) | `compensation-review-framework` | Business | Handlebars | client | — | Not on `/generate` |
+| [PTO / Leave Request](/documents/catalog/business#pto-%2F-leave-request) | `pto-request` | Business | Handlebars | tenant | Employee | — |
+| [Accommodation request](/documents/catalog/business#accommodation-request) | `accommodation-request` | Business | Handlebars | tenant | Employee | — |
+| [Expense Report](/documents/catalog/business#expense-report) | `expense-report` | Business | Handlebars | tenant | Employee | — |
+| [Written Warning](/documents/catalog/business#written-warning) | `written-warning` | Business | Handlebars | tenant | Employee | — |
+| [Corrective Action Warning](/documents/catalog/business#corrective-action-warning) | `corrective-action-warning` | Business | Handlebars | tenant | Employee | — |
+| [HR Incident Report](/documents/catalog/business#hr-incident-report) | `hr-incident-report` | Business | Handlebars | tenant | Employee(s) involved | — |
+| [HR Incident Report (incident-report)](/documents/catalog/business#hr-incident-report-incident-report) | `incident-report` | Business | Handlebars | tenant | Employee (subject) | Not on `/generate`; Same title as `hr-incident-report`; prefer that one |
+| [HR Incident Report (Riverboat Delta King)](/documents/catalog/business#hr-incident-report-riverboat-delta-king) | `incident-report-rdk` | Business | Handlebars | tenant | Employee (subject) | Not on `/generate`; Retired client-specific layout |
+| [Termination Letter](/documents/catalog/business#termination-letter) | `termination-letter` | Business | Handlebars | tenant | Employee | — |
+| [Termination Packet](/documents/catalog/business#termination-packet) | `termination-packet` | Business | Handlebars | tenant | Employee | One document, 4 internal pages |
+| [Resignation Acknowledgment](/documents/catalog/business#resignation-acknowledgment) | `resignation-acknowledgment` | Business | Handlebars | tenant | Employee | — |
+| [Severance summary](/documents/catalog/business#severance-summary) | `severance-summary` | Business | Handlebars | tenant | Employee | — |
+| [Exit interview](/documents/catalog/business#exit-interview) | `exit-interview` | Business | Handlebars | tenant | Employee | — |
+| [Employee Handbook](/documents/catalog/business#employee-handbook) | `employee-handbook` | Business | Handlebars + LLM chapters | client | — | Always LLM-written (8 chapters); slow |
+| [Employee Handbook Discovery & Assessment](/documents/catalog/business#employee-handbook-discovery-%26-assessment) | `employee-handbook-discovery-assessment` | Business | Handlebars | tenant | — | — |
+| [Employee Handbook Assessment](/documents/catalog/business#employee-handbook-assessment) | `employee-handbook-assessment` | Business | Handlebars | client | — | Not on `/generate`; Superseded by `employee-handbook-discovery-assessment`; Team-member dropdown |
+| [Employee Handbook Development Agreement](/documents/catalog/business#employee-handbook-development-agreement) | `employee-handbook-development-agreement` | Business | Handlebars | tenant | — | — |
+| [AI and Confidential Data Policy](/documents/catalog/business#ai-and-confidential-data-policy) | `ai-confidential-data-policy` | Business | Handlebars | client | — | Not on `/generate` |
+| [Remote Work and Expense Reimbursement Policy](/documents/catalog/business#remote-work-and-expense-reimbursement-policy) | `remote-work-expense-reimbursement-policy` | Business | Handlebars | client | — | Not on `/generate` |
+| [Injury and Illness Prevention Program](/documents/catalog/business#injury-and-illness-prevention-program) | `injury-illness-prevention-program` | Business | Handlebars | client | — | Not on `/generate` |
+| [Workplace Violence Prevention Plan](/documents/catalog/business#workplace-violence-prevention-plan) | `workplace-violence-prevention-plan` | Business | Handlebars | client | — | Not on `/generate` |
+| [Wage Theft Prevention Notice](/documents/catalog/business#wage-theft-prevention-notice) | `wage-theft-prevention-notice` | Business | Handlebars | tenant | Employee | — |
+| [HR Compliance Checklist](/documents/catalog/business#hr-compliance-checklist) | `compliance-checklist` | Business | Handlebars | tenant | — | — |
+| [Time Off Policy Intake](/documents/catalog/business#time-off-policy-intake) | `time-off-policy-intake` | Business | Handlebars | tenant | — | — |
+| [Industry Resource Center](/documents/catalog/business#industry-resource-center) | `industry-resource` | Business | Handlebars | tenant | — | — |
+| [Workers Comp Summary](/documents/catalog/business#workers-comp-summary) | `workers-comp-summary` | Business | Handlebars | tenant | — | — |
+| [Client Intake Form](/documents/catalog/business#client-intake-form) | `intake-form` | Business | Handlebars | tenant | — | — |
+| [Company Information](/documents/catalog/business#company-information) | `company-info` | Business | Handlebars | tenant | — | — |
+| [HR Assessment](/documents/catalog/business#hr-assessment) | `hr-assessment` | Business | Handlebars | client | — | Not on `/generate`; Team-member dropdown |
+| [HR Audit Report](/documents/catalog/business#hr-audit-report) | `hr-audit-report` | Business | Handlebars | tenant | — | Team-member dropdown |
+| [HR Roadmap](/documents/catalog/business#hr-roadmap) | `hr-roadmap` | Business | Handlebars | tenant | — | — |
+| [AI Readiness Audit Report](/documents/catalog/business#ai-readiness-audit-report) | `ai-readiness-audit-report` | Business | Handlebars | tenant | — | Team-member dropdown |
+| [AI Readiness Scorecard](/documents/catalog/business#ai-readiness-scorecard) | `readiness-scorecard` | Business | Handlebars | tenant | — | Team-member dropdown |
+| [Opportunity Register](/documents/catalog/business#opportunity-register) | `opportunity-register` | Business | Handlebars | tenant | — | — |
+| [Quarterly Business Review](/documents/catalog/business#quarterly-business-review) | `qbr` | Business | Handlebars | tenant | — | — |
+| [Status Report](/documents/catalog/business#status-report) | `status-report` | Business | Handlebars | tenant | — | — |
+| [Meeting Agenda & Minutes](/documents/catalog/business#meeting-agenda-%26-minutes) | `meeting-agenda` | Business | Handlebars | tenant | — | — |
+| [SOP / Runbook](/documents/catalog/business#sop-%2F-runbook) | `sop` | Business | Handlebars | tenant | — | — |
+| [Sales to Implementation Handoff Form](/documents/catalog/business#sales-to-implementation-handoff-form) | `sales-to-implementation-handoff` | Business | Handlebars | tenant | — | — |
+| [Personal Engagement Letter](/documents/catalog/business#personal-engagement-letter) | `personal-engagement-letter` | Business | Handlebars | tenant | — | — |
+| [Client Service Agreement](/documents/catalog/business#client-service-agreement) | `client-service-agreement` | Business | Handlebars | tenant | — | — |
+| [Service Agreement](/documents/catalog/business#service-agreement) | `service-agreement` | Business | Handlebars | tenant | — | — |
+| [Non-Disclosure Agreement](/documents/catalog/business#non-disclosure-agreement) | `nda` | Business | Handlebars | tenant | — | Say "non-disclosure agreement", not "NDA" |
+| [Pricing Quote](/documents/catalog/business#pricing-quote) | `pricing-quote` | Business | Handlebars | tenant | — | — |
+| [Invoice](/documents/catalog/business#invoice) | `invoice` | Business | Handlebars | tenant | — | Check for a shadowing tenant row |
+| [Influencer agreement](/documents/catalog/business#influencer-agreement) | `influencer-agreement` | Business | Handlebars | tenant | Creator | — |
+| [Board update](/documents/catalog/business#board-update) | `board-update` | Business | Handlebars | tenant | — | — |
+| [Deal memo (short)](/documents/catalog/business#deal-memo-short) | `deal-memo` | Business | Handlebars | tenant | — | — |
+| [Investment memo](/documents/catalog/business#investment-memo) | `investment-memo` | Business | Handlebars | tenant | — | — |
+| [LP onboarding packet](/documents/catalog/business#lp-onboarding-packet) | `lp-onboarding` | Business | Handlebars | tenant | LP contact | — |
+| [LP quarterly update](/documents/catalog/business#lp-quarterly-update) | `lp-update` | Business | Handlebars | tenant | — | — |
+| [Term sheet](/documents/catalog/business#term-sheet) | `term-sheet` | Business | Handlebars | tenant | — | — |
+| [Energy project assessment](/documents/catalog/business#energy-project-assessment) | `energy-project-assessment` | Business | Handlebars | tenant | — | Team-member dropdown |
+| [Returns policy](/documents/catalog/business#returns-policy) | `returns-policy` | Business | Handlebars | tenant | — | — |
+| [Tech pack (cover sheet)](/documents/catalog/business#tech-pack-cover-sheet) | `tech-pack` | Business | Handlebars | tenant | — | — |
+| [Wholesale order](/documents/catalog/business#wholesale-order) | `wholesale-order` | Business | Handlebars | tenant | — | — |
+| [Elevated HR Assessment](/documents/catalog/business#elevated-hr-assessment) | `elevated-hr-assessment` | Business | Handlebars | client | — | Module-generated; do not pick |
+| [Elevated HR Roadmap](/documents/catalog/business#elevated-hr-roadmap) | `elevated-hr-roadmap` | Business | Handlebars | client | — | Module-generated; do not pick |
+| [Elevated HR Roadmap Progress Report](/documents/catalog/business#elevated-hr-roadmap-progress-report) | `elevated-hr-roadmap-progress` | Business | Handlebars | client | — | Module-generated; do not pick |
+| [iSolved Billing Memo](/documents/catalog/business#isolved-billing-memo) | `implementation-billing-memo` | Business | Handlebars | tenant | — | Module-generated; do not pick |
+| [Company Implementation Kit](/documents/catalog/business#company-implementation-kit) | `implementation-kit` | Business | Handlebars | tenant | — | Inactive; use `isolved-implementation-kit-form` |
+| [California POA Declaration (DE 48)](/documents/catalog/business#california-poa-declaration-de-48) | `implementation-ca-poa` | Business | Handlebars | tenant | — | Inactive; use `power-of-attorney-california` |
+| [Capabilities overview](/documents/catalog/marketing#capabilities-overview) | `capabilities-overview` | Marketing | Handlebars | tenant | — | — |
+| [Overview Flyer](/documents/catalog/marketing#overview-flyer) | `overview-flyer` | Marketing | Handlebars | tenant | — | — |
+| [Solution flyer (single service)](/documents/catalog/marketing#solution-flyer-single-service) | `solution-flyer` | Marketing | Handlebars | tenant | — | — |
+| [Service comparison (tiered)](/documents/catalog/marketing#service-comparison-tiered) | `service-comparison` | Marketing | Handlebars | tenant | — | — |
+| [Marketing flyer](/documents/catalog/marketing#marketing-flyer) | `marketing-flyer` | Marketing | Handlebars | tenant | — | — |
+| [Contractor Solutions Flyer](/documents/catalog/marketing#contractor-solutions-flyer) | `contractor-solutions-flyer` | Marketing | Handlebars | tenant | — | — |
+| [HR Tech Bundle Flyer](/documents/catalog/marketing#hr-tech-bundle-flyer) | `hr-tech-bundle-flyer` | Marketing | Handlebars | tenant | — | — |
+| [Integrations Flyer](/documents/catalog/marketing#integrations-flyer) | `integrations-flyer` | Marketing | Handlebars | tenant | — | — |
+| [Officer Payroll Flyer](/documents/catalog/marketing#officer-payroll-flyer) | `officer-payroll-flyer` | Marketing | Handlebars | tenant | — | — |
+| [Timekeeping Flyer](/documents/catalog/marketing#timekeeping-flyer) | `timekeeping-flyer` | Marketing | Handlebars | tenant | — | — |
+| [CA HR Compliance Update](/documents/catalog/marketing#ca-hr-compliance-update) | `ca-hr-compliance` | Marketing | Handlebars | tenant | — | — |
+| [Case Study](/documents/catalog/marketing#case-study) | `case-study` | Marketing | Handlebars | tenant | — | — |
+| [Email Newsletter](/documents/catalog/marketing#email-newsletter) | `email-newsletter` | Marketing | Handlebars | tenant | — | — |
+| [Press Release](/documents/catalog/marketing#press-release) | `press-release` | Marketing | Handlebars | tenant | — | — |
+| [Pitch Deck (mini)](/documents/catalog/marketing#pitch-deck-mini) | `pitch-deck-mini` | Marketing | Handlebars | tenant | — | — |
+| [Editorial pitch](/documents/catalog/marketing#editorial-pitch) | `editorial-pitch` | Marketing | Handlebars | tenant | — | — |
+| [Drop announcement](/documents/catalog/marketing#drop-announcement) | `drop-announcement` | Marketing | Handlebars | tenant | — | — |
+| [DTC product page](/documents/catalog/marketing#dtc-product-page) | `dtc-product-page` | Marketing | Handlebars | tenant | — | — |
+| [Line book (per-door)](/documents/catalog/marketing#line-book-per-door) | `gfs-linebook` | Marketing | Handlebars | tenant | — | — |
+| [Linesheet](/documents/catalog/marketing#linesheet) | `linesheet` | Marketing | Handlebars | tenant | — | — |
+| [Lookbook page](/documents/catalog/marketing#lookbook-page) | `lookbook-page` | Marketing | Handlebars | tenant | — | — |
+| [HR Proposal](/documents/catalog/sales#hr-proposal) | `proposal` | Sales | Handlebars | tenant | — | — |
+| [Services Proposal](/documents/catalog/sales#services-proposal) | `services-proposal` | Sales | Handlebars | tenant | — | — |
+| [Consulting Proposal](/documents/catalog/sales#consulting-proposal) | `consulting-proposal` | Sales | Handlebars | tenant | — | — |
+| [Discovery Summary](/documents/catalog/sales#discovery-summary) | `discovery-summary` | Sales | Handlebars | tenant | — | Team-member dropdown |
+| [Tier Flyer](/documents/catalog/sales#tier-flyer) | `tier-flyer` | Sales | Handlebars | tenant | — | — |
+| [Workers' Comp Proposal](/documents/catalog/sales#workers%E2%80%99-comp-proposal) | `wc-proposal` | Sales | Handlebars | tenant | — | — |
+| [Workers' Comp Contractor One-Pager](/documents/catalog/sales#workers%E2%80%99-comp-contractor-one-pager) | `wc-contractor-onepager` | Sales | Handlebars | tenant | — | — |
+| [Billing Memo](/documents/catalog/sales#billing-memo) | `billing-memo` | Sales | Legacy authored | client | — | Tenant `ariya` only; module-generated |
+| [Cap table snapshot](/documents/catalog/data#cap-table-snapshot) | `cap-table-snapshot` | Data | Handlebars | tenant | — | — |
+| [Financial model (mini)](/documents/catalog/data#financial-model-mini) | `financial-model` | Data | Handlebars | tenant | — | — |
+| [Risk register](/documents/catalog/data#risk-register) | `risk-register` | Data | Handlebars | tenant | — | — |
+| [Variance Analysis](/documents/catalog/data#variance-analysis) | `variance-report` | Data | Handlebars | tenant | — | — |
+| [Business card](/documents/catalog/print-and-social#business-card) | `business-card` | Print | Handlebars | tenant | — | — |
+| [Social asset pack](/documents/catalog/print-and-social#social-asset-pack) | `social-pack` | Social | Handlebars | tenant | — | — |
+| [Report Authorization Form](/documents/catalog/pdf-forms#report-authorization-form) | `report-authorization-form` | Business (PDF form) | PDF form | client | — | Documents UI only; the assistant refuses it |
+| [Power of Attorney California](/documents/catalog/pdf-forms#power-of-attorney-california) | `power-of-attorney-california` | Business (PDF form) | PDF form | client | — | Documents UI only; the assistant refuses it |
+| [ISolved Implementation Kit Form](/documents/catalog/pdf-forms#isolved-implementation-kit-form) | `isolved-implementation-kit-form` | Business (PDF form) | PDF form | client | — | Documents UI only; the assistant refuses it |
+
+## Related
+
+- [How templates work](/documents/how-templates-work)
+- [Choosing a template](/documents/choosing-a-template)
+- [Create a document](/documents/create-a-document)
+- [Templates page](/documents/templates)
+- [Generate page](/documents/generate-page)
+
+## Source files
+
+- `packages/core/src/db/schema.ts` (`document_templates` table)
+- `packages/core/src/db/migrations/0100_platform_templates_handlebars.sql`
+- `packages/core/src/db/migrations/0110_hr_roadmap_document_templates_rework.sql`
+- `packages/core/src/db/migrations/0129_hide_superseded_implementation_templates.sql`
+- `packages/core/src/db/migrations/0137_roadmap_progress_template.sql`
+- `packages/core/src/db/migrations/0094_replace_billing_memo_template.sql`
+- `packages/core/src/documents/pdf-form-manifests/index.ts`
+- `packages/core/src/documents/engine/template-resolver.ts`
+- `packages/templates/src/registry.ts` (`/generate` catalog)
+- `packages/web/src/components/documents/template-catalog-rows.ts`

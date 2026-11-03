@@ -1,0 +1,278 @@
+---
+title: "Document editor"
+sidebarTitle: "Document editor"
+description: "Edit a saved document's fields, clear sample data, fill official PDF forms, download or print, manage versions, edit with AI and run the review flow."
+keywords: ["document editor", "edit document", "save document", "download PDF", "print", "version history", "restore version", "clear samples", "PDF form", "send for review", "approve and deliver", "request revision", "back to chat"]
+---
+
+<Info>
+**URL:** `/documents/{id}` (optional `?session={sessionId}`) · **Reach:** chat **Open in editor**; library drawer **Open in editor**; **Generate now**, `/generate` **Generate** and packet **Open** all land here; a row on a client's Documents tab · **Roles:** Principal ✓ Operator ✓ (Admin and Member too; review buttons only for the assigned reviewer) · **Ready when:** "Loading document…" is gone and the toolbar shows the document title.
+</Info>
+
+The full-height editor for one saved document. Use it to fix fields by hand, fill PDF forms, download in every format, view versions and send the document through review. For AI edits, it hands off to the chat.
+
+## Page map
+
+- **Toolbar** (48px bar across the top), left to right: home icon (title "Back to documents"); **Back to chat** (only when a source chat exists); the document title (h1); status badge; `v{n}`; save state; client slug link; spacer; history icon; chat icon; **Share** menu; divider; **Save**.
+- **Left column:** banners (sample data, version view, review, readiness), then the form. The form depends on the document kind (see [Form variants](#form-variants)).
+- **Right column:** preview. A scaled US-Letter frame titled "Document preview"; for official PDF forms, the real PDF in a frame titled "Form preview".
+- No page header or Documents tabs on this page; the sidebar stays.
+
+## Recipes
+
+### Open a document in the editor
+**Risk:** `READ` · **Roles:** Principal, Operator
+
+1. Open `/documents/{id}` directly. Or from a chat click **Open in editor**, or from `/documents` click a card then **Open in editor**.
+   - Wait for: "Loading document…" to disappear and the toolbar title to show.
+
+**Done when:** the toolbar shows the title, status badge and `v{n}`.
+
+| If you see | Why | Do this |
+|---|---|---|
+| "Document not found." | Wrong id, deleted, or another workspace's document | Find it again on `/documents` |
+
+### Edit fields and save
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+**Preconditions:** you are on the current version (no purple `Viewing version {n}` banner).
+
+1. Click a field in the left column and type. Field labels come from the template (for example "Incident date and time", "Start date"). For lists: `+ Add {row label}` or "+ Add item" adds a row; per row "↑" (title "Move up"), "↓" (title "Move down") and "×" (title "Remove" or "Remove row"). Empty lists read "No entries yet." or "No items yet.".
+2. Team-member fields are a select "Choose a team member" with options `{name} — {email}`. Choose "Someone else…" to type a free-text name; **Pick from team** switches back.
+3. Stop typing.
+   - Wait for: the toolbar save state goes "Unsaved changes" → "Saving…" (about 2 s after the last keystroke) → "Saved" (save-state text, testid `autosave-status`).
+4. Optional: click **Save** (button; visual: rightmost in the toolbar; reads **Save Changes** while there are unsaved edits) or press Ctrl+S / Cmd+S. A toast at the bottom-right reads `Saved - v{n}`, "No changes detected" or "No changes to save".
+
+**Done when:** the toolbar reads "Saved". Each save makes a new version.
+
+| If you see | Why | Do this |
+|---|---|---|
+| **Save failed — retry** (red, in the toolbar) | Autosave failed | Click it to retry |
+| `Error: {msg}` or `Save failed: {msg}` toast | Save refused | Report the message |
+| Form fields greyed out | You are viewing an old version | Click **Back to current** |
+
+### Clear template sample data
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+**Preconditions:** a blue banner **Showing template sample data** is visible (common after **Generate now** or a packet run).
+
+1. Read the banner text: `{labels} still hold the template's example values. Edit each section, or clear the samples to start fresh.` The labels name the fields with example values.
+2. Either overwrite each listed field with real facts, or click **Clear samples** (button; visual: inside the blue banner) to blank them all.
+   - Wait for: toast `Cleared {n} sample fields` (singular for one), then autosave to "Saved".
+3. Fill the blanked fields with the facts you have. Blank fields stay fillable in the editable PDF.
+
+**Done when:** the banner is gone and the toolbar reads "Saved".
+
+### Fill an official PDF form
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+**Preconditions:** the document comes from an official PDF form (the right column shows "Form preview").
+
+1. Wait for: "Loading form fields…" to be replaced by a blue header `{filled} of {editable} fields filled` and "Blank fields stay editable in the downloaded PDF — you don't have to fill them here."
+2. Fields are grouped by `Page {n}` (or "Other fields") with a count. Click a field (input, id `pdf-field-{key}`, placeholder "Leave blank to fill in the PDF") and type.
+   - Fields with the badge "pre-set" (title "Set by the form's publisher. AI never fills this — you can edit it if it changes.") are pre-filled; change them only if Clarwiz says so.
+3. Click **Save fields** (button; visual: right end of the blue header). It is disabled until you change something.
+   - Wait for: "Saving…" then "Saved".
+
+**Done when:** the button reads "Saved".
+
+<Warning>Only **Save fields** saves PDF-form values. Autosave, the toolbar **Save** and the downloads do not save them, and there is no unsaved-changes warning. Always click **Save fields** before downloading or leaving.</Warning>
+
+| If you see | Why | Do this |
+|---|---|---|
+| `Could not load the form fields: {msg}` | Load failed | Reload once |
+| Red box under the header after saving | Save failed | Retry **Save fields**; report the message |
+
+### Download or print
+**Risk:** `READ` · **Roles:** Principal, Operator
+
+1. Click **Share** (button with a chevron; visual: toolbar right, before **Save**).
+   - Wait for: a dropdown menu.
+2. Click one menu item:
+   - **Download PDF (editable)**: empty fields stay fillable.
+   - **Download PDF (not editable)**: flat.
+   - **Download one page (A4)**: the whole document on one A4 page; not for official PDF forms or long documents.
+   - Wait for: the item reads "Preparing PDF…" and a loading toast "Preparing PDF…" with "Rendering the editable PDF — empty fields stay fillable.", "Rendering the flat PDF — nothing stays editable." or "Fitting the whole document onto one A4 page.". The editor saves pending edits first.
+3. Confirm: toast "PDF downloaded" with the file name.
+
+**Done when:** the success toast shows and the file is downloaded.
+
+Print: **Share** → **Print / Save as PDF** opens a pop-up window with the document and the browser's print dialog (toasts "Preparing print…" then "Print dialog opened"). Prefer the downloads: the native print dialog can block a browser agent; press Esc to close it.
+
+| If you see | Why | Do this |
+|---|---|---|
+| `PDF download failed ({status})` or `PDF download failed: {msg}` | Server error | Retry once; report |
+| A message that the document is too long for one page | One-page limit | Use **Download PDF (editable)** |
+| "One-page export is not available for official PDF forms. Use the regular PDF download." | PDF form | Use **Download PDF (editable)** |
+| "Pop-up blocked — allow pop-ups to print" | Browser blocked the window | Use a download instead |
+| `Print failed ({status})` | Server error | Use a download instead |
+
+### View, compare or restore a version
+**Risk:** `READ` (viewing), `WRITE` (restoring) · **Roles:** Principal, Operator
+
+1. Click the history icon (icon button, aria-label and title `History ({n})`; visual: toolbar right, first icon).
+   - Wait for: a sheet titled `Version history ({n})` with rows grouped by "Today", "Yesterday" or date.
+2. Click a version row.
+   - Wait for: a purple banner `Viewing version {n}`; the form becomes read-only and autosave is off.
+3. Click **Restore this version** (button in the banner; reads "Restoring…") to make it current, or **Back to current** to leave.
+   - Wait for: toast `Restored from v{n} (now v{m})` or "Already at this version".
+
+**Done when:** the banner is gone.
+
+To compare, click **Compare any two versions →** in the sheet (shown with two or more versions); it opens `/compare?doc={id}`.
+
+| If you see | Why | Do this |
+|---|---|---|
+| `Restore failed: {msg}` | Server refused | Report it |
+| "No version history yet." | Single version | Nothing to do |
+
+### Edit with AI or go back to the chat
+**Risk:** `WRITE` (creates a chat if none exists) then `AI` · **Roles:** Principal, Operator
+
+1. If **Back to chat** is shown (link, testid `back-to-chat`, title "Back to the chat this document came from"; visual: toolbar left, after the home icon), click it to return to the source chat.
+2. Otherwise click the chat icon (icon button; aria-label and title "Edit this document in chat", or "Open the chat this document came from" when a source chat exists; visual: toolbar right, second icon).
+   - Both save pending edits first.
+   - Wait for: URL `/documents/chat/{sessionId}`. A new chat is created and bound to this document if none exists.
+3. Send the change in one message and follow [Wait for the turn to finish](/documents/create-a-document#wait-for-the-turn-to-finish).
+
+**Done when:** the chat workspace shows this document in **Live preview**.
+
+| If you see | Why | Do this |
+|---|---|---|
+| "Could not open a chat for this document" or a server message | Chat could not start (help says: "Link this document to a client before editing it in chat.") | Make sure the document has a client; otherwise edit by hand |
+
+### Send for review
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** reviewer name; optional comment.
+**Preconditions:** the toolbar reads "Saved" (the menu item is disabled while there are unsaved changes or once delivered).
+
+1. Click **Share**, then **Send for Review** (menu item; reads **Reassign Reviewer** with `with {reviewer}` underneath when already in review).
+   - Wait for: dialog **Send for review**. Its description reads "Hand this draft back to the requester (or any reviewer). The linked request flips to Review." or "No request is linked to this draft yet — Ariya will create one in Review and assign it to the reviewer."
+2. Click the **Reviewer** select (placeholder "Select reviewer..."; "No teammates loaded" when empty) and choose the person. It may be pre-selected, with the note "Pre-selected the original requester for this draft."
+3. Optional: type in **Comment (optional)** (placeholder "Anything the reviewer should know before opening it...").
+4. Click **Send for Review** (button in the dialog footer; reads "Sending..."). **Cancel** closes the dialog.
+
+**Done when:** a toast reads `New review request created and assigned to {name}` or `Sent to {name} for review`, and an amber review banner appears (`In review with {name}`, or "You have this draft in review" if you are the reviewer).
+
+| If you see | Why | Do this |
+|---|---|---|
+| "Pick a reviewer first" | No reviewer chosen | Choose one |
+| `Error: {msg}` | Server refused | Report it |
+| Menu item disabled | Unsaved changes, sending, or already delivered | Wait for "Saved" |
+
+### Approve and deliver as the reviewer
+**Risk:** `WRITE` `DESTRUCTIVE` (closes the linked request; no undo on this page) · **Roles:** the assigned reviewer only (any role)
+**Preconditions:** the amber banner reads "You have this draft in review" with "Approve & deliver, or request a revision — both update the linked request."
+
+<Warning>**Approval required (DESTRUCTIVE).** Stop here and get approval before clicking **Approve & Deliver**. It marks the document delivered and closes the linked request; the editor offers no way back. It does not send anything outside Ariya.</Warning>
+
+1. Click **Approve & Deliver** (button in the amber banner; reads "Updating...").
+
+**Done when:** toast "Approved & delivered locally" and a green banner "Delivered. The linked request is closed. Open request →".
+
+### Request a revision as the reviewer
+**Risk:** `WRITE` · **Roles:** the assigned reviewer only
+
+1. Click **Request Revision** (button in the amber banner).
+   - Wait for: dialog **Request revision** with "Tell the back-office what needs to change. Required."
+2. Type the change in the box (placeholder "What needs to change before this can be delivered?").
+3. Click **Request Revision** in the dialog (reads "Submitting..."; disabled while the box is empty).
+
+**Done when:** toast "Revision requested" and the status badge reads "Draft".
+
+| If you see | Why | Do this |
+|---|---|---|
+| "Comment is required when requesting revision" | Empty comment | Type the change |
+
+The banner also has **Open request →** (link to the request) and a collapse button (aria-label "Collapse review banner"); collapsed, it shows a bar with **Expand**.
+
+### Attach to the case reply
+**Risk:** `READ` (navigation) · **Roles:** Principal, Operator
+**Preconditions:** the document was created from an Operations case.
+
+1. Click **Share**, then **Attach to case reply** (subtitle "Stages this PDF on the case it came from"). It is only listed when the document has an originating case.
+   - Wait for: URL `/service-desk?case={caseId}&stage={documentId}`.
+
+<Warning>**Approval required (EXTERNAL).** This only stages the PDF on the case reply. Do not send the reply without explicit human approval.</Warning>
+
+## Form variants
+
+The left column depends on what the document was made from.
+
+| Kind | How to recognise it | What to do |
+|---|---|---|
+| Template form (most documents) | One card with labelled fields, list rows and add buttons | [Edit fields and save](#edit-fields-and-save) |
+| Official PDF form | "Form preview" on the right; blue header `{filled} of {editable} fields filled` | [Fill an official PDF form](#fill-an-official-pdf-form) |
+| Older database or legacy template | Amber readiness banner (`{x} of {y} sections need content`, "Fill in these fields to enable generation:", "Incomplete section(s):", `Min. {n} characters per section.`), **Complete Document**, an **Enrich with AI** panel, per-section cards with **Polish** and **Edit** / **View**, "Locked from AI edits" badges, **Add Section** | Edit the section text by hand and save. Do not use **Complete Document**, **Enrich with AI** or **Polish**: they fail. Use the chat icon for AI edits. |
+| Plain text | Read-only box with "This document is plain text, so it can't be edited here or in chat. Regenerate it to make changes." | There is no Regenerate button. Create the document again from the chat or a template. |
+
+**Complete Document**, **Enrich with AI** and **Polish** call endpoints the server has removed. Expect toasts "Error: Endpoint removed — use the Enrich draft button in the editor." or "Polish failed: Endpoint removed — use the chat panel for AI polish.".
+
+**Add Section** (non-template documents only) opens an input "Section name" with **Add** and **Cancel**.
+
+## Status values
+
+The status badge reads "Draft", "Review", "Approved", "Delivered", "Published" or "Archived". The editor has no status picker. Status changes only through the review flow:
+
+| Action | Status after |
+|---|---|
+| **Send for Review** | Review |
+| **Request Revision** (reviewer) | Draft |
+| **Approve & Deliver** (reviewer) | Delivered |
+
+## Controls reference
+
+| Visible text | Type | Locator | What it does | Risk |
+|---|---|---|---|---|
+| (home icon) | link | title "Back to documents" | Saves pending edits, goes to `/documents` | `WRITE` (flush) |
+| **Back to chat** | link | testid `back-to-chat`, title "Back to the chat this document came from" | Saves, goes to the chat | `WRITE` (flush) |
+| status badge | text | toolbar | Shows status | none |
+| "Unsaved changes" / "Saving…" / "Saved" / **Save failed — retry** | text or button | testid `autosave-status` | Autosave state; the error form retries | `WRITE` |
+| `{clientSlug}` | link | title `Client: {slug}` | Opens `/clients/{slug}` | `READ` |
+| (history icon) | icon button | aria-label and title `History ({n})` | Opens the version sheet | `READ` |
+| (chat icon) | icon button | aria-label "Edit this document in chat" or "Open the chat this document came from" | Saves, opens or creates the chat | `WRITE` |
+| **Share** | dropdown button | toolbar right | Opens the menu below | none |
+| **Send for Review** / **Reassign Reviewer** / **Delivered** | menu item | disabled while unsaved, sending or delivered | Opens the review dialog | `WRITE` |
+| **E-signature delivery** | menu item | always disabled, subtitle "Coming soon; no external send path" | Nothing | none |
+| **Attach to case reply** | menu item (link) | only with an originating case | Opens `/service-desk?case={caseId}&stage={documentId}` | `READ` |
+| **Print / Save as PDF** | menu item | opens a pop-up | Browser print dialog | `READ` |
+| **Download PDF (editable)** / **Download PDF (not editable)** / **Download one page (A4)** | menu items | "Preparing PDF…" while running | Saves, then downloads | `READ` |
+| **Save** / **Save Changes** / "Saving…" | button | Ctrl+S or Cmd+S | Saves now (new version) | `WRITE` |
+| **Clear samples** | button | blue banner | Blanks fields with example values | `WRITE` |
+| **Back to current** / **Restore this version** | buttons | purple banner | Leaves or restores an old version | `READ` / `WRITE` |
+| **Save fields** | button | PDF form header | Saves PDF-form values | `WRITE` |
+| **Approve & Deliver** | button | review banner, reviewer only | Delivers, closes the request | `WRITE` `DESTRUCTIVE` |
+| **Request Revision** | button | review banner, reviewer only | Opens the revision dialog | `WRITE` |
+| **Open request →** | link | review banner | Opens the linked request | `READ` |
+
+## Waits and signals
+
+- Load: "Loading document…" then the toolbar.
+- Autosave: "Unsaved changes" → about 2 s after typing stops "Saving…" → "Saved".
+- Manual save toast (bottom-right): `Saved - v{n}`.
+- Downloads: "Preparing PDF…" toast, then "PDF downloaded", 5 to 10 s.
+- PDF form: "Loading form fields…"; **Save fields** → "Saving…" → "Saved".
+
+## Gotchas
+
+- Autosave waits 2 s after the last keystroke. Wait for "Saved" before opening another URL directly; in-app links save first.
+- Closing the tab with unsaved changes triggers the browser's "Leave site?" prompt.
+- **Send for Review** is disabled while there are unsaved changes.
+- PDF-form values are saved only by **Save fields**.
+- While viewing an old version the form is read-only and autosave is off.
+- The toolbar can scroll sideways on narrow screens; **Share** and **Save** may be off-screen to the right.
+- **Share** items are menu items, not buttons.
+- Google Docs export ("Open in Google Docs") is not rendered, so there is no way to export to Google Docs from the UI. **E-signature delivery** is disabled.
+- In-app help names the chat icon "Edit this document in chat"; when a source chat exists it reads "Open the chat this document came from".
+
+## Related
+
+- [Create a document](/documents/create-a-document)
+- [Chat workspace](/documents/chat-workspace)
+- [Documents home](/documents/documents-home)
+- [How templates work](/documents/how-templates-work)
+
+## Source files
+
+- `packages/web/src/app/(dashboard)/documents/[id]/page.tsx`
+- `packages/web/src/app/(dashboard)/documents/[id]/_components/doc-editor-toolbar.tsx`
+- `packages/web/src/app/(dashboard)/documents/[id]/pdf-form-editor.tsx`
+- `packages/web/src/app/(dashboard)/documents/[id]/autosave.ts`
+- `packages/web/src/components/documents/doc-history-sheet.tsx`

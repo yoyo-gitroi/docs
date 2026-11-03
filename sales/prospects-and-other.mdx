@@ -1,0 +1,285 @@
+---
+title: "Prospects and other Sales pages"
+sidebarTitle: "Prospects and more"
+description: "Research and promote prospects in Prospect Studio, log prospect activity, work the follow-up queue, review handoffs, and read the pipeline, documents and manager views."
+keywords: ["prospect studio", "research a company", "promote prospect", "sales materials", "prospects", "log activity", "proposal context", "draft proposal", "work queue", "follow-up", "reschedule", "pipeline", "handoffs", "convert to client", "sales documents", "hr assessment", "sales manager"]
+---
+
+<Info>
+**URL:** `/sales/prospect-studio` · `/sales/prospects` · `/sales/prospects/{id}` · `/sales/handoffs` · `/sales/work-queue` · `/sales/pipeline` · `/sales/documents` · `/sales/manager` · **Reach:** Sales sidebar **More → Prospect Studio** / **Handoffs**; the rest by URL · **Roles:** Principal ✓ Operator ✓ (with differences below; Member ✗) · **Ready when:** the h1 matches the page and no spinner remains.
+</Info>
+
+These pages run the local Ariya prospect workflow. They never write to HubSpot, email, calendar or Slack; each shows a boundary strip with **HubSpot ledger**, **Ariya workflow** and **External writes disabled**. Every error on these pages, including validation errors, appears in an amber box titled **Sales data unavailable**.
+
+## Which pages are in the nav
+
+| Page | URL | In the Sales sidebar | Other ways in |
+|---|---|---|---|
+| Prospect Studio | `/sales/prospect-studio` | Yes, under **More** (microscope icon) | none needed |
+| Handoffs | `/sales/handoffs` | Yes, under **More** (handshake icon) | none needed |
+| Sales Prospects | `/sales/prospects` | No (URL only) | breadcrumb or **Prospects** link on a prospect page |
+| Sales Prospect | `/sales/prospects/{id}` | No | **Open promoted prospect** and **Recent Studio work** in Prospect Studio; prospect links in Handoffs, Documents, Work queue, Pipeline, Manager |
+| Sales Work Queue | `/sales/work-queue` | No | **Open Work Queue** in Prospect Studio after promoting |
+| Sales Pipeline | `/sales/pipeline` | No | **Open Pipeline** in Prospect Studio after promoting |
+| Sales Documents | `/sales/documents` | No | URL only |
+| Sales Manager | `/sales/manager` | No | URL only |
+
+## Principal and Operator differences
+
+With the default role mapping a Principal acts as `owner` and an Operator as `sales_agent` in Sales. The **Role** tile on `/sales/prospects` shows which one applies.
+
+| Area | Principal | Operator |
+|---|---|---|
+| Prospects, Pipeline, Work queue, Documents, Handoffs lists | All prospects in the workspace | Only prospects they own or are assigned; never team- or workspace-wide ones |
+| Open another person's prospect at `/sales/prospects/{id}` | Opens | Error `Sales prospect access denied` |
+| Handoffs **Convert to local client** | Checkbox and button shown | Text `Conversion requires explicit approval from an owner or admin.` instead |
+| Sales Manager | Opens | Amber **Sales data unavailable** with `Sales manager view is restricted to owner, admin, and sales_leader roles` |
+
+## Page map
+
+### Prospect Studio (`/sales/prospect-studio`)
+- Stage rail `1. Research`, `2. Promote`, `3. Materials` (green check when done).
+- Input card: **Company name**, **Domain**, **Service intent**, **Research company** button.
+- **Research quality** panel (badge **Source-backed**, **Homepage only** or **Manual enrichment**; **Next best actions**; **Missing inputs**).
+- **Recent Studio work** (cards linking to prospects).
+- Left column: **Promote prospect** (candidate cards), **Evidence review**, **Research packet** form. Right column: materials preview.
+- Green status line for success messages; amber **Sales data unavailable** for errors.
+
+### Sales Prospects (`/sales/prospects`)
+- Tiles **Visible prospects**, **Role**, **CRM mutations**; filter input `Filter prospects`; note `1099-style member users see assigned prospects only.`
+- Table **Prospect**, **Stage**, **Owner**, **Next action** (amber `Missing next action`), **Ledger** (**HubSpot link** or **Local only**), **Updated**.
+
+### Sales Prospect (`/sales/prospects/{id}`)
+- Header: h1 prospect name, link **Prospects**.
+- Left: profile card, **Qualification**, **Discovery notes**, **Log activity**, **Activity timeline**, **Stage history**, **Learning summary**.
+- Right rail (resizable, handle `Resize side panel`): **HubSpot context**, proposal context, **Proposal readiness**, **Handoff preflight**.
+
+### Sales Work Queue (`/sales/work-queue`)
+- Tiles **Open actions**, **Overdue**, **Today**, **Blocked**; tables **Overdue**, **Today**, **Upcoming**, **Unscheduled** with columns Owner, Prospect, Stage, Priority, Due, Status, Blocker, Last activity, Actions.
+
+### Sales Pipeline (`/sales/pipeline`)
+- Tiles **Open records**, **HubSpot linked**, **Needs action**; one column per stage with prospect cards; full prospect table below.
+
+### Sales Documents (`/sales/documents`)
+- Header link **Document library** (`/documents`); cards for counts, role and send mode; **Proposal readiness**; **HR Assessment intake** with **Generate assessment**; table **Document**, **Prospect**, **Approval**, **External handoff**, **Stage**.
+
+### Sales Handoffs (`/sales/handoffs`)
+- Tiles `{n} handoffs`, `{n} blocked`, `{policy} Local conversion authority`; **Handoff readiness**; amber **Blocked handoffs**; table **Prospect**, **Status**, **Preflight** (**blocked** or **ready**), **Missing**, **Owner / actions**.
+
+### Sales Manager (`/sales/manager`)
+- Cards **Stuck opportunities**, **Next-action coverage**, **Proposal readiness**, **Handoff readiness**; sections **Stage aging**, **Stuck opportunities**, **Owner workload**, **Won/lost reasons**.
+
+## Recipes
+
+### Research a company in Prospect Studio
+**Risk:** `READ` (fetches the company homepage and web search results; nothing is saved) · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** company name; domain if known; service intent.
+
+1. Open `/sales/prospect-studio`.
+2. Type **Company name** (input inside its label, placeholder `Bluebird Dental Group`).
+3. Type **Domain** (placeholder `bluebirddental.com`).
+4. Change **Service intent** if Clarwiz gave one (default `Fractional HR advisory and compliance support`).
+5. Click **Research company** (button; right of the input card).
+   - Wait for: the spinner to stop and a green status line.
+
+**Done when:** status `{n} company candidate(s) researched. {provider note}` and candidate cards under **Promote prospect**. A note like `BRAVE_API_KEY is not configured, so Prospect Studio prepared a local research draft for review.` means only a local draft was built.
+
+| If you see | Why | Do this |
+|---|---|---|
+| **Sales data unavailable** with `Company name is required.` | Name empty | Fill **Company name** |
+
+Research, evidence decisions and materials live only in the page. Leaving the page loses everything except a promoted prospect.
+
+### Promote a candidate to a prospect
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+
+1. On `/sales/prospect-studio` after research, click the right candidate card (button showing confidence %, match type, sources).
+2. Click **Promote to prospect** (button; header of **Promote prospect**; disabled until a candidate is selected).
+
+**Done when:** status `Local Ariya prospect promoted. Work Queue and Pipeline read from the local workflow row.` or `Existing local prospect selected.`, plus links **Open promoted prospect**, **Open Work Queue**, **Open Pipeline**.
+
+| If you see | Why | Do this |
+|---|---|---|
+| `Select a company candidate first.` | No candidate chosen | Click a candidate card |
+
+### Review evidence
+**Risk:** `READ` (page state only) · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** which sources and facts to trust, or "accept all".
+
+1. In **Evidence review**, for each source and fact click **Use** or **Reject** (small buttons). **Reset** undoes a decision. Rejecting a source rejects the facts that cite it.
+2. Or click **Mark reviewed** to mark every non-rejected source and fact reviewed.
+3. Click **Open** on a source to read it in a new tab.
+
+**Done when:** the readiness badge reads **Evidence ready** (not **Review pending** or **No usable evidence**). Status lines such as `Evidence fact approved for internal drafting.` confirm each decision.
+
+### Draft sales materials
+**Risk:** `WRITE` (logs an activity; materials are not sent) · **Roles:** Principal, Operator
+**Preconditions:** a prospect is promoted and evidence is ready.
+
+1. In **Research packet**, check or fill **Industry**, **Employee count range** (placeholder `51-200`), **Regions**, **Business signals**, **Likely pain points**, **Recommended services**, **Salesperson** (placeholder `Your name`), **Recipient persona** (placeholder `Founder or operations lead`), **Objective** (placeholder `Book a discovery call`).
+2. Click **Draft materials** (button; disabled until promoted and evidence ready).
+3. To take the result out, click **Copy packet**, **Download packet** (Markdown), **Copy brief**, **Copy email** or **Copy follow-ups**. Each shows `Copied` briefly.
+
+**Done when:** status `Draft materials generated for internal review.` and the preview shows **Draft-only marketing materials**, **One-page opportunity brief**, **Email subject**, **Email draft**, **Call prep**, **Discovery questions**, **Proposal outline**, **Follow-up sequence**, **Reviewed citations**, **Claim review**, and the amber **Approval boundary** box.
+
+| If you see | Why | Do this |
+|---|---|---|
+| `Promote a prospect before drafting materials.` | Not promoted | Promote first |
+| `Review or reject each evidence item before drafting materials. At least one reviewed source and fact are required.` | Evidence not reviewed | Finish the review |
+
+Nothing is emailed. To turn the brief into a formal proposal document, use [Create a document](/documents/create-a-document).
+
+### Find a prospect
+**Risk:** `READ` · **Roles:** Principal (all prospects), Operator (own or assigned only)
+
+1. Open `/sales/prospects`.
+2. Type in **Filter prospects** (input; filters the table instantly).
+3. Click the prospect name (link) to open `/sales/prospects/{id}`.
+
+**Done when:** the prospect page h1 shows the name. Empty: `No local Sales prospects are available for this role and tenant.` As an Operator this can mean the prospect belongs to someone else.
+
+### Log activity on a prospect
+**Risk:** `WRITE` (local only) · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** type, summary, details.
+
+1. Open `/sales/prospects/{id}`. Find the **Log activity** card.
+2. Choose **Type** (native select): Note, Call, Email logged, Meeting, Document touchpoint, Research.
+3. Optional: **Subtype (optional)** (input, placeholder `e.g. objection, decision_maker_update`).
+4. Type **Summary** (required; placeholder `One-line summary of what happened`).
+5. Optional: **Details (optional)** (textarea, placeholder `Full notes, objections, decision-maker updates, follow-up needs`).
+6. Click **Log activity** (button; shows `Logging...`).
+
+**Done when:** the entry appears in **Activity timeline**. Nothing is sent outside Ariya.
+
+| If you see | Why | Do this |
+|---|---|---|
+| `Summary is required.` | Summary empty | Fill it |
+| `Sales prospect access denied` | Operator opening someone else's prospect | Stop; a Principal must do it |
+
+### Draft proposal context
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+
+1. Open `/sales/prospects/{id}`.
+2. Click **Draft proposal context** (button; right rail; shows `Drafting...`).
+
+**Done when:** `Draft created. Status: ready for internal review.` or `Draft created with {n} missing field(s) to address.` This is internal context, not a client-ready proposal. To write the proposal document itself, use [Create a document](/documents/create-a-document).
+
+### Complete, skip or reschedule a follow-up
+**Risk:** `WRITE` · **Roles:** Principal (all actions), Operator (own or assigned only)
+**Inputs from Clarwiz:** the action, the reason, and the new due date for a reschedule.
+
+1. Open `/sales/work-queue`. Find the row in **Overdue**, **Today**, **Upcoming** or **Unscheduled**.
+2. Click **Complete**, **Skip** or **Reschedule** (button; Actions column).
+3. In the dialog `{Complete|Skip|Reschedule} Sales action`, type **Reason** (required; textarea, id `sales-action-reason`).
+4. For Reschedule, set **New due date** (`datetime-local`, id `sales-reschedule-due-at`). The default is 24 hours from now in UTC; check it.
+5. Click the confirm button (`Complete`, `Skip` or `Reschedule`; shows `Saving...`).
+
+**Done when:** the dialog closes and the row moves or disappears. The dialog has no X button; use **Cancel** to back out. Server errors appear in the amber **Sales data unavailable** box behind the dialog, not inside it.
+
+### Read the pipeline
+**Risk:** `READ` · **Roles:** Principal, Operator (own or assigned only)
+
+1. Open `/sales/pipeline`.
+2. Read the stage columns (stage badge and count) and the table below. Click a prospect card to open it.
+
+**Done when:** read. Empty: `No local Sales pipeline records yet. New lead will appear here after the first prospect is created.`
+
+### Generate an HR assessment document from Sales Documents
+**Risk:** `READ` here; `AI` `WRITE` on the generate page · **Roles:** Principal, Operator
+
+1. Open `/sales/documents`.
+2. Read **Proposal readiness** and the table (**Document**, **Prospect**, **Approval**, **External handoff**, **Stage**).
+3. Click **Generate assessment** (link; **HR Assessment intake** card). The browser opens `/generate?source=hr-assessment`.
+4. Continue on [Generate page](/documents/generate-page).
+
+**Done when:** the generate page is open. **Document library** (header link) opens `/documents`. Empty table: `No visible Sales document contexts for this role and tenant.`
+
+### Review a handoff and copy missing facts
+**Risk:** `READ`; `WRITE` for logging an escalation · **Roles:** Principal, Operator (own or assigned only)
+
+1. Open `/sales/handoffs`.
+2. Find the prospect. **Preflight** reads **blocked** or **ready**; **Missing** lists what is absent.
+3. On a blocked row, click **Copy required facts** (button). Status `Copied to clipboard.` or `Clipboard unavailable.`
+4. To record that the gap was escalated, click **Log escalation** (button; shows `Logging...`).
+
+**Done when:** `Escalation logged locally. No email or external write.` appears in the row. Results show as small text in the row, not as toasts.
+
+### Convert a won prospect to a local client
+**Risk:** `WRITE` (creates an Ariya client; needs approval) · **Roles:** Principal only (Operator sees `Conversion requires explicit approval from an owner or admin.`)
+**Preconditions:** the row's **Preflight** reads **ready**.
+
+1. Open `/sales/handoffs` and find the row.
+
+<Warning>**Approval required (WRITE, human attestation).** Stop here and get approval before ticking **I approve creating a local client from this prospect**. The checkbox is a human attestation; the agent must not tick it without explicit approval. Conversion creates a new client record in Ariya.</Warning>
+
+2. Tick **I approve creating a local client from this prospect** (native checkbox; Owner / actions column).
+3. Click **Convert to local client** (button; shows `Converting...`).
+
+**Done when:** row text `Local client created ({slug}). No external write.` Failure: `Conversion blocked.` with amber reason badges.
+
+### Read the manager view
+**Risk:** `READ` · **Roles:** Principal only
+
+1. Open `/sales/manager`.
+2. Read the cards and sections **Stage aging** (Prospect, Stage, Days), **Stuck opportunities**, **Owner workload**, **Won/lost reasons**.
+
+**Done when:** read. As an Operator the page shows amber **Sales data unavailable** with `Sales manager view is restricted to owner, admin, and sales_leader roles`; stop and report.
+
+## Controls reference
+
+| Visible text | Type | Locator | What it does | Risk |
+|---|---|---|---|---|
+| Company name / Domain / Service intent | inputs | Prospect Studio input card | Research inputs | none |
+| Research company | button | Prospect Studio | Web research, candidates | READ |
+| (candidate card) | button | **Promote prospect** | Selects the candidate | none |
+| Promote to prospect | button | **Promote prospect** header | Creates a local prospect | WRITE |
+| Open promoted prospect / Open Work Queue / Open Pipeline | links | after promoting | Open those pages | READ |
+| Use / Reject / Reset / Mark reviewed | buttons | **Evidence review** | Page-state review | none |
+| Open | link, new tab | source row | Source URL | READ |
+| Draft materials | button | Research packet | Builds materials | WRITE |
+| Copy packet / Download packet / Copy brief / Copy email / Copy follow-ups | buttons | materials preview | Clipboard or download | READ |
+| Filter prospects | input | `/sales/prospects` | Filters the table | READ |
+| Type / Subtype / Summary / Details | select and inputs | **Log activity** | Activity fields | none |
+| Log activity | button | **Log activity** | Saves a local activity | WRITE |
+| Draft proposal context | button | prospect right rail | Creates proposal context | WRITE |
+| Prospects | link | prospect header | `/sales/prospects` | READ |
+| Complete / Skip / Reschedule | buttons, then dialog | Work queue Actions column | Changes the action state | WRITE |
+| Generate assessment | link | Sales Documents | `/generate?source=hr-assessment` | READ |
+| Document library | link | Sales Documents header | `/documents` | READ |
+| Copy required facts | button | Handoffs blocked row | Copies facts | READ |
+| Log escalation | button | Handoffs row | Local note | WRITE |
+| I approve creating a local client from this prospect | checkbox | Handoffs ready row (Principal) | Enables Convert | approval needed |
+| Convert to local client | button | Handoffs ready row (Principal) | Creates a local client | WRITE |
+
+## Waits and signals
+- Prospect Studio research and drafting show a spinner on the button, then a green status line. **Recent Studio work** shows a spinner while it loads.
+- The prospect page has no loading text; panels show placeholders such as `No local record loaded` until data arrives.
+- All errors appear in the amber **Sales data unavailable** box. On the Work queue it sits behind the dialog.
+- Handoff results are small text in the row, not toasts.
+
+## Gotchas
+- Prospect Studio keeps everything in page state. Navigating away loses research, evidence decisions and materials; only the promoted prospect persists.
+- The prospect page has no editor for stage or next action.
+- The Work queue dialog has no close X. Use **Cancel**. The reschedule default is computed in UTC.
+- As an Operator, empty lists may only mean the records belong to someone else.
+- In-app help for the manager view says "Owners and admins only". The page opens for any Sales user; the restriction appears as an error inside it.
+- Pipeline and Sales Documents have no in-app help guide.
+
+## Related
+- [Generate page](/documents/generate-page)
+- [Create a document](/documents/create-a-document)
+- [Sales Today and accounts](/sales/today-and-accounts)
+- [HR Roadmap](/sales/hr-roadmap)
+
+## Source files
+- `packages/web/src/app/(dashboard)/sales/prospect-studio/page.tsx`
+- `packages/web/src/app/(dashboard)/sales/prospects/page.tsx`
+- `packages/web/src/app/(dashboard)/sales/prospects/[id]/page.tsx`
+- `packages/web/src/app/(dashboard)/sales/work-queue/page.tsx`
+- `packages/web/src/app/(dashboard)/sales/pipeline/page.tsx`
+- `packages/web/src/app/(dashboard)/sales/documents/page.tsx`
+- `packages/web/src/app/(dashboard)/sales/handoffs/page.tsx`
+- `packages/web/src/app/(dashboard)/sales/manager/page.tsx`
+- `packages/web/src/app/(dashboard)/sales/_components.tsx`
+- `packages/transport-api/src/routes/sales.ts`
+- `packages/core/src/dimensions/role-mapping.ts`

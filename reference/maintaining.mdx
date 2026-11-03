@@ -1,0 +1,45 @@
+---
+title: "Keeping this playbook current"
+sidebarTitle: "Keeping it current"
+description: "How this playbook was built from the Ariya code, what makes it go stale, and how to update a page when the UI changes."
+keywords: ["maintenance", "update playbook", "stale", "ui change", "source files"]
+---
+
+<Info>
+**For:** engineers and whoever runs Clarwiz · **Built from:** the `staging` branch of the Ariya repo · **Project files:** `docs/agent-playbook/` (Mintlify `docs.json` plus MDX pages)
+</Info>
+
+## How it was built
+
+Every page was written from the Ariya source, not from screenshots:
+
+- Click paths, labels, placeholders, aria-labels, toasts and error messages: `packages/web/src` (Next.js app).
+- Which actions save, call the AI or leave Ariya: `packages/web/src/lib/api.ts` and `packages/transport-api/src/routes`.
+- Who sees what: `packages/shared/src/roles.ts` and `packages/web/src/lib/navigation.ts`.
+- Template facts: `packages/core`, `packages/templates`, the database migrations and `template-types.csv`.
+- The in-app help (`packages/web/src/components/help-sheet/guides.ts`) was compared against the code. Where they differ, the pages follow the code and say so under **Gotchas**.
+
+Each page ends with a **Source files** list. Start there when something changes.
+
+## What makes it go stale
+
+| Change in Ariya | Pages to check |
+|---|---|
+| A button, tab or heading is renamed | Every page that quotes it. Search this project for the old text. |
+| A route moves or a query parameter changes | The page's Info box, recipes that open it directly, and the [Task router](/start/task-router) |
+| A role gains or loses a capability in `roles.ts` | [Operating rules](/start/operating-rules), [Roles and access](/start/roles-and-access), and the page's Roles line |
+| A template is added, renamed or edited in the database | [Template catalog](/documents/template-catalog) and [Choosing a template](/documents/choosing-a-template) |
+| A new page or module ships | Add a page under the matching group in `docs.json` and add router rows |
+
+## Update a page
+
+1. Find the page's **Source files** and read the changed component.
+2. Copy labels exactly from the JSX. Put anything dynamic in inline code, for example `Working on {Client name}`.
+3. Keep the recipe shape: Risk, Roles, Inputs, Preconditions, numbered steps with `Wait for`, **Done when**, and the failure table.
+4. Tag every step that changes something: `WRITE`, `AI`, `EXTERNAL` or `DESTRUCTIVE`. `EXTERNAL` and `DESTRUCTIVE` steps need a `<Warning>` approval stop right before them.
+5. MDX rules: no raw curly braces or angle brackets outside code; no HTML comments; escape `|` inside table cells.
+6. Run `mint validate` and `mint broken-links` from `docs/agent-playbook/` before publishing.
+
+## Verify against a live environment
+
+These pages are code-derived. Before trusting a new recipe in production, run it once on the pilot environment with the Operator account and once with the Principal account, and compare each `Wait for` and **Done when** signal with what the screen shows.

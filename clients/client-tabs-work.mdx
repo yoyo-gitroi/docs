@@ -1,0 +1,429 @@
+---
+title: "Client work tabs: cases, documents, meetings, files, memory, notes"
+sidebarTitle: "Work tabs"
+description: "Review a client's cases, find or start documents for the client, import and log meetings, manage Google Drive files, curate client memory and write pinned notes."
+keywords: ["client cases", "client documents", "documents for client", "draft for client", "create a document for this client", "generate document", "likely next document", "delete document", "meetings", "Granola", "log a call", "log a note", "commitments", "external documents", "Google Drive", "upload file", "client memory", "add memory", "approve memory", "client notes", "pin note"]
+---
+
+<Info>
+**URL:** `/clients/{slug}?tab=cases`, `documents`, `meetings`, `external-documents`, `memory`, `notes` · **Reach:** client page → tab bar (see [tab map](/clients/client-profile#tab-map)) · **Roles:** Principal ✓ Operator ✓ (Cases and Documents full; Meetings, Memory and Notes view only; External Documents controls enabled but the API returns 403) · **Ready when:** the tab's H2 (**Cases**, **Documents**, **Meetings**, **External Documents**, **Memory**, **Notes**) is visible and its loading text is gone.
+</Info>
+
+Six client tabs for day-to-day work, plus every place in the client workspace that hands off to document creation.
+
+<Note>
+Always open these with `?tab=`. Without it the client page jumps to the tab you last used ([Always pass ?tab=](/clients/client-profile#always-pass-the-tab-parameter)).
+</Note>
+
+## Create a document for this client
+Every "create a document for this client" control in the client workspace navigates to the **Generate Document** page at `/generate?…`, never to `/documents`. Nothing is created until you act on that page. Continue with [Generate page](/documents/generate-page) or [Create a document](/documents/create-a-document).
+
+| Where | Control | URL it opens |
+|---|---|---|
+| Client header | **Generate Document** | `/generate?client={slug}` |
+| Documents tab, **All documents** card | **Generate** (or **Generate a document** in the empty state) | `/generate?client={slug}` |
+| Documents tab, **Likely next** | **Draft with context** (main callout) or **Draft** (other rows) | `/generate?template={docType}&client={slug}` plus optional `&source=service-case&case_id={caseId}` and `&related_documents={id1}%2C{id2}` |
+| Overview, **Needs you on this client** | **Draft with context** | same as Likely next |
+| Road Map tab | **Draft**, **Draft next deliverable**, wand icon (title "Draft deliverable"), **Draft deliverable** | `/generate?template={templateId}&client={slug}&source=hr-roadmap` |
+
+Parameter order is always `template`, `client`, `request_id`, `source`, `case_id`, `related_documents`. `related_documents` is a comma list (encoded `%2C`) of earlier documents the new draft follows from.
+
+To build the URL yourself: `/generate?client={slug}` for a blank start, or `/generate?template={templateId}&client={slug}` when Clarwiz knows the template.
+
+<Note>
+In-app help says **Draft with context** and **Draft** open the document chat. They actually open the **Generate Document** page.
+</Note>
+
+## Cases tab
+Read-only view of every service case linked to the client. No view-only notice; all roles see the same.
+
+**Ready when:** H2 **Cases** and chip `Last 12 months · {Mon YYYY} to {Mon YYYY}`.
+
+Layout: toolbar **Refresh**, **Open Operations**; tiles **Linked**, **Open**, **Waiting**, **Done**; **Cases by service** (pill `{plan} · {n} active services` or "Plan not set in HubSpot"; groups **In their plan**, **Included with the tier**, **Outside their plan** or **Other services**, **Not sorted yet**; link button **Detailed breakdown**); **How cases get solved here**; **Request rhythm** heatmap; **Client reaction on close**; **All cases** table (**Case**, **Service**, **Status**, **Days**, **Touchpoints**, **Reaction**, **Linked by**); **Possible matches (unconfirmed)** when nothing is linked.
+
+### Review the cases for a client
+**Risk:** `READ` · **Roles:** all
+
+1. Open `/clients/{slug}?tab=cases`.
+   - Wait for: H2 **Cases** and the tiles.
+2. Read the tiles and **All cases**. Only 10 rows show; click `Show {n} more cases` (button below the table) for the rest, **Show fewer** to collapse.
+3. To see a one-line summary of a case, click the chevron at the row end (icon button, aria-label "Show the case summary"; "Hide the case summary" when open).
+4. For a per-sub-service table, click **Detailed breakdown** (link button in **Cases by service**). It shows a table (aria-label "Cases by sub-service") with columns **Service**, **Cases**, **Open**, **Waiting**, **Done**, **Avg days**, **Median**, **Avg emails**. Toggle `Show {n} sub-services with no cases` to include empty ones.
+5. Click **Refresh** (button, toolbar) to re-fetch.
+
+**Done when:** you have the numbers. Status pills: **Done**, **Cancelled**, `Waiting on {name}`, **Open**.
+
+Empty states: "No linked cases yet." with "Link cases from the case's Details in Operations."; "No cases in the last 12 months."; "Appears once at least three cases have closed with a summary. Summaries are written when a case closes."; "No sub-services set up. An admin can add them in Settings → Sub-services."
+
+### Open a case or the client Operations queue
+**Risk:** `READ` · **Roles:** all
+
+1. Click a case title in **All cases** (link). It opens `/service-desk?case={id}&view=expanded`.
+2. Or click **Open Operations** (button, toolbar). It opens `/service-desk?client={slug}`.
+
+**Done when:** the Operations page opens on that case or client.
+
+## Documents tab
+Every Ariya document made for this client. No view-only notice; all roles can open, start and delete documents.
+
+**Ready when:** H2 **Documents**, chip `{n} document(s)` and card `All documents ({n})`.
+
+Layout: up to 8 type tiles (toggle buttons showing count, label and `Last {date}`) with link button **Show all types**; **Patterns**; **Likely next** (callout `{label} after “{subject}”. {reason}` with **Draft with context**, extra rows with **Draft**, a recent table **Document**, **Type**, **From**, **Created**); **All documents** card with **Generate**, a filter bar and a table **Title**, **Type**, **Version** (`v{n}`), **Status**, **Updated**.
+
+### Find a client document
+**Risk:** `READ` · **Roles:** all
+**Inputs from Clarwiz:** title words, type or status.
+
+1. Open `/clients/{slug}?tab=documents`.
+2. Type in the search box (input, placeholder "Search documents..."; visual: top of **All documents**).
+3. Optional: click **Status** (select, "All Statuses") or **Type** (select, "All Types"), or click a type tile at the top (toggle button) to set the type.
+4. Click the row (or its title) to open `/documents/{id}`. The row menu (icon button, screen-reader text "Actions"; visual: row end) also has **Edit** and **Preview**, which open the same page.
+
+**Done when:** URL is `/documents/{id}`.
+
+| If you see | Why | Do this |
+|---|---|---|
+| "No documents for this client." | None exist | Start one ([Create a document for this client](#create-a-document-for-this-client)) |
+| "No documents match the current filters." | Filters or search too narrow | Click **Clear all**, then also clear the search box by hand (Clear all does not clear it) |
+| Red alert with **Retry** | Load failed | Click **Retry** once |
+
+### Start a new document for this client
+**Risk:** `READ` (handoff) · **Roles:** all
+
+1. Open `/clients/{slug}?tab=documents`.
+2. Click **Generate** (button; visual: header of **All documents**). In the empty state it reads **Generate a document**.
+   - It opens `/generate?client={slug}`.
+3. Continue on [Generate page](/documents/generate-page).
+
+**Done when:** URL starts with `/generate?client={slug}`.
+
+### Draft the likely next document
+**Risk:** `READ` (handoff) · **Roles:** all
+
+1. Open `/clients/{slug}?tab=documents`.
+2. Read the **Likely next** card. The callout names the document type and the reason.
+3. Click **Draft with context** (link button in the callout) or **Draft** (link button on another row).
+   - It opens `/generate?template={docType}&client={slug}` with `source`, `case_id` and `related_documents` when the prediction came from a case.
+4. Continue on [Generate page](/documents/generate-page).
+
+**Done when:** URL starts with `/generate?template=`. Empty: "Nothing predicted. Likely-next documents appear when a known sequence is part-way through."
+
+### Delete a client document
+**Risk:** `DESTRUCTIVE` · **Roles:** all (Operator included)
+
+1. Find the row ([Find a client document](#find-a-client-document)).
+2. Click the row menu (icon button, screen-reader text "Actions"; visual: right end of the row), then **Delete** (menu item).
+   - Wait for: dialog **Delete document**, text `This will permanently delete "{title}" and all its versions. This action cannot be undone.`
+
+<Warning>
+**Approval required (DESTRUCTIVE).** Stop here and get approval before clicking **Delete**. The document and all its versions are removed permanently.
+</Warning>
+
+3. Click **Delete** (button in the dialog). **Cancel** closes without deleting.
+
+**Done when:** toast "Document deleted" and the row is gone. Failure toast: server text or "Failed to delete document".
+
+## Meetings tab
+Meetings read from Granola, commitments from meetings, and calls or notes logged by hand. Edit needs Clients and packets: Operator and Member see "View only…" and disabled buttons.
+
+**Ready when:** H2 **Meetings** and card **Source** with a pill `{n} meeting(s)`.
+
+Layout: **Source** card (who connected Granola, or "No one has connected Granola yet. Connect it in Settings, Integrations."; buttons **Log a call or note**, **Integrations**); `Across {n} meetings` (**Keeps coming up**, **Open commitments** with pills **We owe** or **They owe** and a **Done** button); **Meetings** (newest first; each row expands; the first is open; chips `{n} memories` or **Needs review**); **Import and review** (Granola import form and imported meetings with candidates).
+
+### Open a specific meeting
+**Risk:** `READ` · **Roles:** all
+
+1. Open `/clients/{slug}?tab=meetings&meeting={intakeId}`. The page scrolls to that meeting (element id `meeting-{intakeId}`) and opens it.
+2. Or click any meeting row under **Meetings** to expand it.
+
+**Done when:** the meeting's details are visible.
+
+### Log a call or note
+**Risk:** `WRITE` · **Roles:** Principal, Admin (Operator, Member: disabled). No email is sent.
+**Inputs from Clarwiz:** channel, direction, subject and/or summary; optional contact and participant.
+
+1. Open `/clients/{slug}?tab=meetings`.
+2. Click **Log a call or note** (button; visual: **Source** card).
+   - Wait for: side sheet with description "For conversations that are not a Granola meeting or a case email."
+3. Optional: **Contact** (select; **No contact** or a client contact).
+4. **Channel** (select): **Call**, **Note**, **Meeting**, **Email**. **Direction** (select): **Outbound**, **Inbound**, **Internal**.
+5. Optional: **Participant name**, **Participant email** (inputs).
+6. Fill **Subject** (input) and/or **Summary** (textarea).
+7. Click **Log communication** (button; reads **Logging…**).
+
+**Done when:** toast "Communication logged." and the entry appears under **Logged so far** (empty text "Nothing logged by hand yet.").
+
+| If you see | Why | Do this |
+|---|---|---|
+| "Add a subject or a summary." | Both empty | Fill one |
+
+### Import a Granola meeting
+**Risk:** `WRITE` · **Roles:** Principal, Admin. Extraction is rule-based, not AI.
+**Inputs from Clarwiz:** meeting title and the Granola notes text; optional date, link, meeting id.
+
+1. Open `/clients/{slug}?tab=meetings` and scroll to **Import and review**.
+   - Wait for: "Loading Granola imports..." to finish.
+2. Fill **Meeting title** (input, placeholder `{Client} HR assessment`).
+3. Optional: **Meeting date** (date input), **Granola link** (input, placeholder "https://..."), **Meeting ID** (input).
+4. Paste the notes into **Granola notes** (textarea; placeholder lines start "Fact:", "Action item:", "Open question:", "Industry:"). Prefixing lines that way helps the parser.
+5. Click **Import** (button; disabled until title and notes are filled; reads **Importing...**).
+
+**Done when:** toast "Granola meeting imported" and a new meeting card at the top of the import list with candidate rows.
+
+| If you see | Why | Do this |
+|---|---|---|
+| "Meeting title and Granola notes are required." | Missing field | Fill both |
+| `Granola import blocked: {reasons}` | Server policy blocked it | Report the reasons |
+
+Other buttons here: **Inbox** (opens `/granola`), **Refresh** (reloads imports), **Granola** (opens the source link in a new tab).
+
+### Review and apply meeting candidates
+**Risk:** `WRITE` (approve, apply), `DESTRUCTIVE` (reject cannot be undone) · **Roles:** Principal, Admin
+
+1. In the imported meeting card, read each candidate row.
+2. To approve, click the green check (icon button, no label; visual: first icon at the right of the candidate row; hidden once approved).
+   - Wait for: toast "Candidate approved".
+
+<Warning>
+**Approval required (DESTRUCTIVE).** Stop here and get approval before clicking the red X. A rejected candidate cannot be approved again.
+</Warning>
+
+3. To reject, click the red X (icon button, no label; visual: second icon at the right of the row). Toast "Candidate rejected".
+4. Click `Apply {n}` or `Apply to Assessment {n}` (button; disabled when nothing is approved).
+
+**Done when:** toast "Approved Granola updates applied" and the candidates show badge **applied**.
+
+### Mark a commitment done
+**Risk:** `WRITE` · **Roles:** Principal, Admin
+
+1. Open `/clients/{slug}?tab=meetings`.
+2. In `Across {n} meetings` › **Open commitments**, click **Done** (button) on the row.
+
+**Done when:** toast "Commitment marked done." Failure toast: server text or "Could not update the commitment."
+
+Empty states: "No meetings yet. Import one from Granola below.", "No open commitments. They appear when a meeting's commitments are approved below.", "Topics show once they come up in two or more meetings.", "No Granola meetings imported for this client."
+
+## External Documents tab
+Files about the client made outside Ariya, stored in the client's folder in the company Google Drive. Ariya reads each one with AI into the client's memory.
+
+<Warning>
+**Operator and Member:** the drop zone and row icons are enabled, but every change is refused by the API (Principal and Admin only). Expect a toast like "Your profile cannot change Clients and packets. Allowed: Principal, Admin." Do not retry; report back.
+</Warning>
+
+**Ready when:** H2 **External Documents** and drop zone "Drop files here, or click to choose". Loading text "Loading documents…".
+
+Layout: intro text with the Drive folder path, drop zone ("Any format — PDF, Word, Excel, PowerPoint, images. Up to 25 at a time."), groups by year (`{YYYY}` or **Undated**, `{n} document(s)`), each row: name (link, new tab), type, summary, notices, read status, size, date with "from the document" or "date added to Drive", and icons.
+
+If Google Drive is not ready, the tab shows one of: "Google Drive is not set up yet", "Connect Google Drive to keep documents here", "Choose which shared drive to use", "Google Drive does not recognise that shared drive", with **Open Settings** (opens `/settings/integrations`). Stop and report; connecting Drive needs a human.
+
+### Upload files to the client Drive folder
+**Risk:** `EXTERNAL` `AI` · **Roles:** Principal, Admin (Operator: 403)
+**Inputs from Clarwiz:** the files (up to 25 at once, each up to 50 MB).
+
+1. Open `/clients/{slug}?tab=external-documents`.
+
+<Warning>
+**Approval required (EXTERNAL).** Stop here and get approval before choosing files. Uploading writes the files to the company Google Drive.
+</Warning>
+
+2. Click the drop zone (button "Drop files here, or click to choose"; visual: large dashed box at the top) and pick the files in the file chooser, or drop them on it.
+   - Wait for: toast `{n} file(s) added. Ariya is reading them now.`
+3. Wait while rows show "Waiting to be read…" or "Scanning…" (spinner). The tab refreshes every 3 seconds on its own.
+
+**Done when:** every new row shows one of `{n} fact(s) added to memory`, "Read — nothing new to remember", "Kept, not readable by Ariya", or "Could not be read".
+
+| If you see | Why | Do this |
+|---|---|---|
+| `{filename}: {error}` (one toast per file) | That file failed | Report the file and text |
+| `"{name}" is larger than 50 MB.` | Too large | Skip the file; report |
+| "Add up to 25 files at a time." | Too many selected | Upload in batches of 25 |
+| "Your profile cannot change Clients and packets. Allowed: Principal, Admin." | Operator or Member | Stop; do not retry |
+
+### Correct the date of a document
+**Risk:** `WRITE` · **Roles:** Principal, Admin (Operator: 403)
+
+1. Click the pencil on the row (icon button, aria-label `Correct the date for {name}`, title "Correct this date").
+2. Set the date in the date input (aria-label `Date for {name}`).
+3. Click **Save** (button next to it). **Cancel** discards.
+
+**Done when:** the row shows the new date and moves to the matching year group.
+
+### Read a document again
+**Risk:** `AI` · **Roles:** Principal, Admin (Operator: 403)
+
+1. Click the refresh icon on the row (icon button, aria-label `Read {name} again`, title "Read this document again"; disabled while that row is scanning).
+
+**Done when:** toast `Reading "{name}" again.` and the row returns to one of the finished states above.
+
+### Remove a document from Drive
+**Risk:** `DESTRUCTIVE` `EXTERNAL` · **Roles:** Principal, Admin (Operator: 403)
+
+1. Click the trash icon on the row (icon button, aria-label `Remove {name}`, title "Remove this document").
+   - Wait for: dialog **Remove this document?** with text `"{name}" moves to the Google Drive trash, and what Ariya learned from it stops being used for this client. You can still recover the file from Drive.`
+
+<Warning>
+**Approval required (DESTRUCTIVE, EXTERNAL).** Stop here and get approval before clicking **Remove**. The file goes to the Google Drive trash and its facts stop being used.
+</Warning>
+
+2. Click **Remove** (button in the dialog). **Cancel** closes.
+
+**Done when:** toast `"{name}" removed.` and the row is gone.
+
+Other row icons: file name (opens the file in a new tab), external-link icon (aria-label `Open {name} in Google Drive`). Empty state: "No documents from outside Ariya yet".
+
+## Memory tab
+What Ariya knows about the client. Drafts use active and core memories. Edit needs Clients and packets: Operator and Member see "View only…".
+
+**Ready when:** H2 **Memory** and the stats strip (**memories**, **kinds**, **last written**, **times used in drafts**, **corrected by people**).
+
+Layout: optional `Proposed for review ({n})` ("Nothing reaches a draft until approved"); **What we know** (button **Add memory**, kind filter buttons, search, memory rows, link button **Show archived**); **Memory at work**.
+
+### Find a memory
+**Risk:** `READ` · **Roles:** all
+
+1. Open `/clients/{slug}?tab=memory`.
+2. Click a kind in the filter group (buttons, group aria-label "Filter memories by kind"): **All**, **Fact**, **Preference**, **Heuristic**, **Learning**, **Correction**, **Voice pattern**.
+3. Type in the search box (input, aria-label "Search memories", placeholder "Search memories…").
+
+**Done when:** matching rows show. Empty: "No memories match this filter."
+
+### Add a memory
+**Risk:** `WRITE` · **Roles:** Principal, Admin
+**Inputs from Clarwiz:** kind, domain, content.
+
+1. Open `/clients/{slug}?tab=memory`.
+2. Click **Add memory** (button; visual: **What we know** header).
+3. **Kind** (select; options read `{Label} — {description}`).
+4. **Domain** (select): **General**, **Documents**, **Compliance**, **Payroll**, **Onboarding**, **Handbook**, **Policies**.
+5. **Content** (textarea, placeholder "e.g., Client prefers formal language in all employee-facing documents").
+6. Click **Save memory** (button; reads **Saving…**). **Cancel** closes the form.
+
+**Done when:** toast "Memory added" and the row appears. Failure toast: server text or "Could not add the memory."
+
+### Approve or dismiss a proposed memory
+**Risk:** `WRITE` (approve), `DESTRUCTIVE` (dismiss cannot be undone) · **Roles:** Principal, Admin
+
+1. Open `/clients/{slug}?tab=memory` and find `Proposed for review ({n})` (only shown when there are proposals).
+2. Click **Approve** (button on the row). Toast "Memory approved. Drafts will use it."
+
+<Warning>
+**Approval required (DESTRUCTIVE).** Stop here and get approval before clicking **Dismiss**. A dismissed memory is never proposed again.
+</Warning>
+
+3. Or click **Dismiss**. Toast "Dismissed. It will not be proposed again."
+
+**Done when:** the row leaves the proposed list.
+
+### Promote, archive, restore or delete a memory
+**Risk:** `WRITE` (promote, restore), `DESTRUCTIVE` (archive, delete) · **Roles:** Principal, Admin
+
+Row icons are invisible until you hover or focus the row on normal-width screens. Hover the row first.
+
+1. **Promote to core:** click the star (icon button, aria-label "Promote to core"; active memories only). Toast "Memory promoted to core".
+
+<Warning>
+**Approval required (DESTRUCTIVE).** Stop here and get approval before clicking **Archive** or **Delete**. Delete removes the memory immediately with no confirmation and no undo.
+</Warning>
+
+2. **Archive:** click the box icon (aria-label "Archive"). Toast "Memory archived". Recover it with step 4.
+3. **Delete:** click the trash icon (aria-label "Delete"). Toast "Memory deleted".
+4. **Restore:** click **Show archived** (link button, bottom of **What we know**), then **Restore** on the row. Toast "Memory restored".
+
+**Done when:** the toast shows. Failure toast: server text or "Something went wrong."; archived list failure "Could not load archived memories."
+
+Empty states: "No memories yet. They are written as cases close, meetings are applied and research is accepted.", "No archived memories.", "Shows here once a draft for this client uses its memories."
+
+## Notes tab
+Internal guidance for the team. Pinned notes are also read by drafts, research and the agent. Edit needs Clients and packets: Operator and Member see "View only…".
+
+**Ready when:** H2 **Notes**, cards **Pinned guidance** and **Add a note**. Loading text "Loading…".
+
+### Add a note
+**Risk:** `WRITE` · **Roles:** Principal, Admin
+**Inputs from Clarwiz:** note text; pinned or not.
+
+1. Open `/clients/{slug}?tab=notes`.
+2. Click the note box (textarea, aria-label "Note", placeholder "For example: Denise prefers calls for anything urgent."; visual: **Add a note** card).
+3. Type the note.
+4. Leave **Pin so drafts read it** ticked (checkbox, ticked by default) or untick it for a team-only note.
+5. Click **Save note** (button; reads **Saving…**).
+
+**Done when:** toast "Note saved" and the note appears under **Pinned guidance** or **Other notes** ("Kept for the team; drafts do not read these.").
+
+### Pin, unpin or edit a note
+**Risk:** `WRITE` · **Roles:** Principal, Admin
+
+1. Pin or unpin: click the pin icon on the note (icon button, aria-label "Pin note" or "Unpin note"). Toasts "Pinned. Drafts will read it." or "Unpinned. Drafts no longer read it."
+2. Edit: click the pencil (icon button, aria-label "Edit note"), change the text in the textarea that appears (also aria-label "Edit note"), click **Save**. Toast "Note updated".
+
+**Done when:** the toast shows. Failures: "Could not update the note.", "Could not save the note."
+
+### Archive a note
+**Risk:** `DESTRUCTIVE` · **Roles:** Principal, Admin
+
+<Warning>
+**Approval required (DESTRUCTIVE).** Stop here and get approval before clicking **Archive note**. It archives immediately with no confirmation, and there is no restore in the app.
+</Warning>
+
+1. Click the archive icon on the note (icon button, aria-label "Archive note").
+
+**Done when:** toast "Note archived" and the note is gone. Failure: "Could not archive the note."
+
+Empty: "Nothing pinned yet." Source chips on notes: **Earlier notes**, **From a meeting**, **From research**, **Written by Ariya**. Load failure: "Could not load notes."
+
+## Controls reference
+| Visible text | Type | Locator | What it does | Risk |
+|---|---|---|---|---|
+| **Refresh** | button | Cases toolbar | Re-fetch cases | READ |
+| **Open Operations** | button | Cases toolbar | `/service-desk?client={slug}` | READ |
+| chevron | icon button | aria-label "Show the case summary" | Expand case summary | READ |
+| **Generate** | button | Documents, All documents header | `/generate?client={slug}` | READ |
+| **Draft with context**, **Draft** | link buttons | Documents, Likely next | `/generate?template=…` | READ |
+| row menu → **Delete** | menu item | screen-reader text "Actions" | Delete document dialog | DESTRUCTIVE |
+| **Log a call or note** | button | Meetings, Source card | Opens log sheet | READ |
+| **Log communication** | button | log sheet | Saves communication | WRITE |
+| **Import** | button | Meetings, Import and review | Imports Granola notes | WRITE |
+| green check, red X | icon buttons, no label | candidate rows | Approve, reject candidate | WRITE, DESTRUCTIVE |
+| `Apply {n}` | button | imported meeting | Applies approved candidates | WRITE |
+| **Done** | button | Open commitments | Marks commitment done | WRITE |
+| drop zone | button | External Documents | Uploads to Google Drive | EXTERNAL, AI |
+| pencil | icon button | aria-label `Correct the date for {name}` | Edit date | WRITE |
+| refresh | icon button | aria-label `Read {name} again` | Re-read with AI | AI |
+| trash | icon button | aria-label `Remove {name}` | Remove to Drive trash | DESTRUCTIVE, EXTERNAL |
+| **Add memory**, **Save memory** | buttons | Memory | Add memory | WRITE |
+| **Approve**, **Dismiss** | buttons | Proposed for review | Approve or dismiss | WRITE, DESTRUCTIVE |
+| star, box, trash | icon buttons | aria-labels "Promote to core", "Archive", "Delete" | Memory status | WRITE, DESTRUCTIVE |
+| **Restore** | button | archived memories | Restore | WRITE |
+| **Save note** | button | Notes, Add a note | Save note | WRITE |
+| pin, pencil, box | icon buttons | aria-labels "Pin note", "Edit note", "Archive note" | Note actions | WRITE, DESTRUCTIVE |
+
+## Waits and signals
+- Each tab shows a skeleton grid (aria-busy "true", aria-label "Loading") or loading text, then content. On error: red alert with **Retry**.
+- External Documents polls every 3 seconds while any row says "Waiting to be read…" or "Scanning…". Reading can take a minute or more per file.
+- Granola import and memory or note actions answer within seconds and confirm with a toast.
+
+## Gotchas
+- **Clear all** in the Documents filter bar resets **Status** and **Type** only; clear the search box yourself.
+- Granola approve and reject buttons have no labels; identify them by position (first = approve, second = reject).
+- Memory row icons are hidden until hover on normal-width screens.
+- The Notes edit button and the edit textarea share the aria-label "Edit note"; after clicking the button, target the textarea.
+- Memory **Delete** and note **Archive** act immediately with no confirmation dialog.
+- Logging a call or note never sends email. Email links on these tabs open the local mail client.
+
+## Related
+- [Client profile and tab map](/clients/client-profile)
+- [Generate page](/documents/generate-page)
+- [Create a document](/documents/create-a-document)
+- [People and HR tabs](/clients/client-tabs-people-hr)
+- [Road Map tabs](/clients/client-tabs-roadmap)
+
+## Source files
+- `packages/web/src/app/(dashboard)/clients/[slug]/components/cases-tab.tsx`
+- `packages/web/src/app/(dashboard)/clients/[slug]/components/documents-tab.tsx`
+- `packages/web/src/app/(dashboard)/clients/[slug]/components/documents-insights.tsx`
+- `packages/web/src/app/(dashboard)/clients/[slug]/components/meetings-tab.tsx`
+- `packages/web/src/app/(dashboard)/clients/[slug]/components/granola-intakes-tab.tsx`
+- `packages/web/src/app/(dashboard)/clients/[slug]/components/external-documents-tab.tsx`
+- `packages/web/src/app/(dashboard)/clients/[slug]/components/memory-tab.tsx`
+- `packages/web/src/app/(dashboard)/clients/[slug]/components/notes-tab.tsx`
+- `packages/web/src/lib/document-routes.ts`

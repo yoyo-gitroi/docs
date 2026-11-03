@@ -1,0 +1,461 @@
+---
+title: "Marketing templates"
+sidebarTitle: "Marketing"
+description: "Look up every seeded Marketing template: flyers, case studies, newsletters, press releases and fashion pieces, with the facts each needs."
+keywords: ["marketing templates", "flyer", "case study", "press release", "newsletter", "pitch deck", "linesheet", "lookbook", "capabilities overview"]
+---
+
+<Info>
+**Reference page** · **Live source of truth:** sidebar **Documents** → **Templates** tab (`/documents/templates`), one template at `/documents/templates/{slug}` · **Roles:** Principal ✓ Operator ✓ can create documents from these templates; only a Principal (or Admin) can fork, edit, lock or deactivate a template · **Baseline:** what the repo seeds; your tenant may differ.
+</Info>
+
+The **Marketing** category holds 21 seeded templates. Most have no required fields: they ship with default copy that the assistant rewrites from the facts you give. Name the subject, the audience and the contact details you want printed.
+
+<Note>
+Every good request names a client because the Document Assistant will not draft until a client is bound, even for internal pieces such as flyers. Example people, amounts and dates are fictional; swap in the user's facts. Facts you leave out become flagged gaps or a follow-up question, never invented values.
+</Note>
+
+## How to read an entry
+
+- **Fields, by form section** uses the labels the template form shows. "(list; each row: …)" is a repeatable list with an add button. Types other than text are shown in brackets, for example (date) or (number); "(choice: …)" lists the dropdown options.
+- **Starts blank** fields have no default and no client value, and their label does not say "optional". The assistant reports each one as a gap, or asks when it is a true blocker such as the person's name.
+- **Blank unless the client profile has it** fields fill themselves from the client record. Put the value in the request only if the client profile lacks it.
+- All other fields start with a default from the template. The assistant only changes a default when it has a source for the new value.
+
+## Templates on this page
+
+- **Service flyers and overviews:** [Capabilities overview](/documents/catalog/marketing#capabilities-overview), [Overview Flyer](/documents/catalog/marketing#overview-flyer), [Solution flyer (single service)](/documents/catalog/marketing#solution-flyer-single-service), [Service comparison (tiered)](/documents/catalog/marketing#service-comparison-tiered), [Marketing flyer](/documents/catalog/marketing#marketing-flyer), [Contractor Solutions Flyer](/documents/catalog/marketing#contractor-solutions-flyer), [HR Tech Bundle Flyer](/documents/catalog/marketing#hr-tech-bundle-flyer), [Integrations Flyer](/documents/catalog/marketing#integrations-flyer), [Officer Payroll Flyer](/documents/catalog/marketing#officer-payroll-flyer), [Timekeeping Flyer](/documents/catalog/marketing#timekeeping-flyer)
+- **Content, PR and pitches:** [CA HR Compliance Update](/documents/catalog/marketing#ca-hr-compliance-update), [Case Study](/documents/catalog/marketing#case-study), [Email Newsletter](/documents/catalog/marketing#email-newsletter), [Press Release](/documents/catalog/marketing#press-release), [Pitch Deck (mini)](/documents/catalog/marketing#pitch-deck-mini), [Editorial pitch](/documents/catalog/marketing#editorial-pitch)
+- **Fashion and DTC:** [Drop announcement](/documents/catalog/marketing#drop-announcement), [DTC product page](/documents/catalog/marketing#dtc-product-page), [Line book (per-door)](/documents/catalog/marketing#line-book-per-door), [Linesheet](/documents/catalog/marketing#linesheet), [Lookbook page](/documents/catalog/marketing#lookbook-page)
+
+## Service flyers and overviews
+
+### Capabilities overview
+
+**Slug:** `capabilities-overview` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none
+
+Single-page capabilities brief — service families, differentiators, process, contact. Brand-tokenized; works for Ariya HR, Arctic Robot, and Aaron Lavee personal advisory.
+
+**Fields, by form section:**
+
+- **Header:** Eyebrow; Title; Lede paragraph
+- **Why Ariya:** Section title; Bullets (one per line)
+- **Service families (4-6)** (list; each row: Title; Body)
+- **Differentiator callout:** Title; Body
+- **Stat strip (4 cells max)** (list; each row: Number / value; Label)
+- **Process:** Section title (blank to hide)
+- **Process steps** (list; each row: #; Title; Body)
+- **Footer:** Industries served (one line); CTA line; CTA button; Contact name; Phone; Email; Domain
+
+**Starts blank (the assistant asks or flags these):** Phone
+
+**Good request:** "Create a Capabilities overview for client ABC Dental: contact Rachel Kim, phone 916-555-0142, rachel@ariyahr.com, domain ariyahr.com; industries served: dental, restaurants, construction."
+
+### Overview Flyer
+
+**Slug:** `overview-flyer` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none
+
+One-page Ariya capabilities overview; the 'first send' before discovery.
+
+**Fields, by form section:**
+
+- **Header:** Eyebrow; Headline (one line per row); Sub-headline
+- **Hero band:** Hero tagline
+- **Service intro:** Section label; Intro paragraph
+- **Service cards (3 max for layout)** (list; each row: Title; Body)
+- **Experience callout:** Big number; Label
+- **Sidebar:** Benefit bullets (one per line); Closing paragraph
+
+**Starts blank:** nothing required. Every field has a default or is labelled optional; replace defaults the user did not ask for.
+
+**Good request:** "Create an Overview Flyer for client ABC Dental with 3 service cards: Payroll, HR OnDemand, Elevated HR."
+
+### Solution flyer (single service)
+
+**Slug:** `solution-flyer` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none
+
+One-page sales flyer for a single Ariya service — hero, 3-up cards, why-it-works callout, optional process strip, contact footer.
+
+**Fields, by form section:**
+
+- **Header:** Eyebrow (small uppercase tag); Title (1 sentence); Intro paragraph
+- **Service cards (3 ideal, 4 max)** (list; each row: Icon (emoji ok); Title; Body)
+- **Why-it-works callout:** Eyebrow; Headline; Body
+- **Process strip (optional):** Section title (blank to hide)
+- **Process steps** (list; each row: #; Title; Body)
+- **CTA + contact:** CTA line; CTA subtext; Contact name; Contact title; Phone; Email; Domain
+
+**Starts blank (the assistant asks or flags these):** Phone
+
+**Good request:** "Create a Solution flyer (single service) for client ABC Dental about Handbook Development: contact Rachel Kim, Principal, phone 916-555-0142, rachel@ariyahr.com, ariyahr.com."
+
+### Service comparison (tiered)
+
+**Slug:** `service-comparison` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none
+
+Tiered services comparison — side-by-side features, pricing matrix with example calcs, add-ons rail.
+
+**Fields, by form section:**
+
+- **Header:** Title; Subtitle; Eyebrow (industries served); Hook line (italic callout)
+- **Stat strip (4 cells max)** (list; each row: Number / value; Label)
+- **Tier A (left column):** Tier name; Price line; Features (one per line)
+- **Tier B (right column):** Tier name; Price line; Features (one per line); Differentiator title (eyebrow); Differentiator body
+- **Add-ons:** Add-on services (one per line, both tiers)
+- **Pricing matrix** (list; each row: Row label; Tier A; Tier B)
+- **Differentiator callout:** Title; Body
+- **Process steps (3-4)** (list; each row: #; Title; Body)
+- **Footer:** Key takeaway; Testimonial; Testimonial attribution; CTA line; Contact name; Phone; Email; Domain
+
+**Starts blank (the assistant asks or flags these):** Phone
+
+**Good request:** "Create a Service comparison (tiered) for client ABC Dental comparing HR OnDemand and Elevated HR: contact Rachel Kim, phone 916-555-0142, rachel@ariyahr.com, ariyahr.com."
+
+### Marketing flyer
+
+**Slug:** `marketing-flyer` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none
+
+One-page service or product flyer with hero, benefits, pricing, and CTA.
+
+**Fields, by form section:**
+
+- **Hero:** Eyebrow; Headline; Subheadline
+- **Benefits (3-5)** (list; each row: Title; Detail)
+- **Pricing tiers (optional)** (list; each row: Tier name; Price; Detail)
+- **CTA:** CTA text; CTA sub
+- **Contact (optional):** Name; Email; Phone; Web
+- **Footer:** Footer note
+
+**Starts blank:** nothing required. Every field has a default or is labelled optional; replace defaults the user did not ask for.
+
+**Good request:** "Create a Marketing flyer for client ABC Dental about HR OnDemand: 3 benefits, one pricing tier at 499 USD a month, CTA 'Book a call', contact Rachel Kim, rachel@ariyahr.com."
+
+### Contractor Solutions Flyer
+
+**Slug:** `contractor-solutions-flyer` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none
+
+Marketing flyer for 1099-contractor / multi-state crew solutions.
+
+**Fields, by form section:**
+
+- **Header:** Eyebrow tag; Headline; Sub-headline; Hero quote bar
+- **Stats (3 ideal)** (list; each row: Value; Label)
+- **Features section:** Section label
+- **Feature cards (4 ideal)** (list; each row: Title; Bullets (one per line))
+- **Workflow section:** Section label
+- **Workflow steps (4 ideal)** (list; each row: #; Title; Body)
+- **Added value callout:** Label; Body
+- **Footer CTA:** CTA line
+
+**Starts blank:** nothing required. Every field has a default or is labelled optional; replace defaults the user did not ask for.
+
+**Good request:** "Create a Contractor Solutions Flyer for client Valley Landscaping about multi-state 1099 crew payroll, CTA 'Book a 15-minute call'."
+
+### HR Tech Bundle Flyer
+
+**Slug:** `hr-tech-bundle-flyer` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none
+
+HR tech admin bundle pitch flyer (timekeeping + onboarding + reporting).
+
+**Fields, by form section:**
+
+- **Headline:** Eyebrow; Headline; Sub-headline
+- **Hero band:** Hero title; Hero body
+- **Pull quote + section:** Pull quote; Section label
+- **Hub (center of wheel):** Kicker; Title; Body
+- **Left column pills (4 max)** (list; each row: Title; Body)
+- **Right column pills (4 max)** (list; each row: Title; Body)
+
+**Starts blank:** nothing required. Every field has a default or is labelled optional; replace defaults the user did not ask for.
+
+**Good request:** "Create an HR Tech Bundle Flyer for client ABC Dental pitching timekeeping, onboarding and reporting in one bundle."
+
+### Integrations Flyer
+
+**Slug:** `integrations-flyer` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none
+
+One-page integrations overview: payroll/HRIS connectivity, supported platforms.
+
+**Fields, by form section:**
+
+- **Hero:** Eyebrow; Headline; Headline accent; Sub-headline
+- **Integration cards (5 for hub-and-spoke layout)** (list; each row: Title; Body; Hub)
+- **Promise strip:** Lead; Emphasis; Tail
+- **Meta line:** Meta · price; Meta · segments; Meta · right
+- **Footer:** CTA label
+
+**Starts blank:** nothing required. Every field has a default or is labelled optional; replace defaults the user did not ask for.
+
+**Good request:** "Create an Integrations Flyer for client ABC Dental with 5 integration cards: QuickBooks, Xero, Gusto, ADP, isolved."
+
+### Officer Payroll Flyer
+
+**Slug:** `officer-payroll-flyer` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none
+
+Officer / executive / S-corp owner payroll specialty flyer.
+
+**Fields, by form section:**
+
+- **Header:** Eyebrow; Headline; Price; Price subtext; Terms line
+- **Body:** Who it serves; "Included" label
+- **Included cards (3 max for layout)** (list; each row: Title; Body)
+- **Footer:** Highlight banner; CTA title; CTA subtext
+
+**Starts blank:** nothing required. Every field has a default or is labelled optional; replace defaults the user did not ask for.
+
+**Good request:** "Create an Officer Payroll Flyer for client ABC Dental for S-corp owners, price 49 USD a month."
+
+### Timekeeping Flyer
+
+**Slug:** `timekeeping-flyer` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none
+
+One-page timekeeping solution flyer; the +\$10/employee/month add-on.
+
+**Fields, by form section:**
+
+- **Headline:** Eyebrow override (defaults to brand name); Headline; Sub-headline
+- **Why it matters:** Section label; Narrative; Callout note
+- **Feature groups (left column)** (list; each row: Title; Bullets (one per line))
+- **Right card:** Highlights label
+- **Feature highlights (3 max for layout)** (list; each row: Title; Body)
+- **Contact card:** Pitch line; Pricing note
+
+**Starts blank (the assistant asks or flags these):** Eyebrow override (defaults to brand name)
+
+**Good request:** "Create a Timekeeping Flyer for client ABC Dental: eyebrow 'Ariya HR', pricing note 'plus 10 USD per employee per month'."
+
+## Content, PR and pitches
+
+### CA HR Compliance Update
+
+**Slug:** `ca-hr-compliance` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none
+
+Annual California HR compliance update; broadcast to all clients.
+
+**Fields, by form section:**
+
+- **Header:** Year; Title; Sub-headline
+- **Intro:** Intro paragraph
+- **Updates section:** Section title
+- **Compliance updates** (list; each row: Title; Body)
+- **Integrated systems section:** Eyebrow; Section title; Section body
+- **Systems bullets** (list; each row: Bullet)
+- **Approach:** Approach title; Approach body
+- **Questions section:** Section title
+- **Questions** (list; each row: Topic; Question)
+
+**Starts blank:** nothing required. Every field has a default or is labelled optional; replace defaults the user did not ask for.
+
+**Good request:** "Create a CA HR Compliance Update for 2027 for client ABC Dental covering the attached list of 2027 California law changes, with questions on paid sick leave and pay transparency."
+
+### Case Study
+
+**Slug:** `case-study` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none
+
+Client success story — context, challenge, approach, results, quote.
+
+- **From the client profile:** company name, industry, employee count
+
+**Fields, by form section:**
+
+- **Header:** Eyebrow; Title
+- **Client:** Client name; Industry; Industry display; Employee count (number); Engagement length
+- **Story:** Challenge; Approach
+- **Key results (4 metrics)** (list; each row: Metric (short); Label)
+- **Detailed results** (list; each row: Result)
+- **Quote:** Pull quote; Attribution
+- **CTA:** CTA title; CTA button; CTA sub
+
+**Starts blank (the assistant asks or flags these):** Industry display
+
+**Blank unless the client profile has it:** Client name; Industry
+
+**Good request:** "Create a Case Study for ABC Dental: industry display 'Dental practices'; challenge, approach, 4 key results and a quote from Dr. Sam Patel from the attached notes."
+
+### Email Newsletter
+
+**Slug:** `email-newsletter` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none
+
+HTML email with header, hero, 2-3 stories, CTA, footer. Brand tokens applied inline for Gmail/Outlook compat.
+
+**Fields, by form section:**
+
+- **Email metadata:** Subject line; Preheader (preview text); Issue label
+- **Hero:** Hero title; Hero sub
+- **Stories** (list; each row: Title; Summary; Link URL; Link text)
+- **CTA:** CTA title; Button; Link URL
+- **Footer:** Footer copy; Reply-to email; Postal address; Include unsubscribe link (choice: Yes / No)
+
+**Starts blank (the assistant asks or flags these):** Footer copy; Postal address
+
+**Good request:** "Create an Email Newsletter for client ABC Dental: 'November HR Brief' with 3 stories from the attached links, footer copy 'You receive this as an Ariya HR client', postal address 100 Main St Sacramento CA 95814."
+
+### Press Release
+
+**Slug:** `press-release` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none
+
+AP-style press release with dateline, headline, subhead, body, boilerplate, contact.
+
+- **From the client profile:** company name
+- **Dated automatically at creation:** Release date
+
+**Fields, by form section:**
+
+- **Header:** Company; Status (choice: For immediate release / Embargoed until); Embargo date (if embargoed) (date)
+- **Dateline:** City; State; Release date (date)
+- **Headline:** Headline (sentence case); Subhead
+- **Body paragraphs** (list; each row: Paragraph (or quote))
+- **Boilerplate (about the company):** Boilerplate
+- **Press contact:** Name; Title; Email; Phone
+
+**Starts blank (the assistant asks or flags these):** Embargo date (if embargoed); Name; Title; Email; Phone
+
+**Blank unless the client profile has it:** Company
+
+**Good request:** "Create a Press Release for ABC Dental: For immediate release, Sacramento, CA, 2026-11-10, headline 'ABC Dental opens a second office in Davis'; press contact Dr. Sam Patel, Owner, press@abcdental.com, 916-555-0100 (embargo date: not applicable)."
+
+### Pitch Deck (mini)
+
+**Slug:** `pitch-deck-mini` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none
+
+6-slide pitch deck — title, problem, solution, traction, ask, contact. PDF export = 6 pages.
+
+- **Dated automatically at creation:** Date
+
+**Fields, by form section:**
+
+- **Cover:** Company; Tagline; Author; Date (date)
+- **Problem:** Problem statement
+- **Solution:** Solution
+- **Traction (4 stats)** (list; each row: Metric (short); Label)
+- **Ask:** Ask type (choice: Investment / Partnership / Hiring / Client / sale); Ask amount; Ask purpose
+- **Contact:** Email; Web
+
+**Starts blank (the assistant asks or flags these):** Company; Email; Web
+
+**Good request:** "Create a Pitch Deck (mini) for Northwind Apparel: company Northwind Apparel, email dana@northwind.com, web northwind.com, ask Investment 3M USD for wholesale expansion; problem, solution and traction from the attached one-pager."
+
+### Editorial pitch
+
+**Slug:** `editorial-pitch` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none
+
+One-page pitch to a publication / editor / stylist for editorial coverage.
+
+- **Dated automatically at creation:** Date
+
+**Fields, by form section:**
+
+- **To:** Publication; Editor name; Editor title; Date (date)
+- **Pitch:** Subject; Angle (use \*word\*)
+- **Why now** (list; each row: Reason)
+- **What we offer** (list; each row: Offer)
+- **Coverage we'd welcome** (list; each row: Item)
+- **Logistics:** Timeline; Contact; Email; Phone; Attachments
+
+**Starts blank (the assistant asks or flags these):** Editor name; Phone
+
+**Good request:** "Create an Editorial pitch from Northwind Apparel to Vogue Business: editor Jane Smith, Fashion Editor; subject: the Winter Capsule; contact Dana Cole, dana@northwind.com, 415-555-0100."
+
+## Fashion and DTC
+
+### Drop announcement
+
+**Slug:** `drop-announcement` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none
+
+Email/social drop announcement: hero, drop time, hero pieces, link.
+
+- **Dated automatically at creation:** Drop date
+
+**Fields, by form section:**
+
+- **Hero:** Eyebrow; Headline (use \*word\*); Sub
+- **Drop:** Drop date (date); Drop time
+- **Hero pieces** (list; each row: Piece; Detail)
+- **CTA:** CTA text; CTA URL; Shop link (footer)
+- **Footer:** Footer note
+
+**Starts blank:** nothing required. Every field has a default or is labelled optional; replace defaults the user did not ask for.
+
+**Good request:** "Create a Drop announcement for Northwind Apparel: Winter Capsule drops 2026-12-05 at 9am PT; hero pieces Alpine Parka and Ridge Knit; CTA 'Shop the drop' to northwind.com/winter."
+
+### DTC product page
+
+**Slug:** `dtc-product-page` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none
+
+Web product page mock for review — hero, copy, spec, sizing, story.
+
+**Fields, by form section:**
+
+- **Product:** SKU; Name; Price (number); Currency (choice: USD / EUR / GBP); Short line (use \*word\*); Long copy
+- **Details** (list; each row: Label; Value)
+- **Sizing & color:** Sizing; Colorways; Stock
+- **Story & ops:** Story; Shipping note; Returns
+
+**Starts blank:** nothing required. Every field has a default or is labelled optional; replace defaults the user did not ask for.
+
+**Good request:** "Create a DTC product page for Northwind Apparel: SKU NW-1001 Alpine Parka, 295 USD, sizes XS-XL, colorways black and olive; copy and details from the attached product sheet."
+
+### Line book (per-door)
+
+**Slug:** `gfs-linebook` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none
+
+Wholesale line book — pieces, size run, wholesale + RRP, plus per-account opening order allocation.
+
+**Fields, by form section:**
+
+- **Header:** Collection; Season; Order window; Wholesale contact; Contact email; Currency (choice: USD / EUR / GBP); Editorial intro
+- **Pieces** (list; each row: SKU; Piece; Sizes; Wholesale; RRP; Material)
+- **Per-account allocation** (list; each row: Account; Doors; Terms)
+- **Terms:** Terms
+
+**Starts blank:** nothing required. Every field has a default or is labelled optional; replace defaults the user did not ask for.
+
+**Good request:** "Create a Line book (per-door) for Northwind Apparel's Winter 2026 collection: order window 2026-11-01 to 2026-12-15, wholesale contact Dana Cole, dana@northwind.com, USD; pieces and account allocations from the attached sheet."
+
+### Linesheet
+
+**Slug:** `linesheet` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none
+
+Wholesale linesheet — pieces, SKUs, wholesale + RRP, sizes, materials.
+
+**Fields, by form section:**
+
+- **Header:** Collection; Season; Order window; Wholesale contact; Contact email; Currency (choice: USD / EUR / GBP)
+- **Pieces** (list; each row: SKU; Piece; Sizes; Wholesale; RRP; Material)
+- **Terms:** Terms
+
+**Starts blank:** nothing required. Every field has a default or is labelled optional; replace defaults the user did not ask for.
+
+**Good request:** "Create a Linesheet for Northwind Apparel's Winter 2026 collection: order window 2026-11-01 to 2026-12-15, wholesale contact Dana Cole, dana@northwind.com, USD; pieces from the attached SKU list."
+
+### Lookbook page
+
+**Slug:** `lookbook-page` · **Kind:** Handlebars · **Scope:** tenant · **Person to name:** none
+
+Editorial lookbook spread with image, look description, and credits.
+
+**Fields, by form section:**
+
+- **Look:** Collection; Look #; Look name; Season tag; Hero image (paste URL or drop a file) (image); Description (use \*word\*)
+- **Pieces in this look** (list; each row: Piece; SKU; Material)
+- **Credits:** Photographer; Stylist; Model; Location
+
+**Starts blank (the assistant asks or flags these):** Hero image (paste URL or drop a file)
+
+**Good request:** "Create a Lookbook page for Northwind Apparel: Winter 2026, look 3 'Alpine', hero image https://example.com/look3.jpg, pieces Alpine Parka and Ridge Knit, photographer Ana Ruiz."
+
+## Related
+
+- [Template catalog overview](/documents/template-catalog)
+- [Choosing a template](/documents/choosing-a-template)
+- [How templates work](/documents/how-templates-work)
+- [Create a document](/documents/create-a-document)
+- [Templates page](/documents/templates)
+
+## Source files
+
+- `packages/core/src/documents/templates/platform/{slug}/meta.json` (seed source for field labels, defaults and client prefill)
+- `packages/core/src/db/migrations/0100_platform_templates_handlebars.sql`
+- `packages/core/src/db/migrations/0120_team_member_fields.sql`
+- `packages/core/src/documents/registry-fill.ts` (which fields count as required)
+- `packages/core/src/documents/engine/from-registry.ts` (client prefill)

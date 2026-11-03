@@ -1,0 +1,196 @@
+---
+title: "Roles and access"
+sidebarTitle: "Roles and access"
+description: "Know what the Principal and Operator accounts can see and change, recognise view-only and blocked pages, and predict what happens on a direct URL."
+keywords: ["role", "profile", "permissions", "principal", "operator", "admin", "member", "access denied", "not available", "view only", "can't see", "missing menu", "internal tenant"]
+---
+
+<Info>
+**URL:** none (applies to every page) · **Reach:** n/a · **Roles:** Principal ✓ Operator ✓ · **Ready when:** n/a.
+</Info>
+
+Ariya calls roles "profiles". There are four: **Principal**, **Admin**, **Operator**, **Member**. The agent runs as either the Principal or the Operator account. This page tells you what each one sees and what happens when a page is out of reach.
+
+## Page map
+- **Where your profile shows:** the label under your name at the bottom of the left sidebar (`Principal`, `Admin`, `Operator`, `Member`); the role badge on `/account` (lowercase raw value such as `principal`); the matrix on `/admin/profiles` (Principal only).
+- **Internal tenant:** tenants `ariya` and `pilot`. A Principal in an internal tenant gets platform powers (Platform Admin, Internal Ops, tenant switching, trusted sources). A Principal in any other (customer) tenant sees the Platform Admin link but its data calls are refused.
+- **The two agent accounts:**
+  - **Principal:** everything, including Intelligence, Playground, Memory, Settings, Platform Admin, Profiles, proxy login and every person's Operations cases.
+  - **Operator:** the service day to day: Command Center, Clients (view-only on most client tabs), Implementation, Operations (own cases), Documents, Sales, Granola, Integrations. No Intelligence, no Settings, no Platform Admin, no Internal Ops, no template editing.
+
+## Recipes
+
+### Find out which profile you are using
+**Risk:** `READ` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** none.
+**Preconditions:** signed in.
+
+1. Look at the bottom of the left sidebar (visual: under the navigation, beside the initials square).
+2. If you see only initials, the sidebar is collapsed: open `/account` instead.
+   - Wait for: h1 **Account** and the identity card.
+3. Read the profile label (`Principal` or `Operator`) or the role badge on `/account` (`principal` or `operator`).
+4. For tenant: read the tenant name pill at the top-right of most page headers, or the tenant name on `/account`.
+
+**Done when:** you know the profile and tenant. If they do not match what the task needs, switch accounts ([Sign in and session](/start/login-and-session#switch-between-the-principal-and-operator-accounts)).
+
+### Check a page is available before you start
+**Risk:** `READ` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** the target page.
+**Preconditions:** you know your profile.
+
+1. Find the page in the [sidebar matrix](#sidebar-by-profile) or [tab bar matrix](#tab-bars-by-profile).
+2. If the cell for your profile is –, do not attempt the task with this account. Report to Clarwiz which account is needed.
+3. If the page is in [Pages with no menu entry](#pages-with-no-menu-entry), open it by URL.
+
+**Done when:** you have confirmed access or reported the mismatch.
+
+### Recognise a view-only page
+**Risk:** `READ` · **Roles:** Operator mostly
+**Inputs from Clarwiz:** none.
+**Preconditions:** a page opened.
+
+1. Look under the page or panel header for a grey strip with an eye icon reading `View only. Your profile can see {Capability label} but not change it.` For example, as Operator on a client tab: `View only. Your profile can see Clients and packets but not change it.`
+2. Inside that area every button and input is disabled. Links still work.
+3. Do not try to work around it. Report that the change needs a Principal (or Admin).
+
+**Done when:** you have identified the view-only area.
+
+Where the Operator meets view-only:
+- Client workspace tabs governed by **Clients and packets**: **Overview**, **Meetings**, **People & Roles**, **Memory**, **Research**, **Notes**, **Employees**, **Payroll & Tax**. (**Cases**, **Documents**, **Compliance**, **Road Map** and **Implementation** stay editable for the Operator; **Roadmap Report** is hidden.)
+- `/clients/new` (notice shown; Operators cannot add clients).
+- Template detail and the template create wizard (**Templates: upload, edit, version, publish**).
+- Member, for reference: view-only across Command Center, client records and more.
+
+### Handle a page your profile cannot use
+**Risk:** `READ` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** none.
+**Preconditions:** you opened a URL directly or followed a link.
+
+1. Wait for the page to finish loading.
+2. Match what you see in the table below.
+3. Stop the task and report the exact text and URL to Clarwiz. Do not retry with other URLs.
+
+**Done when:** reported.
+
+| If you see | Why | Do this |
+|---|---|---|
+| Page title plus a card `{Capability label} is not available on the {Profile} profile.` | The page is gated for your profile (Intelligence, HR Intel, Usage, Playground, Memory, Master Skills, Governance, Implementation, Sales) | Switch to the account with access. |
+| `Only a Principal can open Profiles.` | `/admin/profiles` as non-Principal | Use the Principal account. |
+| Page renders, then panels show `Your profile cannot view {Capability label}. Allowed: {roles}.` or `Your profile cannot change …` | Page has no gate but its data calls do | Use an account listed under Allowed. |
+| `Principal access required` (toast, error card or `Error: …`) | Any `/admin/*` page as non-Principal, or as a Principal in a customer tenant | Use the Principal of the `ariya` or `pilot` tenant. |
+| `Ariya OS internal operations is only available to Ariya internal operators.` or `Ariya OS internal requests are only available to Ariya internal operators.` | `/internal-ops/*` outside an internal-tenant Principal | Use the internal Principal. |
+| `Tenant access denied` | `?tenant_id=` used by someone who cannot switch tenants | Remove the parameter. |
+| Zeros everywhere and empty texts, no error | `/usage` outside tenant `ariya` | Treat as no data, not as a real zero. |
+
+## Sidebar by profile
+
+Internal = Principal in tenant `ariya` or `pilot`. Customer = Principal in any other tenant.
+
+| Sidebar item | Group | Principal internal | Principal customer | Admin | Operator | Member |
+|---|---|---|---|---|---|---|
+| Command Center (`/`) | Workspaces | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Clients (`/clients`) | Workspaces | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Implementation (`/implementation`) | Workspaces | ✓ | ✓ | ✓ | ✓ | – |
+| Operations (`/service-desk`) | Workspaces | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Documents (`/documents`) | Workspaces | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Sales (`/sales`) | Workspaces | ✓ | ✓ | ✓ | ✓ | – |
+| Intelligence (`/intelligence`) | Workspaces | ✓ | ✓ | ✓ | – | – |
+| Internal Ops (`/internal-ops`) | Workspaces | ✓ | – | – | – | – |
+| Settings (`/settings`) | Admin & Setup | ✓ | ✓ | ✓ | – | – |
+| Platform Admin (`/admin`) | Admin & Setup | ✓ | ✓ (data refused) | – | – | – |
+
+The **Admin & Setup** heading is hidden for Operator and Member.
+
+## Tab bars by profile
+
+| Tab bar | Tabs | Principal internal | Principal customer | Admin | Operator | Member |
+|---|---|---|---|---|---|---|
+| Command Center | Your day, Action Queue, Approvals, Compliance | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Command Center | Implementation | ✓ | ✓ | ✓ | ✓ | – |
+| Internal Ops | Today, Requests, People | ✓ | – | – | – | – |
+| Sales (own sidebar, no top bar) | Today, Accounts, Account books, Campaigns, HR Roadmap | ✓ | ✓ | ✓ | ✓ | – |
+| Workspace (clients) | Customers, Contacts, Profile Workspace, HR Road Map | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Documents | Documents, Templates, Brand, Packets | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Operations | Inbox, Deliverables, Settings | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Operations | AI Insights | ✓ | ✓ | ✓ | – | – |
+| Intelligence | Overview, HR Intel, Usage | ✓ | ✓ | ✓ | – | – |
+| Intelligence | Playground, Memory | ✓ | ✓ | – | – | – |
+| Intelligence | Granola | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Intelligence | Trusted Sources | ✓ | ✓ (data refused) | – | – | – |
+| Platform Admin | Overview, Tenants, Master Skills, Governance, Platform Team, Ariya Memory, Style Guide, Platform Memory, Platform Settings | ✓ | ✓ (data refused) | – | – | – |
+| Platform Admin | Profiles | ✓ | ✓ | – | – | – |
+| Settings | General, Team Access, Templates, Brand Assets, Packets, HR Roadmaps, Compliance Defaults, Implementation Catalog, Sub-services, Vendors | ✓ | ✓ | ✓ | – | – |
+| Settings | Integrations | ✓ | ✓ | ✓ | ✓ | ✓ |
+
+Members see the **Approvals** tab although they cannot use Approvals.
+
+## What each profile can do
+
+This is the permission matrix the API enforces. Edit = see and change; View = see only; – = no access.
+
+| Capability (label used in messages) | Principal | Admin | Operator | Member |
+|---|---|---|---|---|
+| Command Center | Edit | Edit | Edit | View |
+| Command Center Approvals: client memory and documents waiting on you | Edit | Edit | Edit | – |
+| Operations: own inbox and cases assigned to me | Edit | Edit | Edit | Edit |
+| Operations: Everyone view of every person's cases | Edit | – | – | – |
+| Documents: create and generate | Edit | Edit | Edit | Edit |
+| Templates: upload, edit, version, publish | Edit | Edit | – | – |
+| Clients and packets | Edit | Edit | View | View |
+| Implementation, HR Assessment, Sales | Edit | Edit | Edit | – |
+| Contacts, employees, compliance and client Road Map | Edit | Edit | Edit | View |
+| Intelligence: overview, HR Intel, usage, AI Insights | Edit | Edit | – | – |
+| Workspace settings | Edit | Edit | – | – |
+| Reply Voice, governance, skills and memory | Edit | – | – | – |
+| Platform Admin, integrations, tenant switching | Edit (internal tenant) | – | – | – |
+| Profiles page and assigning profiles | Edit | – | – | – |
+| Proxy login: use the app as another person in the workspace | Edit | – | – | – |
+
+### Principal versus Operator at a glance
+
+| Area | Principal | Operator |
+|---|---|---|
+| Clients | Create and edit | View-only on most client tabs; cannot add clients |
+| Client Compliance and Road Map tabs | Edit | Edit |
+| Client **Roadmap Report** tab | Edit | Hidden |
+| Templates | Upload, edit, publish | No access (view-only notice) |
+| Operations | Every person's cases (Everyone view) | Own inbox and assigned cases |
+| Intelligence, HR Intel, Usage, AI Insights | Yes | Blocked card |
+| Playground, Memory, Master Skills, Governance | Yes | Blocked card |
+| Granola | Yes | Yes |
+| Settings (all tabs except Integrations) | Yes | Not in menus |
+| Platform Admin, Internal Ops, Data Health, CRM Hygiene, Trusted Sources | Yes (internal tenant) | Data refused |
+| Proxy login, Profiles, tenant switching | Yes | No |
+| Default landing (new account) | `/management` | `/` |
+
+## Pages with no menu entry
+Open these by URL: `/data-health`, `/crm-hygiene`, `/compare`, `/getting-started`, `/platform-feedback`, `/platform-feedback/{id}`, `/admin/integrations`, `/admin/tenants/{id}`, `/admin/skills/new`, `/admin/skills/{id}`, `/internal-ops/people/{id}`, `/internal-ops/requests/new`, `/internal-ops/requests/{id}`, `/management`.
+
+The command palette also lists **Account** (`/account`, everyone) and **Add Client** (`/clients/new`, Principal and Admin).
+
+## Waits and signals
+- Access gates resolve as soon as the session check finishes; a blocked card appears immediately, with no loading.
+- Pages without a web gate render their frame first, then show permission errors when their data calls return (within a few seconds).
+- Profile changes made on `/admin/profiles` apply on the person's next request.
+
+## Gotchas
+- The sidebar hides what you cannot use, but most pages do not block a typed URL. Many admin and data pages render for anyone and only fail when they load data.
+- A Principal in a customer tenant sees **Platform Admin** and **Trusted Sources** in menus, but every call fails with `Principal access required`.
+- `/data-health` is the Admin profile's default landing page, yet its data is Principal-only, so Admins land on an error.
+- Data Health and CRM Hygiene steps on `/getting-started` fail for Operators.
+- During proxy login you have the proxied person's profile, not the Principal's.
+
+## Related
+- [Operating rules](/start/operating-rules#pick-the-account)
+- [Global UI patterns](/start/global-ui)
+- [Sign in and session](/start/login-and-session)
+- [Platform admin](/admin/platform-admin#assign-a-profile-to-a-person)
+
+## Source files
+- `packages/shared/src/roles.ts`
+- `packages/web/src/lib/navigation.ts`
+- `packages/web/src/lib/landing.ts`
+- `packages/web/src/components/access/require-access.tsx`
+- `packages/web/src/components/access/view-only.tsx`
+- `packages/web/src/app/(dashboard)/clients/[slug]/page.tsx`
+- `packages/transport-api/src/middleware/auth.ts`

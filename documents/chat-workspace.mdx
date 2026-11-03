@@ -1,0 +1,224 @@
+---
+title: "Document chat workspace"
+sidebarTitle: "Chat workspace"
+description: "Drive the AI document chat: send a request, wait for the turn, answer questions, add sources and screenshots, manage versions, download and switch chats."
+keywords: ["document chat", "assistant", "draft", "refine document", "blockers", "attach source", "screenshot", "version history", "restore version", "delete chat", "live preview"]
+---
+
+<Info>
+**URL:** `/documents/chat/{sessionId}` · **Reach:** sidebar **Documents** → send a request; or a **Your chats** row; or **Continue your last chat**; or the editor's **Back to chat** / chat icon · **Roles:** Principal ✓ Operator ✓ (Admin and Member too; chats are per user) · **Ready when:** the page title **Document chat** and the **Live preview** header are visible, and the message box is enabled (or a turn is visibly running).
+</Info>
+
+The workspace where the AI assistant drafts and edits one document. Left half is the conversation, right half is the live document. The end-to-end flow, the turn-finished test and the outcome table are on [Create a document](/documents/create-a-document); this page is the full reference.
+
+## Page map
+
+- **Page header:** title **Document chat**, breadcrumbs "Documents › Chat", description "Ask for changes in plain language. The draft on the right updates as the assistant works."
+- **Red error banner** (only on failure): above both panes.
+- **Chat card** (left half), top to bottom:
+  - Header row: icon button "Your chats"; the client chip (`{Client name}` or "No client yet"); **Switch client (new chat)** (or **Choose client** when no client); pill "Case attached — context loads on your first message" when the chat has a case.
+  - Sources strip: **Attach source**; source badges or "No sources attached"; "Web research available" when web research is on.
+  - Transcript. Empty hint: "Describe the document you need — for example “draft an offer letter for Dana starting in March”."
+  - Composer: message box, image thumbnails, **Add image**, hint text, **Send**.
+- **Resize handle** between the panes (role `separator`, aria-label "Resize chat"; wide screens only).
+- **Preview card** (right half): header **Live preview**, `v{n}`, **PDF (editable)**, **PDF (flat)**, **One page (A4)**, **Attach to case** or "Attached to case", **Open in editor**; then an optional error line or version banner; then the document frame (title "Document preview") or a placeholder.
+
+## Recipes
+
+### Send a request or change and wait
+**Risk:** `AI` `WRITE` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** the request or the change, with every fact.
+**Preconditions:** the previous turn is over (see the test below).
+
+1. Click the message box (textarea, placeholder "Ask for a document, or refine the current draft..."; visual: bottom of the left pane).
+2. Type the message. Shift+Enter adds a line; Enter sends.
+3. Press Enter or click **Send** (button, text "Send" with a paper-plane icon; visual: bottom-right of the left pane).
+   - Wait for: the turn to finish. The turn is over when the message box is enabled, the hint next to **Add image** reads "Enter to send, Shift+Enter for a new line" (not "Working..."), and **Send** shows its icon instead of a spinner. Check every 5 s; 30 s to several minutes; 10 min server limit.
+4. Classify the result with the outcome table in [Decide how the turn ended](/documents/create-a-document#decide-how-the-turn-ended).
+
+**Done when:** the turn is over and the outcome is classified.
+
+Full detail, status lines and failure banners: [Wait for the turn to finish](/documents/create-a-document#wait-for-the-turn-to-finish).
+
+### Answer blockers
+**Risk:** `AI` · **Roles:** Principal, Operator
+
+See [Answer the assistant's questions](/documents/create-a-document#answer-questions-from-the-assistant). In short: click a choice or type into each text box (id `blocker-{questionId}`) in the **Blockers** card, then **Send answers** (it becomes **Sent** and a new turn starts). If the card is gone after a reload, or no choice fits, answer in the message box.
+
+### Attach a source file
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+**Preconditions:** the chat has a client (the chip shows a client name, not "No client yet"); no turn is running.
+
+1. Click **Attach source** (label wrapping a hidden multi-file input; visual: left end of the sources strip under the chat header). It opens the OS file picker; set the files on the input.
+   - Allowed: PDF, .docx, .eml, Excel, CSV, text; up to 10MB each. Images picked here are staged on the next message instead.
+   - Wait for: status line `Attached {title}` in the transcript and a new badge in the sources strip (badge title `{n} characters extracted`).
+2. Send a message that tells the assistant what to do with the source.
+
+**Done when:** the badge shows in the sources strip.
+
+| If you see | Why | Do this |
+|---|---|---|
+| `Not attached: {file}. Tell the assistant which client this chat is for before attaching a source` (also in the red banner) | Chat has no client | Tell the assistant the client, wait for the turn, attach again |
+| `Not attached: {file}. File must be between 1 byte and 10MB` | Size limit | Use a smaller file |
+| `Not attached: {file}. {message}` with "Unsupported evidence file type…" or "Could not extract text…" | File type or scan problem | Use a text-based PDF, .docx or plain text |
+| **Attach source** disabled | A turn is running | Wait for the turn to finish |
+
+### Send a screenshot
+**Risk:** `AI` · **Roles:** Principal, Operator
+
+1. Add the image in one of three ways: paste it into the message box (Ctrl+V or Cmd+V), drop it onto the composer area, or click **Add image** (button, title "Attach a screenshot of what you see (or paste one)"; visual: under the message box, left) and pick a PNG, JPEG, WebP or GIF.
+   - Wait for: a thumbnail above the message box (container testid `pending-chat-images`); the placeholder changes to "What should the assistant look at in this screenshot?".
+2. Type what the assistant should look at.
+3. Click **Send** and wait for the turn.
+
+Remove a staged image with its "×" (icon button, aria-label `Remove {name}`). Click a sent thumbnail (title "View full size") to open it full size; click anywhere to close.
+
+| If you see (under the message box) | Why | Do this |
+|---|---|---|
+| "Only PNG, JPEG, WebP or GIF images can be attached" | Wrong type | Convert the image |
+| "That image is larger than 20MB" | Too large | Crop or compress |
+| "At most 4 images per message" | Limit reached (**Add image** is disabled at 4) | Send, then add more in the next message |
+
+<Note>Unverified: in-app help mentions a server message "An attached image is too large (max ~4.5MB)". It is not in the web code.</Note>
+
+### View or restore an older version
+**Risk:** `READ` (viewing), `WRITE` (restoring) · **Roles:** Principal, Operator
+**Preconditions:** a draft exists.
+
+1. Click `v{n}` (button with a history icon, title "Version history"; visual: right after **Live preview** in the preview header).
+   - Wait for: a sheet on the right titled `Version history ({n})`, with day groups ("Today", "Yesterday", or a date) and rows `v{n} {description} {actor} {time}`.
+2. Click the version row.
+   - Wait for: the sheet closes and a banner `Viewing version {n}` (with "· loading…" while it loads) appears above the preview.
+3. Either click **Back to current** (leave without changes) or click `Restore v{n}` to make that version current again.
+   - Wait for: the button reads "Restoring…", then a toast `Restored from v{n} (now v{m})` or "Already at this version".
+
+**Done when:** the banner is gone and `v{n}` shows the new number (after a restore) or the current one (after **Back to current**).
+
+| If you see | Why | Do this |
+|---|---|---|
+| "This version cannot be re-rendered here — use Compare to read it." | Legacy version | Use **Compare any two versions →** in the sheet |
+| `Couldn't load v{n}: {msg}` | Load failed | Retry once |
+| `Restore failed: {msg}` | Server refused | Report it |
+| "No version history yet." | Only one version | Nothing to restore |
+
+The sheet link **Compare any two versions →** opens `/compare?doc={id}` (shown with two or more versions).
+
+### Download the PDF
+**Risk:** `READ` · **Roles:** Principal, Operator
+
+See [Download the PDF](/documents/create-a-document#download-the-pdf).
+
+### Attach the draft to a case
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+
+See [Attach the draft to a case](/documents/create-a-document#attach-the-draft-to-a-case). The button only exists when the chat was started from a case and a draft exists.
+
+### Open the draft in the editor
+**Risk:** `READ` · **Roles:** Principal, Operator
+
+1. Click **Open in editor** (link with an external-link icon; visual: right end of the preview header). It appears once a draft exists.
+   - Wait for: URL `/documents/{id}?session={sessionId}` and the editor toolbar. The editor shows **Back to chat** to return here.
+
+See [Document editor](/documents/document-editor).
+
+### Switch to another chat
+**Risk:** `READ` · **Roles:** Principal, Operator
+
+1. Click the panel icon (icon button, aria-label and title "Your chats"; visual: top-left of the chat card).
+   - Wait for: a sheet from the left titled "Your chats", header "Chats" with **New chat**, then the list ("Loading chats…" while loading).
+2. Click the chat row (button; text is the title and `{client or No client} · {time}`; the current chat has `aria-current`).
+   - Wait for: the URL changes to that chat.
+
+Close the sheet with its "Close" icon or Esc. Alternative: open `/documents?view=chats`.
+
+### Start a new chat or use a different client
+**Risk:** `READ` · **Roles:** Principal, Operator
+
+The client of a chat cannot be changed. To use another client, or to start fresh:
+1. Click **Switch client (new chat)** (text button; visual: next to the client chip at the top of the chat card). When the chat has no client it reads **Choose client**. Or click **New chat** in the "Your chats" sheet.
+   - Wait for: URL `/documents`. No picker opens here; the current chat stays in your history.
+2. Continue with [Create a document from a request](/documents/create-a-document#create-a-document-from-a-request).
+
+### Delete a chat
+**Risk:** `DESTRUCTIVE` · **Roles:** Principal, Operator
+
+1. Open the "Your chats" sheet (see [Switch to another chat](#switch-to-another-chat)).
+2. Hover the chat row to reveal its bin icon (icon button, aria-label "Delete chat"; visual: right end of the row, visible only on hover).
+
+<Warning>**Approval required (DESTRUCTIVE).** Stop here and get approval before clicking the bin. The chat is deleted immediately with no confirmation and no undo.</Warning>
+
+3. Click the bin.
+
+**Done when:** the row is gone. If it was the open chat, the browser goes to `/documents`. Errors show in red under the list.
+
+## Controls reference
+
+| Visible text | Type | Locator | What it does | Risk |
+|---|---|---|---|---|
+| (panel icon) | icon button | aria-label and title "Your chats" | Opens the "Your chats" sheet | `READ` |
+| `{Client name}` / "No client yet" | chip | top of the chat card | Shows the bound client | none |
+| **Switch client (new chat)** / **Choose client** | text button | next to the chip | Goes to `/documents` | `READ` |
+| "Case attached — context loads on your first message" | pill | header row | Chat has a case | none |
+| **Attach source** | label with hidden file input | disabled while a turn runs | Uploads files as client sources (needs a client); images are staged instead | `WRITE` |
+| (source badge) | badge | title `{n} characters extracted` | Shows an attached source | none |
+| (message box) | textarea | placeholder "Ask for a document, or refine the current draft..." (with images: "What should the assistant look at in this screenshot?") | Enter sends, Shift+Enter new line; paste or drop images | none |
+| **Add image** | button | title "Attach a screenshot of what you see (or paste one)"; disabled at 4 images or while busy | Stages a screenshot | `READ` |
+| (image "×") | icon button | aria-label `Remove {name}` | Unstages an image | `READ` |
+| **Send** | button | disabled while busy or empty; spinner while busy | Runs a turn | `AI` `WRITE` |
+| (choice buttons) | buttons | inside the **Blockers** card | Selects an answer | `READ` |
+| **Send answers** / **Sent** | button | inside the **Blockers** card | Sends the answers as the next turn | `AI` |
+| `v{n}` | button (plain badge before a draft exists) | title "Version history" | Opens `Version history ({n})` | `READ` |
+| **PDF (editable)** | button | title "Empty fields stay fillable in the downloaded PDF"; "Preparing…" while running | Downloads a fillable PDF | `READ` |
+| **PDF (flat)** | button | title "Nothing stays editable in the downloaded PDF" | Downloads a flat PDF | `READ` |
+| **One page (A4)** | button | title "The whole document scaled onto a single A4 page" | Downloads a one-page PDF | `READ` |
+| **Attach to case** / "Attaching…" | button | only with a case and a draft | Links the draft to the case, opens `/service-desk?case={caseId}&stage={documentId}` | `WRITE` |
+| "Attached to case" | link | replaces the button after attaching | Returns to the staged case reply | `READ` |
+| **Open in editor** | link | preview header | Opens `/documents/{id}?session={sessionId}` | `READ` |
+| **Back to current** / `Restore v{n}` | buttons | version banner | Leaves the old version / restores it as a new version | `READ` / `WRITE` |
+| **New chat** | button | "Your chats" sheet header | Goes to `/documents` | `READ` |
+| Chat row | button | "Your chats" sheet; `aria-current` on the open chat | Opens that chat | `READ` |
+| (bin on chat row) | icon button, hover-only | aria-label "Delete chat" | Deletes the chat at once | `DESTRUCTIVE` |
+| (sent image thumbnail) | button | title "View full size" | Opens a full-size view (role `dialog`) | `READ` |
+| (resize handle) | separator | aria-label "Resize chat" | Resizes the panes | `READ` |
+
+## Waits and signals
+
+- **Turn running:** message box and **Send** disabled, spinner on **Send**, hint "Working...", grey italic status lines ("Thinking...", "Processing...", `Running {n} tools...`, `Working on {Client name}`, `Attached {file title}`), wrench rows per tool call, a streaming assistant bubble.
+- **New draft being written:** preview shows "Drafting your document…" and "It appears here with your details filled in once the assistant finishes." until the turn ends.
+- **Edits to an existing draft:** shown live; `v{n}` increases.
+- **Reopened mid-turn:** "Still working on this. The chat updates when the assistant finishes."; the page re-checks every 3 s for up to 11 minutes, then shows "Still no result from the assistant. Reload this chat to check on it."
+- **Turn over:** message box enabled, hint "Enter to send, Shift+Enter for a new line", no spinner.
+- **No draft yet:** "No document yet" and "The draft appears here as soon as the assistant generates it."
+- **PDF:** "Preparing…" on all three buttons and a loading toast, 5 to 10 s.
+
+## Gotchas
+
+- The message box is locked for the whole turn.
+- A new document's draft is hidden until the turn ends; this is not a failure.
+- Blockers cards are not restored after a reload or when you reopen the chat.
+- The client cannot be changed inside a chat.
+- **Delete chat** has no confirmation and is only visible on hover.
+- Reloading right after sending from the landing loses the opening request.
+- A second tab sending to the same chat gives "Your last message was not sent because the assistant was still busy. Send it again."
+- The assistant approves its own tool calls and may update the client profile while drafting.
+- Opening another user's chat gives "Session not found".
+- When the assistant is turned off for the workspace, this URL shows a 404 page.
+- There is no Google Docs button (it is not rendered).
+
+## Related
+
+- [Create a document](/documents/create-a-document)
+- [Documents home](/documents/documents-home)
+- [Document editor](/documents/document-editor)
+
+## Source files
+
+- `packages/web/src/app/(dashboard)/documents/chat/[sessionId]/page.tsx`
+- `packages/web/src/components/documents/chat/chat-panel.tsx`
+- `packages/web/src/components/documents/chat/blocker-card.tsx`
+- `packages/web/src/components/documents/chat/preview-pane.tsx`
+- `packages/web/src/components/documents/chat/sources-tray.tsx`
+- `packages/web/src/components/documents/chat/chat-rail.tsx`
+- `packages/web/src/components/documents/chat/client-chip.tsx`
+- `packages/web/src/components/documents/chat/use-doc-chat.ts`
+- `packages/web/src/components/documents/doc-history-sheet.tsx`

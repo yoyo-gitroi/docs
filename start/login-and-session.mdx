@@ -1,0 +1,367 @@
+---
+title: "Sign in and session"
+sidebarTitle: "Sign in and session"
+description: "Sign in, recognise every sign-in, reset and invitation state, land on the right page, recover from an expired session, exit proxy login and sign out."
+keywords: ["log in", "sign in", "login", "sign out", "log out", "forgot password", "reset password", "accept invite", "invitation link", "session expired", "logged out", "proxy login", "exit proxy", "getting started", "landing page", "partner handoff"]
+---
+
+<Info>
+**URL:** `/login` (also `/reset-password?token={token}`, `/accept-invite?token={token}`, `/handoff?token={token}`, `/getting-started`) · **Reach:** any dashboard URL while signed out redirects to `/login` · **Roles:** Principal ✓ Operator ✓ (everyone) · **Ready when:** heading **Ariya** with sub-heading `HR Operations Platform` is visible and the **Email** field has focus.
+</Info>
+
+These pages sit outside the main app frame: no sidebar, no pilot banner. Use them to start a session, recognise reset and invitation links, and handle everything that ends a session.
+
+<Warning>
+**Credentials.** Clarwiz supplies the email and password at runtime. Type them only into the **Email** and **Password** fields on `/login`. Never type, paste or save a credential anywhere else in Ariya (notes, memory, feedback, workflow notes, chat, documents). Password changes, password resets, invitation passwords, MFA and Google sign-in are human steps: stop and hand off.
+</Warning>
+
+## Page map
+
+### Sign-in card on /login
+- Centered card, top to bottom: logo, heading **Ariya**, sub-heading `HR Operations Platform`.
+- Optional Google block: a Google-rendered button (text "Continue with Google", inside an iframe), then divider text `or continue with email`. Shown only when Google sign-in is enabled for the environment.
+- Red error box (only after a failure), directly above the fields.
+- **Email**, **Password**, **Sign in** button, **Forgot password?** link-button.
+- Footer `Ariya HR`.
+- After **Forgot password?** the same card switches to the reset view: heading `Reset password`, sub `Enter your email to receive a reset link.`, **Email**, **Send Reset Link**.
+
+### Reset password on /reset-password
+One card whose heading tells you the state. See [Reset link states](#reset-link-states).
+
+### Accept invitation on /accept-invite
+One card whose heading tells you the state. See [Invitation link states](#invitation-link-states).
+
+### Partner handoff on /handoff
+External partner links only. Shows `Loading…`, then `Opening your document…`, then redirects to one document. Not for staff accounts.
+
+### Getting started on /getting-started
+Inside the app frame (sidebar visible). h1 **Getting started**, card `First-login readiness checklist`, counter `{done} of {total} complete` (Operator and Member see ` (staff view)` appended). Five step cards, each with badge `Step {n}`, a title and a button that opens a page.
+
+### Session frame on every dashboard page
+- While the app checks your session: full-screen spinner with text `Loading...`.
+- Bottom of the left sidebar: initials square (title `Account`), your name, your profile label (`Principal`, `Admin`, `Operator` or `Member`) and a log-out icon button (title `Sign out`).
+- During proxy login only: a violet strip at the top of the main column, labelled `PROXY LOGIN`.
+
+## Recipes
+
+### Check whether you are signed in
+**Risk:** `READ` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** the target URL.
+**Preconditions:** none.
+
+1. Open the target URL (for example `/clients`).
+   - Wait for: the full-screen `Loading...` spinner to disappear.
+2. Read where you ended up.
+   - Still on the target URL with the left sidebar visible: you are signed in.
+   - Redirected to `/login`: you are signed out. Go to [Sign in with email and password](#sign-in-with-email-and-password).
+3. Confirm which account you are: read the name and profile label at the bottom of the left sidebar (expand the sidebar first if you only see initials). The label reads `Principal` or `Operator`.
+
+**Done when:** you know whether a session exists and which profile it belongs to.
+
+<Note>Opening `/login` while signed in does not redirect you away. The form appears even if a session exists, so `/login` is not a signed-in check.</Note>
+
+### Sign in with email and password
+**Risk:** `WRITE` (starts a session) · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** account email and password, supplied at runtime for this run only. Which account (Principal or Operator) the task needs.
+**Preconditions:** Clarwiz has supplied credentials. If it has not, use [Hand off sign-in to a human](#hand-off-sign-in-to-a-human).
+
+1. Open `/login`.
+   - Wait for: heading **Ariya** and sub-heading `HR Operations Platform`.
+2. Click **Email** (input type email, id "email", placeholder "you@company.com"; visual: first field in the centered card).
+3. Type the email Clarwiz supplied.
+4. Click **Password** (input type password, id "password", placeholder "Enter your password"; visual: second field, under Email).
+5. Type the password Clarwiz supplied. Do not echo it anywhere else.
+6. Click **Sign in** (submit button; visual: full-width button under Password). Enter also submits.
+   - Wait for: the button text changes to `Signing in...` and the button disables, then the page navigates away from `/login`.
+7. Ignore wherever you landed. Open the target URL for the task directly (see [Go to the right page after sign-in](#go-to-the-right-page-after-sign-in)).
+8. Confirm the profile label at the bottom of the left sidebar matches the account the task needs (`Principal` or `Operator`).
+
+**Done when:** the URL is no longer `/login`, the left sidebar shows **Ariya HR**, and the profile label at the bottom matches the expected account.
+
+| If you see | Why | Do this |
+|---|---|---|
+| "Invalid email or password" | Wrong credentials, inactive account, or account without a password | Do not retry more than once. Report to Clarwiz. |
+| "Valid email is required" or "Password is required" | A field was empty or malformed | Re-type the field and submit again. |
+| "Too many requests. Try again in a moment." or `Too many requests. Try again in {n} seconds.` | Lockout after repeated failures (the server lock is about 15 minutes) | Stop. Do not retry. Report the lockout to Clarwiz. |
+| "Platform admins must sign in with Google SSO." | Password sign-in is disabled for platform Principals in this environment | Hand off to a human for Google sign-in. |
+| "This tenant requires Google SSO sign-in." | Tenant policy | Hand off to a human for Google sign-in. |
+| "This tenant requires MFA. Use Google SSO or another MFA-capable sign-in method." | Tenant requires MFA; the web app has no MFA code screen | Hand off to a human. |
+| "Login failed" | Unclassified failure | Reload `/login` once and retry; if it repeats, report. |
+
+<Warning>If a Google window, account chooser, consent screen, MFA prompt or any second password prompt appears at any point, **stop and hand off to a human**. Do not type into it.</Warning>
+
+### Hand off sign-in to a human
+**Risk:** `EXTERNAL` (Google OAuth) · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** none.
+**Preconditions:** no runtime credentials, or the sign-in needs Google SSO or MFA.
+
+1. Open `/login` and wait for heading **Ariya**.
+2. Note whether the Google block is present (a Google "Continue with Google" button followed by `or continue with email`).
+
+<Warning>**Approval required (EXTERNAL).** Stop here. Google sign-in opens a Google popup (OAuth). Ask a human to complete sign-in in this browser; do not click the Google button yourself.</Warning>
+
+3. Wait until the human reports sign-in is complete.
+4. Open the target URL and run [Check whether you are signed in](#check-whether-you-are-signed-in).
+
+**Done when:** the target page loads with the sidebar and the expected profile label.
+
+| If you see | Why | Do this |
+|---|---|---|
+| "Google sign-in could not be loaded." | Google script blocked or failed | Report to Clarwiz; a human may need another network or browser. |
+| "Google sign-in did not return a credential." / "Google sign-in could not be verified" / "Google sign-in failed" | Google flow failed | Report to the human; they retry. |
+| "Google account email is not verified" | Google account issue | Report; human action. |
+| "No active Ariya account is linked to that Google email." | Wrong Google account or no Ariya user | Report; a Principal must invite or reactivate the user. |
+| "Google sign-in is not configured" | Environment has no Google client | Use email and password instead. |
+
+### Request a password reset link
+**Risk:** `EXTERNAL` (sends an email) · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** the account email.
+**Preconditions:** a human asked for a reset. The rest of the reset is a human step.
+
+1. Open `/login`.
+2. Click **Forgot password?** (button; visual: under the Sign in button).
+   - Wait for: heading `Reset password` and sub `Enter your email to receive a reset link.`
+3. Click **Email** (input, id "forgot-email", placeholder "you@company.com") and type the email.
+
+<Warning>**Approval required (EXTERNAL).** Stop here and get approval before clicking **Send Reset Link**. It sends an email to the account owner.</Warning>
+
+4. Click **Send Reset Link** (button). It has no loading state; wait about 3 seconds.
+
+**Done when:** the text `If an account exists for that email, a reset link has been sent.` and a **Back to sign in** button appear. The same text appears whether or not the account exists.
+
+| If you see | Why | Do this |
+|---|---|---|
+| "Email is required" | Field empty | Type the email and retry. |
+| "Request failed" or another red message | Server error | Report the exact text. |
+
+### Recognise a reset or invitation link
+**Risk:** `READ` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** the full link from the email.
+**Preconditions:** none. Setting the password itself is a human step.
+
+1. Open the link exactly as given (`/reset-password?token={token}` or `/accept-invite?token={token}`).
+   - Wait for: the heading `Checking reset link` or `Checking invitation` to be replaced by another heading.
+2. Read the card heading and match it in [Reset link states](#reset-link-states) or [Invitation link states](#invitation-link-states).
+
+<Warning>**Hand off.** If the heading is `Choose a new password` or `Accept your invitation`, stop. The next step sets a password; a human must complete it.</Warning>
+
+3. Report the state to Clarwiz. After a human completes the form, the page shows `Password updated` or `Welcome to Ariya` and redirects to `/login` after about 2 seconds. The invited user is not signed in automatically.
+
+**Done when:** you have reported the state, or the human has finished and the page is on `/login`.
+
+#### Reset link states
+
+| Heading | Body text | Meaning |
+|---|---|---|
+| `Invalid reset link` | `This link is missing a reset token. Request a new one from the sign-in page.` | No token in the URL |
+| `Checking reset link` | `Validating your password reset link...` | Still loading |
+| `Reset link already used` | `This reset link has already been used. Sign in with your current password or request a new reset.` | Used |
+| `Reset link expired` | `Request a new reset link from the sign-in page.` | Expired (reset links last 1 hour) |
+| `Invalid reset link` | `This reset link is no longer valid. Request a new one from the sign-in page.` | Bad token |
+| `Choose a new password` | `Resetting password for {email}` (or `Use at least 12 characters.`) | Valid: human fills **New password**, **Confirm password**, clicks **Update password** |
+| `Password updated` | `Redirecting you to sign in...` | Done; redirects to `/login` after 2 s |
+
+Form errors the human may see: `Password must be at least 12 characters.`, `Passwords do not match`, `Invalid or expired reset token`, `Password must be 128 characters or fewer.`, `Failed to reset password`.
+
+#### Invitation link states
+
+| Heading | Body text | Meaning |
+|---|---|---|
+| `Invalid invitation` | `This link is missing an invitation token. Please use the link from your email.` | No token |
+| `Checking invitation` | `Validating your invite link...` | Still loading |
+| `Invitation already accepted` | `This invitation has already been used. Sign in with the account password that was set.` | Used |
+| `Invitation expired` | `Ask an Ariya admin to resend your invitation from Team settings.` | Expired (invitations last 7 days) |
+| `Invalid invitation` | `This invitation link is no longer valid. Use the latest invite email or ask for a new one.` | Bad token |
+| `Accept your invitation` | `{email} invited to {tenant name}` | Valid: human fills **Full name**, **Password**, **Confirm password**, clicks **Create account** |
+| `Welcome to Ariya` | `Your account is ready. Redirecting you to sign in...` | Done; redirects to `/login` after 2 s |
+
+Every non-form state has a **Go to sign in** link. Form errors: `Password must be at least 12 characters.`, `Passwords do not match`, `Invalid or expired invitation`, `User already exists for this email`, `Token, name, and password are required`, `Failed to accept invitation`.
+
+### Recognise a partner handoff link
+**Risk:** `READ` · **Roles:** none (external partners only)
+**Inputs from Clarwiz:** a `/handoff?token={token}` link.
+**Preconditions:** none.
+
+1. Do not open a `/handoff` link in the agent's browser unless Clarwiz explicitly asks. It replaces the tab's session with a partner session locked to one document.
+2. If you opened one, read the state: `Loading…`, then `Opening your document…`, then a redirect to `/documents/{id}` with no sidebar.
+3. Errors appear in a red card titled `Link unavailable`: `Invalid or missing handoff link.`, `This link has expired or has already been used. Please request a new link from your account manager.`, `Could not connect to the server. Please try again or contact support.`
+4. To leave a partner session, close that tab. Any other URL in that tab redirects back to the document.
+
+**Done when:** you have reported the state to Clarwiz.
+
+### Go to the right page after sign-in
+**Risk:** `READ` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** the target URL.
+**Preconditions:** signed in.
+
+1. After **Sign in**, let the first navigation finish (wait for `Loading...` to disappear).
+2. Open the target URL directly. Do not work from wherever you landed.
+
+**Done when:** the target page's ready signal is visible.
+
+Where sign-in sends you, in priority order:
+
+| Priority | Landing | When |
+|---|---|---|
+| 1 | The **Default landing page** chosen on `/account` | Only if it is something other than **Command Center** (`/`) |
+| 2 | The last page you visited (path and query) | If one is saved (not `/login`, `/handoff` or a callback URL; at most 512 characters) |
+| 3 | `/` (Command Center) | If the saved preference is `/` |
+| 4 | Role default: Principal `/management`, Admin `/data-health`, Operator and Member `/` | Brand-new accounts with nothing saved |
+
+In practice a Principal usually returns to the last page they used, and an Operator to the last page or `/`. A saved last page can include `?help={guideId}`, which reopens the help panel on landing; close it with Escape.
+
+### Recover from an expired session
+**Risk:** `READ` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** the URL you were working on.
+**Preconditions:** a page shows an authentication error or you were sent to `/login`.
+
+1. Recognise the signal: a toast or red box reading "Invalid or expired token" or "Authentication required", or several panels failing at once.
+2. Reload the page.
+   - Wait for: `Loading...`, then either the page (session still valid) or a redirect to `/login`.
+3. If you are on `/login`, run [Sign in with email and password](#sign-in-with-email-and-password) or hand off.
+4. Open the URL you were working on. No return address is kept.
+5. Re-check any form you were filling in. Unsaved input is lost.
+
+**Done when:** the target page loads and its data panels populate without auth errors.
+
+### Sign out
+**Risk:** `WRITE` (ends the session) · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** none.
+**Preconditions:** signed in. Only sign out when the task says so or you must switch accounts.
+
+1. Look at the bottom of the left sidebar. If you see only an initials square, the sidebar is collapsed or the window is narrow: open `/account` instead and go to step 3.
+2. Click **Sign out** (icon button, log-out arrow, title "Sign out"; visual: right of your name at the bottom-left of the sidebar). Go to the Done check.
+3. On `/account`, click **Sign out** (button; visual: in the `Sessions` card, next to **Revoke other sessions**).
+
+**Done when:** the URL is `/login` and heading **Ariya** is visible.
+
+### Switch between the Principal and Operator accounts
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** which account the next task needs; runtime credentials for it.
+**Preconditions:** none.
+
+1. Read the profile label at the bottom of the left sidebar. If it already matches, stop.
+2. Run [Sign out](#sign-out).
+3. Run [Sign in with email and password](#sign-in-with-email-and-password) with the other account.
+4. Open the target URL.
+
+**Done when:** the sidebar profile label shows the account the task needs.
+
+<Tip>The session is a browser cookie, so one browser profile holds one account at a time. If Clarwiz can run two browser profiles, keep the Principal and the Operator in separate profiles instead of switching.</Tip>
+
+### Recognise and exit a proxy login
+**Risk:** `WRITE` · **Roles:** Principal only (Operators never see proxy login)
+**Inputs from Clarwiz:** whether the task should run as the proxied person.
+**Preconditions:** a violet `PROXY LOGIN` strip is visible at the top of the page.
+
+1. Read the strip (role "status", aria-label "Proxy login"): `Viewing as {name} ({Profile}) · {email}` and `Proxied by {principal name} · {n} min left`. Everything you do is recorded as proxied by the Principal.
+2. If the task does not require acting as that person, click **Exit proxy** (button; visual: right end of the violet strip).
+   - Wait for: the label `Exiting…`, then a full page reload.
+
+**Done when:** the page reloads on `/settings/team` without the violet strip and the sidebar shows the Principal's own name. If the Principal session could not be restored you land on `/login`; sign in again.
+
+| If you see | Why | Do this |
+|---|---|---|
+| "Could not exit proxy login" or another toast | Exit call failed | Reload the page; if the strip remains, report. |
+| `Not available during proxy login: {action}.` | You tried something proxy login forbids (Gmail send, password, sessions, sign-in, MFA, Granola, saved layout, Profiles, another proxy) | Exit proxy, then retry as the Principal if the task allows. |
+
+Proxy login lasts at most 1 hour and exits on its own. During proxy login the last page and layout are not saved. Starting a proxy login is described in [Platform admin](/admin/platform-admin#start-a-proxy-login).
+
+### Use the getting started checklist
+**Risk:** `READ` (progress is saved in this browser only) · **Roles:** Principal, Operator (step 5 only for Principal and Admin)
+**Inputs from Clarwiz:** none.
+**Preconditions:** signed in.
+
+1. Open `/getting-started` (no nav link leads here).
+   - Wait for: h1 **Getting started** and the counter `{done} of {total} complete`.
+2. On a step card, click its button to open the page:
+
+| Step | Title | Button | Opens |
+|---|---|---|---|
+| 1 | `Review Data Health` | **Open Data Health** | `/data-health` |
+| 2 | `Open CRM Hygiene` | **Open CRM Hygiene** | `/crm-hygiene` |
+| 3 | `Open a client workbench` | **Open Clients** | `/clients` |
+| 4 | `Identify one staff work queue item` | **Open Work Queue** | `/work-queue` |
+| 5 | `Open Management Cockpit` (badge `admin only`) | **Open Management** | `/management` |
+
+3. To tick a step, click the circle icon button on its card (aria-label "Mark step complete"; visual: left edge of the card). It becomes "Mark step incomplete".
+4. To clear all ticks, click **Reset checklist** (shown once at least one step is done).
+
+**Done when:** the counter reflects the ticks. When all are done the intro card shows `All clear — you've walked the operating model.`
+
+<Note>Steps 1 and 2 open pages whose data is Principal-only. As an Operator they show load errors. Ticks are stored in this browser (`ariya-readiness-checklist-v1`) and are not shared with other browsers or accounts.</Note>
+
+## Controls reference
+
+### Controls on the sign-in card
+
+| Visible text | Type | Locator | What it does | Risk |
+|---|---|---|---|---|
+| "Continue with Google" | Google iframe button | inside `div[data-google-sign-in-target="true"]` | Google sign-in popup | EXTERNAL (hand off) |
+| **Email** | input type email | id "email", placeholder "you@company.com" | Account email | — |
+| **Password** | input type password | id "password", placeholder "Enter your password" | Account password | — |
+| **Sign in** (`Signing in...`) | submit button | under Password | Starts a session | WRITE |
+| **Forgot password?** | button | under Sign in | Switches to reset view | READ |
+| **Email** (reset view) | input | id "forgot-email", placeholder "you@company.com" | Reset email | — |
+| **Send Reset Link** | button | reset view | Sends reset email | EXTERNAL |
+| **Back to sign in** | button | after reset request | Returns to sign-in view | READ |
+
+### Controls on reset and invitation pages
+
+| Visible text | Type | Locator | What it does | Risk |
+|---|---|---|---|---|
+| **New password** | input type password | id "password", placeholder "At least 12 characters" | Human only | WRITE |
+| **Confirm password** | input type password | id "confirm" | Human only | WRITE |
+| **Update password** (`Updating...`) | submit | reset card | Sets the password | WRITE (human) |
+| **Full name** | input | id "name", placeholder "Jane Doe" | Invite form | — |
+| **Password** | input type password | id "password", placeholder "At least 12 characters" | Invite form | — |
+| **Create account** (`Creating account...`) | submit | invite card | Creates the user | WRITE (human) |
+| **Go to sign in** | link | non-form states | Opens `/login` | READ |
+
+### Controls in the session frame
+
+| Visible text | Type | Locator | What it does | Risk |
+|---|---|---|---|---|
+| `{initials}` | link | title "Account"; bottom-left square | Opens `/account` | READ |
+| `{user name}` and profile label | link | bottom of sidebar, expanded only | Opens `/account` | READ |
+| (log-out icon) | icon button | title "Sign out"; expanded sidebar only | Ends session, opens `/login` | WRITE |
+| **Exit proxy** (`Exiting…`) | button | right end of violet `PROXY LOGIN` strip | Ends proxy login | WRITE |
+| **Mark step complete** / **Mark step incomplete** | icon button | aria-label; `/getting-started` cards | Ticks a step (browser only) | READ |
+| **Reset checklist** | button | `/getting-started` footer | Clears ticks | READ |
+
+## Waits and signals
+- Session check on every full page load: full-screen spinner `Loading...`, usually under 2 seconds. If it ends on `/login`, you are signed out.
+- **Sign in** shows `Signing in...` until the server answers; then the browser navigates.
+- **Send Reset Link** has no busy state; the confirmation text replaces the form.
+- Reset and invitation pages show `Checking reset link` / `Checking invitation` first; after success they redirect to `/login` after 2 seconds.
+- A sign-in session lasts 24 hours from sign-in. The app checks the session only on a full page load, so an expired session first shows up as failing panels or toasts; reload to be sent to `/login`.
+- A password change signs out every other session of that account (see [Account](/admin/account-and-feedback#change-your-password)).
+
+## Gotchas
+- No return URL is kept. After any redirect to `/login`, re-open the target URL yourself.
+- `/login` does not redirect when you are already signed in; signing in again replaces the current session.
+- The web app has no MFA code screen. MFA-required tenants must use Google SSO, which is a human step.
+- The 429 lockout message is generic (`Too many requests…`); the server lock lasts about 15 minutes. Never loop on sign-in.
+- A collapsed or narrow sidebar hides the **Sign out** button and your name; use `/account` → **Sign out**.
+- On the first dashboard visit in a fresh browser the help panel `How Ariya fits together` opens by itself. Press Escape before working.
+- Reset links expire 1 hour after the request; invitations expire 7 days after they are sent (a resend gives 7 more days).
+
+## Related
+- [Operating rules](/start/operating-rules)
+- [Global UI patterns](/start/global-ui)
+- [Roles and access](/start/roles-and-access)
+- [Account and feedback](/admin/account-and-feedback)
+- [Platform admin](/admin/platform-admin)
+
+## Source files
+- `packages/web/src/app/login/page.tsx`
+- `packages/web/src/app/reset-password/page.tsx`
+- `packages/web/src/app/accept-invite/page.tsx`
+- `packages/web/src/app/handoff/page.tsx`
+- `packages/web/src/app/(dashboard)/getting-started/page.tsx`
+- `packages/web/src/app/(dashboard)/layout.tsx`
+- `packages/web/src/components/auth-provider.tsx`
+- `packages/web/src/components/layout/proxy-banner.tsx`
+- `packages/web/src/lib/landing.ts`
+- `packages/transport-api/src/routes/auth.ts`
+- `packages/transport-api/src/middleware/auth.ts`

@@ -1,0 +1,276 @@
+---
+title: "Client profile and tab map"
+sidebarTitle: "Client profile"
+description: "Open a client on the right tab, use the header actions, edit company details, service ecosystem, jurisdictions and document branding, and delete a client."
+keywords: ["client profile", "client page", "client overview", "open client", "client tabs", "profile and setup", "company details", "service ecosystem", "jurisdiction", "document branding", "client logo", "client colors", "delete client", "remove client", "generate document for client", "create service item", "open in HubSpot", "needs you"]
+---
+
+<Info>
+**URL:** `/clients/{slug}?tab={tab}` · **Reach:** click a client anywhere, or [Clients portfolio](/clients/clients-list) · **Roles:** Principal ✓ Operator ✓ (view-only on most tabs; no **Delete client**, no **Roadmap progress report**) · **Ready when:** H1 is the client name, breadcrumbs read `Clients › {name}`, and the tab bar (aria-label "Client sections") is visible.
+</Info>
+
+The client workspace. A sticky header with actions, a facts card, and fifteen tabs. This page covers the header, the **Overview** tab including **Profile & setup**, and deleting a client. The other tabs have their own pages; see the [tab map](#tab-map).
+
+## Always pass the tab parameter
+Opening `/clients/{slug}` with no `tab` parameter redirects to the tab this user last used on any client (saved per user on the server). To land on a known tab, always open `/clients/{slug}?tab={tab}`; use `?tab=overview` for Overview. Switching tabs replaces the URL, so the browser Back button does not step back through tabs.
+
+## Tab map
+Tab labels are exact. The tab bar scrolls sideways on narrow screens; opening the URL is more reliable than clicking.
+
+| Tab label | `?tab=` | What it holds | Operator | Covered on |
+|---|---|---|---|---|
+| **Overview** | `overview` | Needs you on this client, client in brief, stat tiles, recent memory and meetings; collapsible **Profile & setup** (company details, service ecosystem, jurisdictions, document branding, dossier) | View only | [This page](#overview-tab) |
+| **Cases** | `cases` | Linked service cases, grouped by service, with stats | Full (read-only tab) | [Cases tab](/clients/client-tabs-work#cases-tab) |
+| **Meetings** | `meetings` | Granola meetings, commitments, logged calls and notes | View only | [Meetings tab](/clients/client-tabs-work#meetings-tab) |
+| **People & Roles** | `people` | Client contacts, role coverage, contact change requests | View only | [People and Roles tab](/clients/client-tabs-people-hr#people-and-roles-tab) |
+| **Documents** | `documents` | Ariya documents made for this client; start a new one | Full | [Documents tab](/clients/client-tabs-work#documents-tab) |
+| **External Documents** | `external-documents` | Files kept in the client's Google Drive folder, read into memory | Controls enabled, API returns 403 | [External Documents tab](/clients/client-tabs-work#external-documents-tab) |
+| **Memory** | `memory` | What Ariya knows about the client; proposed memories to approve | View only | [Memory tab](/clients/client-tabs-work#memory-tab) |
+| **Compliance** | `compliance` | Compliance register and research runs | Edit, but **Start research** returns 403 | [Compliance tab](/clients/client-tabs-people-hr#compliance-tab) |
+| **Research** | `research` | AI research runs, sources, facts to review and save | View only | [Research tab](/clients/client-tabs-people-hr#research-tab) |
+| **Notes** | `notes` | Internal notes; pinned notes are read by drafts | View only | [Notes tab](/clients/client-tabs-work#notes-tab) |
+| **Road Map** | `roadmap` | Approved 12-month HR Road Map, phases, initiatives, deliverables | Edit, but **Start research** returns 403 | [Road Map tab](/clients/client-tabs-roadmap#road-map-tab) |
+| **Roadmap Report** | `roadmap-report` | Progress report against the road map; client PDF | Hidden (Principal only) | [Roadmap Report tab](/clients/client-tabs-roadmap#roadmap-report-tab) |
+| **Implementation** | `implementation` | Onboarding status and after go-live services | Full (hidden for Member) | [Implementation tab](/clients/client-tabs-roadmap#implementation-tab) |
+| **Employees** | `employees` | Staff records, CSV import | Buttons disabled; row click still opens the edit sheet and saves | [Employees tab](/clients/client-tabs-people-hr#employees-tab) |
+| **Payroll & Tax** | `payroll-tax` | Tax IDs, payroll configuration, banking, system access | View only | [Payroll and Tax tab](/clients/client-tabs-people-hr#payroll-and-tax-tab) |
+
+- Legacy values are rewritten: `?tab=communications` opens **Meetings**, `?tab=contacts` opens **People & Roles**.
+- Unknown values (for example `profile`, `setup`) and tabs hidden for your role fall back to **Overview**. There is no separate profile or setup tab.
+- Other parameters: `?from={portfolio URL}` (keeps **Back to portfolio**, **Previous**, **Next** on a filtered list), `?meeting={intakeId}` (with `tab=meetings`), `?start=1` (with `tab=roadmap-report`, Principal).
+- "View only" means the tab shows "View only. Your profile can see Clients and packets but not change it." (or the matching capability name) and every button and input inside is disabled. Links still work. Admin matches Principal except **Roadmap Report**; Member is view-only everywhere and has no **Implementation** tab.
+
+## Page map
+- **Sticky header:** H1 client name; action buttons on the right: **Open in HubSpot** (only when linked), **Create Service Item**, **Generate Document**, **Roadmap progress report** (Principal), **Delete client** (red outline; Principal, Admin).
+- **Navigation row:** **Back to portfolio** (left); `{i} of {n}`, **Previous**, **Next** (right).
+- **Facts card:** lifecycle pill, a summary line, website link (new tab), info button (aria-label "About these facts"), eight facts: **Service tier**, **Active services** (`{n} of {total}`), **Coverage owner**, **HR advisor** (shows "Fills in after the next HubSpot sync" when empty), **Primary contact**, **Employees** (`{n} active`), **Jurisdiction**, **Client since**. An empty fact reads "Not set".
+- **Sticky tab bar** (tablist, aria-label "Client sections").
+- **Tab panel:** each tab starts with an H2 equal to the tab label, except Overview and Compliance.
+
+## Recipes
+
+### Open a client on a specific tab
+**Risk:** `READ` · **Roles:** all
+**Inputs from Clarwiz:** client slug (or name) and the tab.
+
+1. Open `/clients/{slug}?tab={tab}` using the [tab map](#tab-map). If you only have the name, use [Find and open a client](/clients/clients-list#find-and-open-a-client), then add `?tab=`.
+   - Wait for: "Loading client…" to be replaced by the H1, then the tab's own loading state to end (a grid with aria-busy "true" and aria-label "Loading", or tab-specific loading text).
+2. Alternatively click the tab (tab, exact label; visual: horizontal bar under the facts card).
+
+**Done when:** the selected tab is highlighted and its H2 (or Overview's **Needs you on this client** card) is visible.
+
+| If you see | Why | Do this |
+|---|---|---|
+| "Not found" (alert) and a **Back to portfolio** link | Wrong slug | Search the portfolio for the right slug |
+| `Client facts could not be loaded. {error}` | Facts card failed | Ignore; tabs still work |
+| Red alert box with **Retry** inside a tab | That tab failed to load | Click **Retry** once; if it fails again, report the text |
+| Overview opens instead of the tab you asked for | Unknown tab value or tab hidden for your role | Check the value against the tab map and your role |
+
+### Step to the previous or next client
+**Risk:** `READ` · **Roles:** all
+
+1. Click **Next** or **Previous** (link buttons; visual: right side of the row under the header). They follow the filtered list from `?from=`, sorted by name, and are disabled at the ends or when the client is not in that list.
+2. Click **Back to portfolio** to return to the list you came from (or `/clients`).
+
+**Done when:** H1 shows the adjacent client.
+
+### Start a document for this client from the header
+**Risk:** `READ` (handoff) · **Roles:** all
+
+1. Click **Generate Document** (link button, wand icon; visual: header, right side).
+   - It opens `/generate?client={slug}`, a page titled **Generate Document** with the client preselected.
+2. Continue on [Generate page](/documents/generate-page).
+
+**Done when:** URL starts with `/generate?client={slug}`.
+
+Every other "create a document for this client" entry point is listed in [Create a document for this client](/clients/client-tabs-work#create-a-document-for-this-client).
+
+### Create a service item for this client
+**Risk:** `READ` (handoff) · **Roles:** all
+
+1. Click **Create Service Item** (link button, plus icon; visual: header).
+   - It opens `/requests?client={slug}`.
+
+**Done when:** URL is `/requests?client={slug}`. Continue with the service item recipes for that page.
+
+### Open the client in HubSpot
+**Risk:** `READ` · **Roles:** all
+
+1. Click **Open in HubSpot** (button, external-link icon; visual: header, leftmost action; only shown when the client is linked to HubSpot).
+   - It opens the HubSpot company in a new browser tab. Nothing changes in Ariya or HubSpot.
+
+**Done when:** a new tab with hubspot.com opens. If a HubSpot login appears, stop and hand off to a human.
+
+### Start a roadmap progress report
+**Risk:** `READ` (opens the start dialog) · **Roles:** Principal only (button hidden for others)
+
+1. Click **Roadmap progress report** (button, clipboard icon; visual: header). It switches to `?tab=roadmap-report&start=1` and opens the start dialog when no run is active.
+2. Continue with [Run a roadmap progress report](/clients/client-tabs-roadmap#run-a-roadmap-progress-report).
+
+### Act on Needs you on this client
+**Risk:** `READ` (navigation) · **Roles:** all
+
+1. Open `/clients/{slug}?tab=overview`.
+   - Wait for: card **Needs you on this client** (or 6 skeleton cards to finish).
+2. Read each item: a coloured dot (Overdue, Due soon, Open, Predicted), detail, `Due {date}`, source chips.
+3. Click the item's action button. Labels and where they go:
+   - **Open case** → `/service-desk?case={id}&view=expanded`
+   - **Draft with context** → `/generate?template={docType}&client={slug}`, plus `&source=service-case&case_id={caseId}` and `&related_documents={id1}%2C{id2}` when present. Continue on [Generate page](/documents/generate-page).
+   - **See meeting** → `?tab=meetings&meeting={intakeId}`
+   - **See rhythm** → `?tab=cases`
+
+**Done when:** the target page or tab opens. Empty: "Nothing needs you on this client right now."
+
+### Edit company details
+**Risk:** `WRITE` · **Roles:** Principal, Admin. Operator and Member: fields disabled.
+**Inputs from Clarwiz:** the fields to change.
+
+1. Open `/clients/{slug}?tab=overview`.
+2. Click **Profile & setup** (summary row of a collapsible section; hint "Company details, services, jurisdictions, branding and the dossier"; visual: bottom of the Overview tab). It reads **Hide** when open.
+3. Scroll down and click **Profile setup** (collapsible row, right side reads **Show**). It reveals **Connected Systems**, **Company Information**, **Jurisdictions**, **Document Branding**.
+4. In **Company Information**, edit the fields (labels above each input): **Company Name**, **Industry** (select, placeholder "Select..."; **Professional Services**, **Hospitality**, **Construction**, **Nonprofit**, **Healthcare**, **Retail**), **Address** (textarea), **Primary Contact**, **Email**, **Title**, **Pay Frequency** (select: **Weekly**, **Biweekly**, **Semi-Monthly**, **Monthly**), **Phone**. **Employee Count** is read-only (title "Auto-computed from jurisdiction totals").
+5. Click **Save Changes** (button, under **Company Information**). It reads **Saving...** while saving.
+
+**Done when:** toast "Client details saved." and a green alert "Client details saved." (visible about 2.5 seconds).
+
+| If you see | Why | Do this |
+|---|---|---|
+| Red alert with server text | Save rejected | Report the text |
+| Fields disabled, "View only…" notice | Operator or Member | Stop; needs Principal or Admin |
+
+### Edit the service ecosystem
+**Risk:** `WRITE` · **Roles:** Principal, Admin. Operator and Member: disabled.
+**Inputs from Clarwiz:** service tier, payroll platform, processing method, vendors, active services.
+
+1. Open `/clients/{slug}?tab=overview` and click **Profile & setup**.
+2. In card **Service Ecosystem**, click **Edit ecosystem** (button; visual: card header).
+3. Edit inputs: **Service tier** (placeholder "Elevated HR"), **Payroll platform**, **Processing method** (placeholder "Ariya Processing"), **Benefits broker**, **401(k) provider**, **Workers comp** (placeholder "Workers comp platform"), **CPA**, **Bookkeeper**.
+4. Tick or untick **Active services** checkboxes: **Payroll Processing**, **HR Road Map**, **Benefits Administration**, **401(k) Integration**, **Workers Comp Integration**, **Handbook**, **Timekeeping**, **Employee Onboarding**, **Time Off Tracking**, **Employee Self Service**, **Recruiting / Hiring Support**, **GL Integration**, **Other**.
+5. Click **Save** (button; reads **Saving...**, then **Saved**). **Cancel** discards.
+
+**Done when:** toast "Service ecosystem saved." and the card returns to read mode showing `Missing profile data: …` or "Profile ecosystem is complete for the core fields Pilot tracks today."
+
+The two **Research** buttons in this area open `?tab=research`.
+
+### Add or remove a jurisdiction
+**Risk:** `WRITE` (add), `DESTRUCTIVE` (remove) · **Roles:** Principal, Admin
+
+1. Open **Profile & setup** › **Profile setup** (see [Edit company details](#edit-company-details), steps 1-3).
+2. In **Jurisdictions**, click **Country** (select, placeholder "Country") and pick the country.
+3. Click **State** (select, placeholder "State"; loads after a country is chosen) and pick the state.
+4. Optional: type the headcount in **Employees** (input, placeholder "Count").
+5. Click **Add** (button; disabled until country and state are chosen).
+
+**Done when:** toast "Jurisdiction added." and a new green chip `{CC}-{ST} ({n} employees)`.
+
+To remove:
+
+<Warning>
+**Approval required (DESTRUCTIVE).** Stop here and get approval before clicking the chip's ×. It deletes the jurisdiction immediately with no confirmation.
+</Warning>
+
+6. Click × on the chip (icon button, no aria-label, title "Remove jurisdiction"; visual: right end of the chip).
+
+**Done when:** toast "Jurisdiction removed." Failure toast: server text or "Failed to add jurisdiction".
+
+### Set client branding for documents
+**Risk:** `WRITE` · **Roles:** Principal, Admin
+**Inputs from Clarwiz:** company name to print, logo URL, primary and accent colours (hex).
+
+Client branding controls how client-scoped documents (offer letters, handbooks, warnings) look. With **Use Tenant Branding** ticked, documents use the tenant brand.
+
+1. Open **Profile & setup** › **Profile setup** (see [Edit company details](#edit-company-details), steps 1-3).
+2. In **Document Branding**, untick **Use Tenant Branding** (checkbox). The helper text changes from "Documents use tenant brand settings" to "Documents use client brand below".
+3. Fill **Company Name (on documents)**, **Logo URL** (placeholder "https://..."), **Primary Color** (text input, placeholder "#1a3c5e", next to a colour picker), **Accent Color** (text input, placeholder "#B88F59").
+4. Click **Save Changes** (button, bottom of **Document Branding**).
+
+**Done when:** toast "Client details saved."
+
+To go back to tenant branding, tick **Use Tenant Branding** and click **Save Changes**.
+
+### Delete a client
+**Risk:** `DESTRUCTIVE` · **Roles:** Principal, Admin (button hidden for others; server answers "Only a Principal or Admin can delete a client")
+**Inputs from Clarwiz:** the exact client name.
+
+1. Open `/clients/{slug}?tab=overview`.
+2. Click **Delete client** (red outline button, trash icon; visual: header, rightmost).
+   - Wait for: dialog `Delete {name}?` and "Checking what this client has…" to be replaced by the lists.
+3. Read and report to the human: **Deleted permanently** (counts such as `{n} documents`, `{n} contacts`), **Kept, but no longer linked to this client** (if shown), **Not touched** ("HubSpot, Google Drive and Gmail.").
+
+<Warning>
+**Approval required (DESTRUCTIVE).** Stop here and get approval before clicking **Continue**. Deletion removes the client and everything stored for it in Ariya and cannot be undone. Give the human the counts from step 3.
+</Warning>
+
+4. Click **Continue** (button; disabled until the counts load).
+   - Wait for: title **Confirm permanent deletion**, "Step 2 of 2. This cannot be undone."
+5. Click the input under `Type {name} to delete it permanently` (input, id "delete-client-name") and type the client name exactly (case-sensitive, surrounding spaces ignored).
+6. Click **Delete permanently** (button; disabled until the name matches; reads **Deleting…**). Enter in the input also submits.
+
+**Done when:** toast `{name} was deleted.` and the URL returns to the portfolio.
+
+| If you see | Why | Do this |
+|---|---|---|
+| "Could not load what this would delete." | Count lookup failed; **Continue** stays disabled | Click **Cancel**; report |
+| "The client could not be deleted. Nothing was changed." | Server failure | Report; do not retry without approval |
+| "Type the client name to confirm" | Name mismatch reached the server | Retype the exact name |
+| "Only a Principal or Admin can delete a client" | Wrong role | Stop |
+
+The dialog has no close ×; use **Cancel** (step 1) or **Back** (step 2).
+
+## Overview tab
+- Ready when the card **Needs you on this client** is visible (or the 6 skeleton cards finish).
+- Cards top to bottom: **Needs you on this client**, **Client in brief**, four stat tiles (**Cases, last 12 months**, **Average time to resolve**, **Touchpoints per case**, **Client reaction on close**; each is a button that opens **Cases**), **What they ask us for** (link button **All services**), **Coming up**, **Who's who** (link **People**), **Recently learned** (link **Memory**), **Last meeting** (link **Meetings**).
+- Insight cards have an info button (aria-label "About this card").
+- Collapsible **Profile & setup** at the bottom. Inside, in order: alerts, **Client Operating Brief**, **Service Ecosystem**, **Client Intelligence**, collapsible **Supporting intelligence** (**Client Intelligence Dossier**), collapsible **Profile setup** (**Connected Systems**, **Company Information**, **Jurisdictions**, **Document Branding**).
+- Empty states: "Nothing needs you on this client right now.", "No cases in the last 12 months.", "No repeating requests yet. Predictions appear once something has happened at least three times.", "No contacts yet.", "Nothing learned yet.", "No meetings imported for this client yet."
+
+## Controls reference
+| Visible text | Type | Locator | What it does | Risk |
+|---|---|---|---|---|
+| **Open in HubSpot** | button in link | header; new tab | Opens HubSpot company | READ |
+| **Create Service Item** | link button | header | `/requests?client={slug}` | READ |
+| **Generate Document** | link button | header | `/generate?client={slug}` | READ |
+| **Roadmap progress report** | button | header; Principal | `?tab=roadmap-report&start=1` | READ |
+| **Delete client** | button | header; Principal, Admin | Opens delete dialog | DESTRUCTIVE |
+| **Back to portfolio**, **Previous**, **Next** | link buttons | row under header | Portfolio navigation | READ |
+| tabs | tab | tablist aria-label "Client sections" | Switch tab (URL replaced) | READ |
+| **Profile & setup** | summary row | bottom of Overview | Expand or collapse | READ |
+| **Supporting intelligence**, **Profile setup** | summary rows (**Show** / **Hide**) | inside Profile & setup | Expand or collapse | READ |
+| **Edit ecosystem** | button | Service Ecosystem card | Edit mode | READ |
+| **Save** (ecosystem) | button | Service Ecosystem card | Saves ecosystem | WRITE |
+| **Save Changes** | button | Company Information and Document Branding (same action) | Saves company, contact, pay frequency and branding together | WRITE |
+| **Add** | button | Jurisdictions | Adds jurisdiction | WRITE |
+| chip × | icon button, title "Remove jurisdiction" | Jurisdictions chip | Deletes jurisdiction, no confirm | DESTRUCTIVE |
+| **Continue**, **Delete permanently** | buttons | Delete dialog | Steps through deletion | DESTRUCTIVE |
+
+## Waits and signals
+- Page load: "Loading client…" plain text, then the header. Facts card shows a skeleton (aria-busy) while loading.
+- Each tab loads only when opened and has its own skeleton or loading text and its own **Retry**.
+- Saves in Profile & setup show **Saving...** on the button and a toast on success.
+- Rate limit anywhere: `Too many requests. Try again in {n} second(s).` Wait that long, then retry once.
+
+## Gotchas
+- The header and tab bar are sticky; content scrolls under them. Scroll the panel, not the header, to reach lower cards.
+- **Profile & setup** and **Profile setup** are two nested collapsibles; fields inside are not visible until both are open.
+- Both **Save Changes** buttons send the whole Company Information plus Document Branding form. Do not leave half-edited fields in the other card.
+- Saving company details when the client has no jurisdictions and the address ends in `, XX 12345` also adds a jurisdiction automatically.
+- **Employee Count** cannot be typed; it is the sum of jurisdiction headcounts.
+- In-app help says **Delete client** is for "admins and owners"; the app allows Principal and Admin. Help also calls a header item "industry"; it is a server summary line.
+
+## Related
+- [Clients portfolio](/clients/clients-list)
+- [Work tabs: cases, documents, meetings, external documents, memory, notes](/clients/client-tabs-work)
+- [People and HR tabs: people, employees, payroll and tax, compliance, research](/clients/client-tabs-people-hr)
+- [Road Map, Roadmap Report, Implementation](/clients/client-tabs-roadmap)
+- [Generate page](/documents/generate-page)
+- [Create a document](/documents/create-a-document)
+
+## Source files
+- `packages/web/src/app/(dashboard)/clients/[slug]/page.tsx`
+- `packages/web/src/app/(dashboard)/clients/[slug]/components/overview-tab.tsx`
+- `packages/web/src/app/(dashboard)/clients/[slug]/components/overview-profile-setup.tsx`
+- `packages/web/src/app/(dashboard)/clients/[slug]/components/client-jurisdictions-card.tsx`
+- `packages/web/src/app/(dashboard)/clients/[slug]/components/delete-client-dialog.tsx`
+- `packages/web/src/lib/document-routes.ts`
+- `packages/shared/src/client-workspace.ts`
+- `packages/core/src/client-workspace/read-models/overview.ts`

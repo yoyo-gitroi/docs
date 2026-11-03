@@ -1,0 +1,215 @@
+---
+title: "Triage settings and Gmail connection"
+sidebarTitle: "Settings and Gmail"
+description: "Read and edit Operations triage settings (client, vendor and noise domains, noise keywords, scan window, learned rules, reply voice) and hand Gmail connection off to a human."
+keywords: ["operations settings", "triage settings", "client domains", "vendor domains", "noise domains", "noise keywords", "scan window", "learned rules", "suppression rules", "reply voice", "tone", "connect gmail", "reconnect gmail", "gmail oauth", "gmail not connected"]
+---
+
+<Info>
+
+**URL:** `/service-desk/settings` (settings); `/service-desk/gmail/callback` (Google's return page only) · **Reach:** on `/service-desk`, the gear icon (aria-label "Operations settings") in the header · **Roles:** Principal ✓ Operator ✓ (domain and keyword lists editable by Principal and Admin only; **Reply voice** card Principal only) · **Ready when:** h1 **Triage Settings** with the description "Control how Ariya automatically sorts your incoming emails." and the first card **How email triage works** are visible and the spinner is gone.
+
+</Info>
+
+Settings that decide how Ariya sorts incoming email. **This page has no Gmail connect or disconnect control**, even though messages elsewhere say "Operations settings". Gmail is connected from the Operations header and always needs a human (see [Connect Gmail](#connect-gmail)).
+
+<Note>
+
+**Principal vs Operator.** A Principal (and an Admin) can add and remove domains and keywords and sees **Reply voice**. An Operator sees the lists as read-only chips ("None configured." when empty) and no **Reply voice** card. **Save & scan** and the learned-rule **Pause** / **Reactivate** buttons show for every role. Unverified: whether the server accepts those two from an Operator.
+
+</Note>
+
+## Page map
+- Breadcrumb "Operations Inbox › Settings"; h1 **Triage Settings**. No tab bar.
+- **How email triage works**: read-only table (What Ariya checks / What happens / AI involved?).
+- **Client domains**: chips with × (aria-label `Remove {domain}`), input placeholder "acmecorp.com", **+** button.
+- **Vendor domains**: chips, inputs "gusto.com" and "Gusto (label)", **+** button.
+- **Noise domains**: input "noreply.github.com", **+**.
+- **Noise keywords (subject line)**: input "unsubscribe", **+**.
+- **Inbox scan window**: number input (1 to 365) "days" and **Save & scan**. "Default: 30 days. Already-triaged emails are never duplicated."
+- **Learned suppression rules**: rows with reason, **Active** / **Paused** badge, `{domain|Any sender} · {scope} · matched {n}`, `Pattern: …`, and **Pause** / **Reactivate**.
+- **Reply voice** (Principal only): **Tone**, **Avoid**, **Prefer**, **Save**.
+
+## Recipes
+
+### Read the triage settings
+**Risk:** `READ` · **Roles:** Principal, Operator
+
+1. Open `/service-desk/settings`. Alternative: on `/service-desk` click the gear icon (aria-label "Operations settings"; visual: header, far right).
+   - Wait for: the spinner to go and **How email triage works** to appear.
+2. Read each card's chips and values.
+
+**Done when:** you have the lists to report.
+
+| If you see | Why | Do this |
+|---|---|---|
+| Toast "Failed to load settings — make sure you have admin access" | Load refused or failed | Report it. |
+| "None configured." | Empty list (read-only view) | Report it. |
+| "None added yet." | Empty list (editable view) | Report it. |
+
+### Add a client, noise domain or noise keyword
+**Risk:** `WRITE` (changes triage for the whole workspace) · **Roles:** Principal (and Admin) only
+**Inputs from Clarwiz:** the domain or keyword
+
+1. Open `/service-desk/settings`.
+2. In the card (**Client domains**, **Noise domains** or **Noise keywords (subject line)**), click the input (placeholder "acmecorp.com", "noreply.github.com" or "unsubscribe").
+3. Type the value.
+4. Click **+** (button with a plus icon, no label; visual: right of the input). Pressing `Enter` in the input also adds it.
+
+**Done when:** toast "Added" and a new chip.
+
+| If you see | Why | Do this |
+|---|---|---|
+| Toast "Failed to add — check the value and try again" | Invalid or refused | Check the value and retry once. |
+| No input field, only chips | You are not Principal or Admin | Report that the role cannot edit. |
+
+### Add a vendor domain
+**Risk:** `WRITE` · **Roles:** Principal (and Admin) only
+**Inputs from Clarwiz:** domain and vendor name
+
+1. In **Vendor domains**, type the domain in the first input (placeholder "gusto.com").
+2. Type the vendor name in the second input (placeholder "Gusto (label)").
+3. Click **+** (or press `Enter` in either input).
+
+**Done when:** toast "Added".
+
+| If you see | Why | Do this |
+|---|---|---|
+| Toast "Failed to add — check the domain and try again" | Invalid or refused | Check the domain and retry once. |
+
+### Remove a domain or keyword
+**Risk:** `DESTRUCTIVE` (immediate, no confirmation) · **Roles:** Principal (and Admin) only
+**Inputs from Clarwiz:** the exact value
+
+1. Open `/service-desk/settings` and find the chip.
+
+<Warning>**Approval required (DESTRUCTIVE).** Stop here and get approval before clicking the ×. The value is removed at once with no confirmation and no undo; it changes triage for the whole workspace.</Warning>
+
+2. Click × on the chip (icon button, aria-label `Remove {value}`).
+
+**Done when:** toast "Removed" and the chip is gone.
+
+| If you see | Why | Do this |
+|---|---|---|
+| Toast "Failed to remove" | Refused or failed | Report it. |
+
+### Change the inbox scan window and scan
+**Risk:** `WRITE` + `EXTERNAL` (reads your Gmail) `AI` · **Roles:** Principal, Operator (button shown to all)
+**Inputs from Clarwiz:** number of days, 1 to 365
+
+1. Open `/service-desk/settings`.
+2. In **Inbox scan window**, select the number input and type the days.
+
+<Warning>**Approval required (EXTERNAL).** Stop here and get approval before clicking **Save & scan**. It saves the window and then scans the user's Gmail.</Warning>
+
+3. Click **Save & scan** (button; reads "Saving..." then "Scanning...").
+   - Wait for: the toast. A scan can take a minute or two.
+
+**Done when:** toast `Scan window updated — {n} new threads triaged`.
+
+| If you see | Why | Do this |
+|---|---|---|
+| Toast "Enter a number between 1 and 365" | Out of range | Fix the number. |
+| Toast "Failed to save or scan" | Save or scan failed | Report it. |
+
+### Pause or reactivate a learned rule
+**Risk:** `WRITE` · **Roles:** Principal, Operator (button shown to all)
+**Inputs from Clarwiz:** which rule (reason, sender domain or pattern)
+
+1. Open `/service-desk/settings` and scroll to **Learned suppression rules**.
+2. Find the row by its reason, `{domain} · {scope} · matched {n}` line or `Pattern: …`.
+3. Click **Pause** (on an **Active** rule) or **Reactivate** (on a **Paused** rule).
+
+**Done when:** toast "Learning rule paused" or "Learning rule reactivated" and the badge changes.
+
+| If you see | Why | Do this |
+|---|---|---|
+| "No learned rules yet" | None created | New rules come from [Stop similar emails reaching Triage](/operations/inbox#stop-similar-emails-reaching-triage). |
+| Toast "Failed to update learning rule" | Refused or failed | Report it. |
+
+### Set the reply voice
+**Risk:** `WRITE` (affects every AI-drafted reply) · **Roles:** Principal only
+**Inputs from Clarwiz:** tone text; words to avoid; words to prefer
+
+1. Open `/service-desk/settings` and scroll to **Reply voice**.
+2. Type in **Tone** (textarea, id "voiceTone"; placeholder "Warm, direct, calm, and practical. …").
+3. Type in **Avoid** (id "voiceBanned"; comma-separated; placeholder "synergy, leverage, unlock").
+4. Type in **Prefer** (id "voiceEncouraged"; comma-separated; placeholder "senior advisor, judgment").
+5. Click **Save** (button; reads "Saving...").
+
+**Done when:** toast "Reply voice saved".
+
+| If you see | Why | Do this |
+|---|---|---|
+| No **Reply voice** card | Not a Principal | Report that the role cannot set it. |
+| Toast "Failed to save reply voice" | Save failed | Retry once, then report. |
+
+### Connect Gmail
+**Risk:** `EXTERNAL` (OAuth) · **Roles:** Principal, Operator (each person connects their own mailbox)
+
+The agent never completes this. It needs the user's Google sign-in and consent.
+
+1. Open `/service-desk`. The header shows **Connect Gmail** (button) when Gmail is not connected; an empty desk shows a card "Gmail not connected" with **Connect**.
+
+<Warning>**Approval required (EXTERNAL, OAuth).** Stop here. Do not click **Connect Gmail**, **Connect** or **Reconnect Gmail**. Hand off to a human: tell the user to click **Connect Gmail** in the Operations header themselves.</Warning>
+
+2. What the human will see (for your hand-off message): a full-page redirect (not a popup) to Google sign-in; possibly "Google hasn't verified this app" → **Advanced** → **Go to Ariya (unsafe)**; then a permissions screen → **Allow**; then a return to `/service-desk/gmail/callback`.
+3. After the human says they are done, open `/service-desk` and check the header shows the mailbox pill (`{email} · scanned N min ago`) or **Scan inbox** is enabled.
+
+**Done when:** **Connect Gmail** is no longer shown and **New email** is visible in the header.
+
+| If you see | Why | Do this |
+|---|---|---|
+| Toast "Couldn’t start the Gmail connection" | Redirect could not start | Report it. |
+| Any Google sign-in, password, MFA or consent screen | OAuth in progress | Stop and hand off to the human. |
+
+### Read the Gmail callback result
+**Risk:** `READ` (the page itself completes OAuth; never open it by hand) · **Roles:** Principal, Operator
+
+Reached only as Google's redirect after **Connect Gmail**. Opening `/service-desk/gmail/callback` directly fails ("Google did not return an authorization code.").
+
+1. If the browser is on this page, read the card titled "Gmail Service Desk".
+   - "Connecting Gmail..." with a spinner: wait.
+   - Success: `Connected {email}. Ariya will now monitor your inbox.` (or "Gmail connected to service desk.") with **Go to Service Desk**.
+   - Failure: "Google did not return an authorization code.", "OAuth state could not be verified. Please try connecting again.", or a server message, with **Back to Service Desk**.
+2. Click **Go to Service Desk** or **Back to Service Desk** (link → `/service-desk`).
+
+**Done when:** you have reported the result and are back on `/service-desk`. On failure, the human must retry **Connect Gmail**.
+
+## Controls reference
+| Visible text | Type | Locator | What it does | Risk |
+|---|---|---|---|---|
+| (gear) | icon link | aria-label "Operations settings" | Opens this page | `READ` |
+| `Remove {value}` | icon button (×) | on a chip | Removes immediately | `DESTRUCTIVE` |
+| + | icon button, unlabeled | right of each input | Adds the value | `WRITE` |
+| acmecorp.com / gusto.com / Gusto (label) / noreply.github.com / unsubscribe | inputs (placeholders) | list cards | Value to add (Enter adds) | — |
+| days | number input | Inbox scan window | 1 to 365 | — |
+| Save & scan / Saving... / Scanning... | button | Inbox scan window | Saves, then scans Gmail | `WRITE` `EXTERNAL` `AI` |
+| Pause / Reactivate | button | learned rule row | Toggles the rule | `WRITE` |
+| Tone / Avoid / Prefer | textarea / inputs | Reply voice | Voice settings | — |
+| Save / Saving... | button | Reply voice | Saves voice | `WRITE` |
+| Connect Gmail / Connect / Reconnect Gmail | button / link | Operations header / empty desk / case conversation | Google OAuth | `EXTERNAL` (human only) |
+| Go to Service Desk / Back to Service Desk | link | callback card | `/service-desk` | `READ` |
+
+## Waits and signals
+- Spinner while settings load.
+- Toasts: "Added", "Removed", "Learning rule paused", "Learning rule reactivated", "Reply voice saved", `Scan window updated — {n} new threads triaged`.
+- Callback: "Connecting Gmail..." then the success or error text.
+
+## Gotchas
+- Removing a chip is immediate, with no confirm.
+- There is no Gmail control here. The **Connect Gmail** / **Reconnect Gmail** links inside a case and the reply-disabled messages point to this page anyway. Use the Operations header button (human only).
+- **Save & scan** scans Gmail, not just saves.
+- "No learned rules yet" tells you to use "Don't triage again" from the Triage Inbox; the actual menu items are **Hide similar emails from now on…** (pane) and **Suppress similar…** (row).
+- The callback page is not restored as a "last page" after sign-in.
+
+## Related
+- [Operations inbox](/operations/inbox)
+- [Email and replies](/operations/email-and-replies)
+
+## Source files
+- `packages/web/src/app/(dashboard)/service-desk/settings/page.tsx`
+- `packages/web/src/app/(dashboard)/service-desk/gmail/callback/page.tsx`
+- `packages/web/src/app/(dashboard)/service-desk/components/gmail-connect-card.tsx`
+- `packages/web/src/app/(dashboard)/service-desk/components/help-modal.tsx`
+- `packages/web/src/lib/landing.ts`

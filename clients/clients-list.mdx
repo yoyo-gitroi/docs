@@ -1,0 +1,231 @@
+---
+title: "Clients portfolio"
+sidebarTitle: "Clients list"
+description: "Find and open a client, filter the portfolio by URL or controls, fill profile gaps, review HR Road Map work across clients and change a client's HR Advisor."
+keywords: ["clients", "client list", "customers", "portfolio", "find a client", "open client", "filter clients", "HR advisor", "assign advisor", "coverage owner", "profile gaps", "profile workspace", "enrichment queue", "HR road map", "elevated HR", "service tier", "prospects", "open cases", "missing CPA", "missing contact"]
+---
+
+<Info>
+**URL:** `/clients` · **Reach:** sidebar **Clients**, or Workspace sub-nav **Customers** · **Roles:** Principal ✓ Operator ✓ (view; the HR Advisor select and Profile Workspace **Save** look enabled but the API returns 403) · **Ready when:** H1 **Clients** is visible, the skeleton rows in the table are gone and the line `{shown} of {total} clients shown` is visible.
+</Info>
+
+The client portfolio. Use it to find a client, narrow the list with filters, jump to the cross-client Profile Workspace or HR Road Map, and change who is the HR Advisor on a client.
+
+## Page map
+- **Header:** H1 **Clients**, description "Manage client ownership, service model, and active work from one portfolio." Button **New Client** at the top right (Principal and Admin only).
+- **Snapshot** (default view only): eyebrow **Portfolio**, heading **Client operating snapshot**. An optional badge names the active filter (for example **Profile gaps**, **Clients with open cases**, `{Name} HR Advisor`, **Contact review**, **Client reachability**).
+- **Five metric tiles** (links): **Active Clients** (scrolls to the table), **Service Tier Mix** (value `{elevated}/{construction}/{operational}`, opens `?view=service-tiers`), **Open Service Items** (opens `/service-desk`, detail `{n} on you · {n} vendor · {n} client`), **Road Map Work** (opens `?view=hr-road-map`), **HR Advisor Coverage** (value `{n} assigned`, opens `?view=hr-advisors`).
+- **Customer portfolio** card (anchor `#customer-portfolio`): **Filters** toggle, filter chips, **Reset**, the line `{n} of {m} clients shown`, a collapsible filter grid, then the table.
+- **Table columns** (exactly these seven): **Customer** (link), **HR Advisor** (select), **Primary Contact** (link), **Service Model** (tier plus `{payroll} · {processing}`), **Active Services** (up to 2 chips plus `+N`), **Open Cases** (link `{n} case(s)`), **Profile Gaps** (badge **Complete** or `{first gap} +{n}`; hover shows all gaps).
+- **Pagination footer:** **Rows per page** select (10, 20, 50; default 20), text `{start}-{end} of {total}`, two icon-only chevron buttons with no label (left = previous page, right = next page).
+- Below medium screen width the table becomes a stack of cards.
+
+## URL parameters
+Open any of these directly. Parameters combine with `&`. Every filter except `work` and `contact_filter` adds a removable chip.
+
+| Parameter | Values | Chip text | Effect |
+|---|---|---|---|
+| `view` | `profile-workspace` | none | Profile Workspace enrichment queue (see recipe below) |
+| `view` | `hr-road-map` | none | Elevated HR road map queue across clients |
+| `view` | `service-tiers` | none | Clients grouped by tier, table still below |
+| `view` | `hr-advisors` | none | Clients grouped by HR Advisor, table still below |
+| `view` | `communications` | none (badge **Client reachability**) | Only clients missing a primary email or reachable contacts |
+| `service_tier` | `elevated`, `construction`, `operational` | `Elevated tier`, `Construction tier`, `Operational tier` | Tier bucket |
+| `coverage_owner` | a user id, or `unassigned` | `{Name} HR Advisor` | HR Advisor on the client |
+| `payroll_platform` | normalized key | `{Value} payroll` | Payroll platform |
+| `processing_method` | normalized key | `{Value} processing` | Processing method |
+| `active_service` | normalized key | `{Value} service` | Has that active service |
+| `open_cases` | `has_open`, `clear` | `Has open cases`, `No open cases` | Open service items |
+| `profile_gaps` | `has_gaps`, `complete` | `Has profile gaps`, `Complete profiles` | Missing profile fields |
+| `lifecycle` | `prospect`, `exclude_prospects` | `Prospects only`, `Excluding prospects` | Lifecycle stage |
+| `work` | `roadmap` | `Open roadmap work` (no control in the filter grid) | Clients with open road map tasks |
+| `contact_filter` | `needs-coverage` | none (badge **Contact review**) | Clients missing a primary, accounting or HR/payroll email |
+| `profile_gap` | a category key (see Profile Workspace) | none | Preselects a Profile Workspace category |
+
+**Normalized key** = the value lowercased, `&` replaced by `and`, every run of other characters replaced by `_`, leading and trailing `_` removed. Example: "Ariya Processing" becomes `ariya_processing`; "401(k) Integration" becomes `401_k_integration`.
+
+Examples:
+- Elevated HR clients with open cases: `/clients?service_tier=elevated&open_cases=has_open`
+- Clients with no HR Advisor: `/clients?coverage_owner=unassigned`
+- Prospects only: `/clients?lifecycle=prospect`
+
+## Recipes
+
+### Find and open a client
+**Risk:** `READ` · **Roles:** all
+**Inputs from Clarwiz:** client name (or a contact name, email, domain, CPA, bookkeeper or vendor linked to it).
+
+1. Open `/clients`.
+   - Wait for: skeleton rows gone and `{n} of {m} clients shown` visible.
+2. Click the search box (input, placeholder "Search customers, contacts, roles, or emails..."; visual: top of the **Customer portfolio** card, above the table).
+3. Type the client name. Filtering is instant, on the page.
+4. Click the client name in the **Customer** column (link; visual: first column). Clicking anywhere else on the row also works, except the **HR Advisor** cell.
+   - Wait for: plain text "Loading client…" to be replaced by the client name as H1.
+
+**Done when:** URL is `/clients/{slug}` (possibly with `?tab=` and `?from=`) and H1 is the client name.
+
+<Tip>
+If you already know the slug, skip the list: open `/clients/{slug}?tab=overview` (always pass `?tab=`, see [Client profile](/clients/client-profile#always-pass-the-tab-parameter)).
+</Tip>
+
+| If you see | Why | Do this |
+|---|---|---|
+| "No customers yet. Run a read-only HubSpot import or add a customer manually." | Also shown when the search or filters match nothing | Clear the search box, click **Reset**, search a shorter part of the name |
+| Skeleton rows that never finish | The client list request failed; the page has no error state | Reload once. If it persists, stop and report |
+| Client page opens on an unexpected tab | The client page remembers the last tab you used | Add `?tab={tab}` to the URL |
+
+### Filter the portfolio
+**Risk:** `READ` · **Roles:** all
+**Inputs from Clarwiz:** the filter(s) wanted.
+
+Fastest: build the URL from [URL parameters](#url-parameters) and open it. With the controls instead:
+
+1. Open `/clients`.
+2. Click **Filters** (toggle button, shows a count badge when filters are active; visual: top of the **Customer portfolio** card).
+3. Click the select under the label you need, then click the option in the popup list:
+   - **HR Advisor** (placeholder "All advisors"): **All advisors**, **Unassigned**, or a person.
+   - **Service Tier** ("All tiers"): **All tiers**, **Elevated HR**, **Construction**, **Operational**.
+   - **Payroll** ("All payroll"), **Processing** ("All processing"), **Active Services** ("All services"): values come from the data.
+   - **Open Cases** ("All cases"): **All cases**, **Has open cases**, **No open cases**.
+   - **Profile Gaps** ("All profiles"): **All profiles**, **Has gaps**, **Complete**.
+   - **Lifecycle** ("All lifecycle stages"): **All lifecycle stages**, **Prospects only**, **Exclude prospects**.
+   - Wait for: URL gains the parameter and a chip appears.
+4. To remove one filter, click the chip's × (icon button, aria-label `Remove {chip label} filter`, for example "Remove Elevated tier filter"). To remove all, click **Reset** (button next to the chips; keeps `view`).
+
+**Done when:** the chip is visible and `{n} of {m} clients shown` reflects the filter.
+
+### Step through a filtered list of clients
+**Risk:** `READ` · **Roles:** all
+
+1. Apply filters (URL or controls).
+2. Open the first client from the table. The link carries `?from=` with your filtered list.
+3. On the client page, click **Next** or **Previous** (link buttons; visual: right side of the row under the page title, next to `{i} of {n}`). **Back to portfolio** returns to the filtered list.
+
+**Done when:** `{i} of {n}` advances and H1 changes to the next client.
+
+### Change the HR Advisor on a client
+**Risk:** `WRITE` · **Roles:** Principal, Admin. Operator and Member: the select is enabled but the save is rejected with 403.
+**Inputs from Clarwiz:** client name; advisor name or "unassigned".
+
+<Warning>
+**Operator:** this select is enabled for you but the API refuses the change. Expect the red box "Your profile cannot change Clients and packets. Allowed: Principal, Admin." Do not retry; report back.
+</Warning>
+
+1. Open `/clients` and search for the client (see [Find and open a client](#find-and-open-a-client)).
+2. In that row, click the **HR Advisor** cell (select; trigger shows **Unassigned**, a name, or **Former teammate**; visual: second column).
+3. Click the person, or **Unassigned**, in the popup list. It saves immediately; there is no Save button and no toast.
+   - Wait for: the select to re-enable (it is disabled while saving).
+
+**Done when:** the trigger shows the new name and no red box appears above the table.
+
+| If you see | Why | Do this |
+|---|---|---|
+| "The HR Advisor must be an active user of this workspace." (red box above the table) | Chosen user is not active | Pick another person; tell Clarwiz |
+| "Your profile cannot change Clients and packets. Allowed: Principal, Admin." | Operator or Member | Stop. Do not retry |
+| "Could not update client coverage owner." | Other failure | Reload and check the cell once; report if unchanged |
+
+### Fill missing profile data (Profile Workspace)
+**Risk:** `WRITE` · **Roles:** Principal, Admin. Operator and Member: **Save** is enabled but rejected with 403, and the error is not visible on this view.
+**Inputs from Clarwiz:** client, category (for example CPA), value; or for contacts: name and/or email, role.
+
+<Warning>
+**Operator:** **Save** is enabled but the API returns 403, and this view hides the error. The row simply stays in the list. Do not retry; report that the save was not allowed.
+</Warning>
+
+1. Open `/clients?view=profile-workspace&profile_gap={categoryKey}`. Category keys: `benefits_broker`, `cpa`, `bookkeeper`, `provider_401k`, `workers_comp`, `payroll_platform`, `processing_method`, `active_services`, `service_tier`, `primary_contact`, `hr_payroll_contact`.
+   - Alternative: sub-nav **Profile Workspace**, then click the category button in the left column **Missing data categories** (visual: grouped under **Service ecosystem**, **Service model**, **Contacts**, each with a count badge).
+   - Wait for: eyebrow **Profile Workspace**, H2 **Enrichment queue**, and on the right the category name with badge `{n} missing`.
+2. Find the client's row on the right (client name link; `Current value: {v}` under it when one exists).
+3. Field categories: click the value box (input, placeholder `Enter {category}` in lowercase, for example "Enter cpa"; visual: in the row) and type the value. For **Active Services**, separate values with commas or semicolons.
+4. Contact categories (**Primary Contact**, **HR/Payroll Contact**): fill **Contact name** and/or **Email** (inputs, placeholders "Contact name", "Email"). **Role** (placeholder "Role") is pre-filled with "Primary contact" or "HR/Payroll contact".
+5. Click **Save** in that row (button; disabled until text is entered; reads **Saving...** while saving).
+
+**Done when:** the row disappears from the list (the client no longer misses that value).
+
+<Note>
+Contacts saved here are created directly on the client, with no approval step, unlike the client **People & Roles** tab which files change requests.
+</Note>
+
+| If you see | Why | Do this |
+|---|---|---|
+| Row stays after **Save** | Save failed; errors render in the portfolio card, which is hidden on this view | Open `/clients` (default view) to read the red box, or open the client and use [Profile & setup](/clients/client-profile#edit-the-service-ecosystem) |
+| "This category is complete across current clients." | Nothing missing | Done |
+| "Open the client profile to complete this item." | Category is not editable here | Click **Open profile** and edit there |
+
+Other row buttons: **Open profile** (opens the client) and **People setup** (opens the client's **People & Roles** tab, for contact categories).
+
+### Review HR Road Map work across clients
+**Risk:** `READ` · **Roles:** all
+
+1. Open `/clients?view=hr-road-map` (or sub-nav **HR Road Map**, or the **Road Map Work** tile).
+   - Wait for: eyebrow **HR Road Map**, H2 **Elevated HR execution workspace**, and the **Loading** badge next to **Open roadmap queue** to disappear.
+2. Read tiles **Elevated HR clients**, **Open roadmap items**, **Overdue**, **Upcoming**.
+3. Left list **Open roadmap queue** ("Sorted by due date, then client.", max 20 rows): task name, status badge, `{client} · {phase}`, due date or "No due date". Right list **Client progress**: `{open} open · {done}/{total} complete`, `{pct}%`.
+4. To work on one, click **Open roadmap** (button in the row) or a **Client progress** card. It opens `/clients/{slug}?tab=roadmap&from=%2Fclients%3Fview%3Dhr-road-map`.
+
+**Done when:** you have the list, or the client's **Road Map** tab is open ([Road Map tab](/clients/client-tabs-roadmap#road-map-tab)).
+
+Empty states: "No open roadmap tasks were found for Elevated HR clients.", "No active Elevated HR roadmaps found."
+
+### Review clients by service tier or by HR Advisor
+**Risk:** `READ` · **Roles:** all
+
+1. Open `/clients?view=service-tiers` (section **Service Tier Review**, H2 **Clients by service tier**; columns **Elevated HR**, **Construction**, **Operational**, up to 8 client links each) or `/clients?view=hr-advisors` (section **HR Advisor Review**, H2 **Clients by HR Advisor**; one column per active user plus **Unassigned**, up to 10 links each).
+2. Click **View all** `{n}` under a column to open the filtered table (`/clients?service_tier={key}` or `/clients?coverage_owner={id}#customer-portfolio`).
+
+**Done when:** the filtered table shows. Empty column text: "No clients in this tier." or "No clients assigned."
+
+### Find clients with contact gaps
+**Risk:** `READ` · **Roles:** all
+
+1. Open `/clients?contact_filter=needs-coverage` (missing primary, accounting or HR/payroll email; badge **Contact review**) or `/clients?view=communications` (missing primary email or reachable contacts; badge **Client reachability**).
+2. Open each client and fix contacts on its **People & Roles** tab ([People & Roles](/clients/client-tabs-people-hr#people-and-roles-tab)).
+
+**Done when:** the list is read. These two views have no chip and no **Reset**; to leave, click sub-nav **Customers** or open `/clients`.
+
+## Controls reference
+| Visible text | Type | Locator | What it does | Risk |
+|---|---|---|---|---|
+| **New Client** | link button | top right (Principal, Admin only) | Opens `/clients/new` | READ |
+| **Filters** | toggle button | top of portfolio card | Shows or hides the filter grid | READ |
+| Filter selects | select | labels **HR Advisor**, **Service Tier**, **Payroll**, **Processing**, **Active Services**, **Open Cases**, **Profile Gaps**, **Lifecycle** | Sets a URL filter | READ |
+| chip × | icon button | aria-label `Remove {chip label} filter` | Removes that filter | READ |
+| **Reset** | button | next to chips | Removes all filters, keeps `view` | READ |
+| search | input | placeholder "Search customers, contacts, roles, or emails..." | Filters on the page | READ |
+| client name | link | **Customer** column | Opens `/clients/{slug}` | READ |
+| HR Advisor cell | select | **HR Advisor** column | Saves the advisor immediately | WRITE |
+| Primary contact | link | **Primary Contact** column | Opens the client's **People & Roles** tab | READ |
+| `{n} case(s)` | link | **Open Cases** column | Opens the client's **Cases** tab | READ |
+| Profile Gaps badge | link | **Profile Gaps** column, `title` lists gaps | Opens the client (missing fields are not focused) | READ |
+| Profile Workspace **Save** | button | each row in Enrichment queue | Saves the field or creates the contact | WRITE |
+| **Open profile**, **People setup** | link buttons | each row in Enrichment queue | Open the client | READ |
+| **Open roadmap** | button | HR Road Map queue rows | Opens the client's Road Map tab | READ |
+
+## Waits and signals
+- List load: skeleton rows in the table; done when rows or the empty text appear. No error is ever shown if the load fails.
+- Filters, search and sorting are instant on the page; filters also change the URL.
+- HR Advisor save: the cell's select is disabled while saving. No toast on success.
+- HR Road Map view: **Loading** badge next to **Open roadmap queue** while per-client road maps load.
+
+## Gotchas
+- Clicking a client name from the unfiltered list opens `/clients/{slug}` with no `?tab=`, so the client page jumps to the tab you last used. Add `?tab=` yourself when you need a specific tab.
+- The **Profile Gaps** link adds `?action=complete-profile#client-profile-fields`, which nothing handles. Open Overview › **Profile & setup** yourself ([Client profile](/clients/client-profile#edit-the-service-ecosystem)).
+- There is no way to change a client's name, industry or stage from this list. The inline edit buttons exist in code but their column is not rendered.
+- Sorting and search are lost when you navigate away.
+- Values saved in Profile Workspace can be overwritten by the next HubSpot sync.
+- HubSpot-sourced clients appear only when HubSpot marks them active for Ariya; manual clients appear unless retired. In-app help says HubSpot companies must have lifecycle "Customer"; the app actually checks the Ariya client status flag.
+- The HR Road Map view counts tasks on road maps that are not yet approved; the client's **Road Map** tab shows only approved ones and may land on "Start a Discovery Assessment".
+- Only clients whose service tier contains "elevated" appear in the HR Road Map view.
+
+## Related
+- [Create a client](/clients/new-client)
+- [Client profile and tab map](/clients/client-profile)
+- [Road Map tab](/clients/client-tabs-roadmap)
+- [Contacts directory](/clients/people-and-contacts)
+
+## Source files
+- `packages/web/src/app/(dashboard)/clients/page.tsx`
+- `packages/web/src/components/data-table.tsx`
+- `packages/web/src/components/filter-bar.tsx`
+- `packages/transport-api/src/routes/clients.ts`
+- `packages/shared/src/roles.ts`

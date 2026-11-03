@@ -1,0 +1,207 @@
+---
+title: "Action Queue and requests"
+sidebarTitle: "Action Queue"
+description: "Find, create, open, progress, assign and delete requests in the Action Queue; nothing here sends email."
+keywords: ["action queue", "requests", "new request", "create a request", "log a request", "intake", "triage request", "start work", "submit for review", "approve and deliver", "request revision", "close request", "delete request", "assign to me"]
+---
+
+<Info>
+
+**URL:** `/requests` (list) and `/requests/{id}` (detail) · **Reach:** top tab **Action Queue** (the tab bar shows on `/requests`, `/approvals` and `/compliance`, not on `/`) · **Roles:** Principal ✓ Operator ✓ (no role gating in the page) · **Ready when:** h1 **Action Queue** and the stats row **Total**, **Needs Review**, **In Progress**, **Delivered** are visible and the table skeleton is gone.
+
+</Info>
+
+The Action Queue lists requests (units of work for a client). The detail page moves a request through its status. All status changes are local to Ariya: the detail page states "No external sends are triggered from this local request detail view."
+
+<Note>Unverified: whether the server restricts creating or deleting requests by role. The UI shows the same controls to Principal and Operator.</Note>
+
+## Page map
+
+**List — `/requests`**
+- Breadcrumb "Command Center › Action Queue". Header: h1 **Action Queue**, button **New Request** (top right).
+- Stats strip: **Total**, **Needs Review**, **In Progress**, **Delivered**.
+- Card: search box (placeholder "Search action queue..."), table with columns **Title**, **Type**, **Client**, **Requested By**, **Status**, **Priority**, **Created**, and a row-actions ⋯ button.
+- Pagination under the table: "Rows per page" (10 / 20 / 50), `{a}-{b} of {n}`, unlabeled chevron buttons.
+
+**Detail — `/requests/{id}`**
+- Breadcrumb `Command Center › Action Queue › {title}`. h1 = request title plus a status badge.
+- Left column: header card (Type, Priority, Requested By, Assigned To, Created, and the action buttons) → **Client context** card → **Documents** card.
+- Right column: **Execution progress** (with **Operator feedback**) → **Operator review boundary** → **Source context** → **Activity** (id "request-activity").
+
+## Recipes
+
+### Find a request
+**Risk:** `READ` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** words from the request title
+
+1. Open `/requests`.
+   - Wait for: the table skeleton to be replaced by rows, or "No action queue items yet."
+2. Click the search box (input, placeholder "Search action queue..."; visual: top of the table card) and type part of the title. It filters by title as you type.
+3. If the row is not visible, change "Rows per page" to 50 or click the chevron buttons (unlabeled; visual: bottom right of the table) to page.
+
+**Done when:** the row with the title is visible.
+
+### Open a request
+**Risk:** `READ` · **Roles:** Principal, Operator
+
+1. Open `/requests/{id}` directly, or on `/requests` click anywhere on the row **except** the client name (the client name is a link to `/clients/{slug}`).
+   - Wait for: "Loading..." to be replaced by the h1 title and the card **Execution progress**.
+
+**Done when:** the h1 shows the request title with its status badge.
+
+| If you see | Why | Do this |
+|---|---|---|
+| Red error banner with a server message | Request not found or not allowed | Report the message. |
+
+### Create a request
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** title (required); client and description (optional)
+
+1. Open `/requests?new=1` (the **New Request** sheet opens). To preselect a client open `/requests?client={slug}` instead; this also opens the sheet. Alternative: on `/requests` click **New Request** (button; visual: top right).
+2. Type the title in **Title** (input, placeholder "e.g., Prepare offer letter for Jane at Delta King"). Required.
+3. Optional: choose the client in **Client** (select, placeholder "Select a client...").
+4. Optional: type details in **Description** (textarea, placeholder "Additional details...").
+5. Click **Create Request** (button; disabled until Title has text; shows "Creating..." while saving).
+
+**Done when:** toast "Request created successfully"; the sheet closes and the list refreshes with the new row. New requests are auto-triaged.
+
+| If you see | Why | Do this |
+|---|---|---|
+| **Create Request** stays disabled | Title is empty | Fill **Title**. |
+| Button returns to **Create Request** with no toast and the sheet stays open | Save failed (no error message is shown) | Retry once, then report "request was not created". |
+
+### Move a request through its status
+**Risk:** `WRITE` (local only, no email) · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** the target status; a note (required for a revision)
+
+Status buttons in the header card depend on the current status:
+
+| Current status | Button | Next status | Note |
+|---|---|---|---|
+| intake | **Triage** | triaged | optional |
+| triaged | **Start Work** | in_progress | optional |
+| in_progress | **Submit for Review** | review | optional; replaced by the text "Create a document before submitting for review" when no document is linked |
+| review | **Approve & Deliver** | delivered | optional |
+| review | **Request Revision** | revision | **required** |
+| revision | **Resume Work** | in_progress | optional |
+| delivered | **Close** | closed | optional |
+
+1. Open `/requests/{id}`.
+2. Click the status button (button in the header card; visual: under the Type / Priority fields).
+   - A confirm box opens below the buttons.
+3. Optional (required for **Request Revision**): type in the box (textarea, placeholder "Add a note (optional)..." or "What needs to change? (required)").
+4. Click `Confirm: {action}` (button; shows "Updating..." while saving). Click **Cancel** to back out.
+
+**Done when:** the status badge next to the h1 shows the new status and the **Activity** card lists the change.
+
+| If you see | Why | Do this |
+|---|---|---|
+| "Create a document before submitting for review" instead of **Submit for Review** | No document is linked to the request | Generate one (see below) or report. |
+| `Confirm: Request Revision` is disabled | The note is empty | Type what needs to change. |
+| "Please add a comment explaining what needs to change." | Revision without a note | Type a note and confirm again. |
+| Red error banner with a server message | Status change refused | Report the message. |
+
+<Note>**Approve & Deliver** here only changes the status inside Ariya. It does not email the client.</Note>
+
+### Assign a request
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+
+1. Open `/requests/{id}`.
+2. Click **Assign to Me** (button; only shown when **Assigned To** is empty).
+
+**Done when:** **Assigned To** is filled.
+
+<Warning>**Assign to Me** does not assign the request to you. It writes the fixed value `backoffice`. Tell the user the request now shows as assigned to "backoffice".</Warning>
+
+### Generate a document for a request
+**Risk:** `READ` here; `AI` / `WRITE` on the next page · **Roles:** Principal, Operator
+
+1. Open `/requests/{id}`.
+2. Click **Generate Document** (button in the **Documents** card header) or **Generate** (button in the **Client context** card).
+   - The browser goes to `/generate?client={slug}&request_id={id}&source=request`.
+3. Continue with [Create a document](/documents/create-a-document).
+
+**Done when:** the Generate page is open with the client preselected.
+
+<Note>The **Documents** card lists linked documents with **Open Editor** (link → `/documents/{id}`), or "No documents created yet."</Note>
+
+### Open client context from a request
+**Risk:** `READ` · **Roles:** Principal, Operator
+
+1. Open `/requests/{id}`.
+2. In **Client context** click one of: **Client profile** (`/clients/{slug}`), **Client documents** (`?tab=documents`), **Compliance** (`?tab=compliance`), **Research** (`?tab=research`), **Memory** (`?tab=memory`).
+3. To jump to the history click **Activity log** (anchor → `#request-activity`).
+
+**Done when:** the client page or the Activity card is in view.
+
+### Log operator feedback on a request
+**Risk:** `WRITE` (internal comment) · **Roles:** Principal, Operator
+
+1. Open `/requests/{id}`.
+2. Under **Execution progress** → **Operator feedback**, click **Helpful** or **Needs follow-up** (button; shows "Logging..." while saving).
+3. If the request came from platform feedback, **Open source feedback** (link → `/platform-feedback/{id}`) opens the source.
+
+**Done when:** the button returns to its label and a comment appears in **Activity**.
+
+### Delete a request
+**Risk:** `DESTRUCTIVE` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** the exact request title
+
+1. Open `/requests` and find the row (see [Find a request](#find-a-request)).
+2. Click ⋯ at the end of the row (icon button, screen-reader text "Actions"; visual: last column).
+3. Click **Delete** (menu item). Menu also has **View**.
+   - A dialog opens: title "Delete request", text `This will permanently delete "{title}". This action cannot be undone.`
+4. Check the title in the dialog matches.
+
+<Warning>**Approval required (DESTRUCTIVE).** Stop here and get approval before clicking **Delete**. The request is permanently deleted and there is no undo.</Warning>
+
+5. Click **Delete** (button in the dialog). Click **Cancel** to back out.
+
+**Done when:** toast "Request deleted" and the row is gone.
+
+## Controls reference
+| Visible text | Type | Locator | What it does | Risk |
+|---|---|---|---|---|
+| New Request | button | `/requests` header | Opens the create sheet | `READ` |
+| Search action queue... | input | placeholder | Filters by title | `READ` |
+| (row) | clickable row | table | Opens `/requests/{id}` | `READ` |
+| (client name) | link | Client column | Opens `/clients/{slug}` | `READ` |
+| ⋯ | icon button | screen-reader text "Actions" | Menu **View**, **Delete** | — |
+| Delete | menu item, then dialog button | row menu | Deletes permanently | `DESTRUCTIVE` |
+| Title / Client / Description | sheet fields | placeholders above | Request fields | — |
+| Create Request / Creating... | button | sheet footer | Creates the request | `WRITE` |
+| Cancel | button | sheet / confirm box | Closes | `READ` |
+| Rows per page | select | under table | 10 / 20 / 50 | `READ` |
+| Assign to Me | button | detail header card | Assigns to `backoffice` | `WRITE` |
+| Triage / Start Work / Submit for Review / Approve & Deliver / Request Revision / Resume Work / Close | buttons | detail header card | Opens the confirm box | — |
+| `Confirm: {action}` / Updating... | button | confirm box | Changes the status | `WRITE` |
+| Client profile / Client documents / Compliance / Research / Memory | links | Client context | Client pages | `READ` |
+| Generate / Generate Document | links | Client context / Documents | Opens `/generate` for this client | `READ` |
+| Activity log | anchor | Client context | Scrolls to Activity | `READ` |
+| Open Editor | link | Documents card | `/documents/{id}` | `READ` |
+| Helpful / Needs follow-up / Logging... | buttons | Operator feedback | Adds an internal comment | `WRITE` |
+| Open source feedback | link | Source context | `/platform-feedback/{id}` | `READ` |
+
+## Waits and signals
+- List: table skeleton while loading; empty text "No action queue items yet."
+- Detail: plain "Loading..." until loaded.
+- Create: "Creating..." on the button, then toast "Request created successfully".
+- Status change: "Updating..." on the confirm button, then the badge changes.
+
+## Gotchas
+- `/requests?client={slug}` does **not** filter the list. It opens the **New Request** sheet with that client. Links from the Work Queue use this URL.
+- Every status button is two-step: the button, then `Confirm: {action}`.
+- Row click and the client-name link both navigate; click the title cell to open the request.
+- The pagination chevrons have no label; use "Rows per page" = 50 where possible.
+- Deleting is permanent.
+- Nothing on these pages sends email, e-signature or HubSpot updates.
+
+## Related
+- [Your day](/command-center/your-day)
+- [Work Queue and Management](/command-center/work-queue-and-management)
+- [Create a document](/documents/create-a-document)
+
+## Source files
+- `packages/web/src/app/(dashboard)/requests/page.tsx`
+- `packages/web/src/app/(dashboard)/requests/[id]/page.tsx`
+- `packages/web/src/lib/document-routes.ts`

@@ -1,0 +1,306 @@
+---
+title: "Email and replies"
+sidebarTitle: "Email and replies"
+description: "Draft, edit and attach files to a case reply, send it only after approval, undo a send, choose where the case goes next, and compose a new email that becomes a case."
+keywords: ["reply", "reply to client", "draft a reply", "draft with Ariya", "redraft", "polish", "fix grammar", "nudge", "follow up email", "send reply", "undo send", "attach document", "attach from Drive", "new email", "compose email", "send and create case", "email the client", "cc", "bcc"]
+---
+
+<Info>
+
+**URL:** a case: `/service-desk?case={caseId}` (reply box in the pane) or `&view=expanded`; new email: `/service-desk` → **New email** · **Reach:** sidebar **Operations** → open a case, or header **New email** · **Roles:** Principal ✓ Operator ✓ (you can only send on a case that is in your mailbox or assigned to you) · **Ready when:** the reply section (aria-label "Reply") and the action bar button **Send reply** are visible; for a new email, the drawer titled "New email" is open.
+
+</Info>
+
+Every send on this page goes out from the user's Gmail to real people. Drafting, polishing and attaching never send anything. Only two buttons send: **Send reply** and **Send & create case**.
+
+<Danger>
+
+**Every send is EXTERNAL.** Stop and get explicit approval for the exact recipients and text before clicking **Send reply** or **Send & create case**. **Send & create case** has no undo. **Send reply** can be undone only within 5 seconds.
+
+Keyboard traps:
+- In the **New email** drawer, pressing `Enter` in **To**, **Cc** or **Subject** **submits the form and sends the email** once To, Subject and Message are filled. Never press `Enter` in those fields; click into the next field instead.
+- Pressing `Enter` while any button has focus clicks it. If **Send reply** has focus, `Enter` sends.
+- Outside text fields, single keys act instantly on the case (`e`, `1`, `2`, `3`). See [Keyboard shortcuts](/operations/inbox#keyboard-shortcuts).
+
+</Danger>
+
+## Page map
+**Reply composer** (section aria-label "Reply", in the case under **Conversation**; hidden when the case is done or while a send is held):
+- Recipient chip (summary such as "Claire +1" or "Thread sender"). Click it to show **To**, **Cc**, **Bcc** (inputs, placeholder "Type 3 letters of a name or address"; suggestions `+ {email}`; remove chip aria-label `Remove {email}`; **Done** closes). `Cc: +{n} suggested`. `From {address}` (expanded and pop-out views).
+- "Start from:" quick-reply chips (only when the box is empty).
+- Editor (aria-label "Reply"; placeholder "Type, or press Ctrl+J/⌘J to draft with Ariya…"; "Ariya is drafting…" while AI writes).
+- Formatting toolbar (role "toolbar", aria-label "Formatting"): Undo, Redo, Bold, Italic, Underline, Text colour, Align, Numbered list, Bulleted list, Indent less, Indent more (icon buttons with those aria-labels).
+- **Draft with Ariya** / **Redraft with Ariya**, **Polish ▾**, **Fix grammar**, **Attach**, `{n} attachment(s) ▾`, **Pop out** (title "Open the reply in a larger window"), "Saving…" / "Draft saved".
+- A reason line under the box when sending is not possible.
+
+**Action bar** (pinned at the bottom of the case): **Send reply**, the word "then", radiogroup "After sending, the ball is with": **Keep with us**, **Client**, **Vendor**. After a send: **Reply again**. Right: **Done**, ⋯ **More case actions**.
+
+**New email drawer** (right side): title "New email", "Sending creates a case and records it in your inbox.", fields **To**, **Cc (optional)**, **Client**, **Subject**, **Message**, buttons **Send & create case** and **Discard**.
+
+## Recipes
+
+### Draft a reply with Ariya
+**Risk:** `AI` (never sends) · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** optional guidance ("confirm the W-2c is filed")
+**Preconditions:** the case is assigned to you (otherwise drafting fails)
+
+1. Open the case (`/service-desk?case={caseId}`).
+2. Click **Draft with Ariya** (button under the reply box; reads **Redraft with Ariya** when text exists). Alternative: click into the editor and press Ctrl+J (⌘J on Mac).
+   - A popover opens with the label "Anything Ariya should know?" (or "What should change?" for a redraft) and a textarea (id "composer-redraft").
+3. Optional: type the guidance into that textarea. Pressing `Enter` here submits the popover (Shift+Enter for a new line); it does not send email.
+4. Click **Draft** (or **Redraft**).
+   - Wait for: "Ariya is drafting…" in the editor to be replaced by the draft text. This is slow.
+5. Read the draft. Edit it by clicking into the editor and typing.
+6. Click the recipient chip and check **To**, **Cc** and **Bcc** (To defaults to the latest inbound sender).
+7. **Stop. Report the draft and the recipients to Clarwiz.** Do not click **Send reply** without approval.
+
+**Done when:** the draft is in the editor and "Draft saved" shows.
+
+| If you see | Why | Do this |
+|---|---|---|
+| Red alert "Assign this case to yourself before drafting a reply." | Case owned by someone else | Take the case first ([Take or reassign a case](/operations/case#take-or-reassign-a-case)) if the user agrees. |
+| Red alert "Ariya couldn’t draft the reply. Try again." | AI failed | Click **Dismiss** on the alert and retry once. |
+
+### Polish or fix the grammar of a draft
+**Risk:** `AI` (never sends) · **Roles:** Principal, Operator
+
+1. With text in the reply box, click **Polish ▾** (menu button) → **Casual** ("Warm and conversational") or **Formal** ("Polished and professional"). Or click **Fix grammar** (button).
+   - Both are disabled while the box is empty (title "Write something first").
+   - Wait for: the text in the editor to change.
+
+**Done when:** the rewritten text is in the editor.
+
+### Draft a nudge
+**Risk:** `AI` (never sends) · **Roles:** Principal, Operator
+**Preconditions:** the case is waiting on the client or a vendor
+
+1. Open the case. The banner reads `Waiting on {the client|vendor} since {Mon D}. Ariya brings it back to Cases when they reply.`
+2. Click **Draft a nudge** (button in the banner).
+   - Wait for: "Ariya is drafting…" to be replaced by a short follow-up asking for an update.
+3. Review and stop, as in [Draft a reply with Ariya](#draft-a-reply-with-ariya) step 7.
+
+**Done when:** the nudge text is in the editor.
+
+### Set the reply recipients
+**Risk:** `READ` (local to this browser tab until sent) · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** To, Cc, Bcc addresses
+
+1. Click the recipient chip above the editor (button; shows names such as "Claire +1" or "Thread sender").
+2. Click into **To**, **Cc** or **Bcc** (input, placeholder "Type 3 letters of a name or address").
+3. Type an address. Click a suggestion `+ {email}`, or press `Enter`, `Tab` or `,` to turn the typed text into a chip. (In this composer `Enter` adds the address; it does not send.)
+4. To remove one, click its × (aria-label `Remove {email}`).
+5. Click **Done** to close the fields. Optional: click `Cc: +{n} suggested` to add suggested Cc addresses.
+
+**Done when:** the chips show exactly the approved recipients and no warning "One entry is not a valid email address." is shown.
+
+### Attach files to the reply
+**Risk:** `READ` for Ariya documents; `EXTERNAL` (reads Google Drive) for Drive files. Nothing is sent until **Send reply** · **Roles:** Principal, Operator
+
+Ariya document:
+1. Open the case at full width, **Documents** tab. Link the document first if needed ([Link an existing document to a case](/operations/case#link-an-existing-document-to-a-case)).
+2. Click **Stage for reply** on the linked row (becomes **Staged**). A URL with `&stage={documentId}` does this automatically for an already-linked document.
+
+Google Drive file:
+1. Click **Attach** (button under the reply box).
+   - Dialog "Attach files from Google Drive" opens at "Client folder" ("Loading Drive files..." while loading). "Files are fetched from Drive when the reply is sent, and attached as real files."
+2. Select one or more files.
+3. Click **Attach 1 file** or `Attach {n} files`.
+
+Check and remove:
+1. Click `{n} attachment(s) ▾` (button under the reply box). The popover "Attaching to this reply" lists each item ("· PDF" for Ariya documents, "· Drive" for Drive files).
+2. To remove one, click its remove button (aria-label `Remove {title}`).
+
+**Done when:** `{n} attachment(s)` shows the right count and items.
+
+| If you see | Why | Do this |
+|---|---|---|
+| "No Drive folder was found for this case's client. Browse from the shared drive root instead." | No client folder | Browse from the root or report. |
+| "This folder is empty." | Empty folder | Go up a level or report. |
+
+### Choose where the case goes after sending
+**Risk:** `READ` (applies only when the reply is sent) · **Roles:** Principal, Operator
+
+1. In the action bar, after the word "then", click **Keep with us**, **Client** or **Vendor** (radiogroup "After sending, the ball is with"). Click the same option again to clear it.
+
+**Done when:** the option shows as selected. If none is chosen, a prompt appears after sending (see [Answer where the ball goes after a send](#answer-where-the-ball-goes-after-a-send)).
+
+### Use the larger reply window
+**Risk:** `READ` · **Roles:** Principal, Operator
+
+1. Click **Pop out** (button, title "Open the reply in a larger window").
+   - Dialog "Reply" opens with the case title as its description and the same composer. The pane shows "The reply is open in a larger window." with **Show it**.
+2. Click **Close** to return. The dialog's **Send reply** sends exactly like the action bar button (approval required).
+
+### Send the reply
+**Risk:** `EXTERNAL` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** explicit approval for this exact text and these recipients
+**Preconditions:** Gmail connected with send permission; sending switched on; the case is yours or assigned to you; the reply box has text
+
+1. Confirm the draft text, the **To** / **Cc** / **Bcc** chips and `{n} attachment(s)` match what was approved.
+2. Check **Send reply** is enabled. If not, hover it: the title (and the line under the box) gives the reason (table below).
+
+<Warning>**Approval required (EXTERNAL).** Stop here and get approval before clicking **Send reply**. This sends an email from the user's Gmail. It can only be undone in the next 5 seconds.</Warning>
+
+3. Click **Send reply** (button with a paper-plane icon; visual: action bar, bottom left of the case).
+   - The banner reads `Sending reply to {name}` with `Undo send · {n}s` counting down from 5. **Do not navigate, click links, or change case during these 5 seconds.**
+   - Then `Sending reply to {name}…`.
+4. Wait for `Reply sent to {name} · {time}`.
+
+**Done when:** the banner reads `Reply sent to {name} · {time}`, the list row shows the tag "Reply sent", and the action bar shows **Reply again**. If a "then" option was chosen the case moves ("Kept with us" or `Moved to Waiting on {client|vendor}`); otherwise "Where does the ball go now?" appears.
+
+Send disabled reasons (title on **Send reply** and the line under the box):
+
+| Text | Why | Do this |
+|---|---|---|
+| "Sending email is switched off for this workspace." | Workspace setting | Report it. |
+| "Connect your Gmail account in Operations settings to reply from here." | Gmail not connected | Hand off: [Connect Gmail](/operations/settings#connect-gmail). (Operations settings has no Gmail controls.) |
+| "Your Gmail account is connected but has not granted permission to send. Reconnect it in Operations settings." | Send permission missing | Hand off: reconnect via the header **Connect Gmail**. |
+| "This case is in another operator’s mailbox and is not assigned to you. Assign it to yourself to reply." | Not your case | Take the case if the user agrees. |
+| "Write a reply first" | Box empty | Draft first. |
+
+Send failures (toast `Reply not sent: {reason}` plus a red alert in the composer with **Dismiss**; the draft stays):
+
+| Reason | Do this |
+|---|---|
+| "Gmail is not connected for sending." | Hand off to reconnect Gmail. |
+| "Assign this case to yourself before replying." | Take the case if the user agrees, then ask again before resending. |
+| "Reply attachments are not enabled in this environment." | Remove the attachments, ask again. |
+| "Attachments are only supported when replying from the mailbox that owns this case." | Report it. |
+| "That document is not linked to this case." / "That document could not be found." | Link the document, restage, ask again. |
+| "The document could not be rendered to PDF. The reply was not sent." / "PDF generation is unavailable, so the attachment could not be prepared. The reply was not sent." | Report it. |
+| "The attachment is too large to send." | Remove or replace the attachment, ask again. |
+| "The reply was not sent." or another server message | Report it. |
+| Toast "Check the recipients: one entry is not a valid email address." (nothing was held) | Fix the recipient chips, ask again. |
+
+### Undo a reply send
+**Risk:** `READ` (cancels the send) · **Roles:** Principal, Operator
+
+1. Within 5 seconds of clicking **Send reply**, click `Undo send · {n}s` (button in the send banner). If you already moved to another case with `j` / `k`, click **Undo** in the toast "Sending reply…".
+
+**Done when:** toast "Send undone. The draft is back." and the draft is back in the editor.
+
+<Warning>
+
+- Clicking any in-app link or menu that leaves the Operations page during the 5 seconds **sends the reply at once**.
+- Moving to another case does not cancel it; only **Undo** does.
+- Closing or reloading the tab shows the browser's leave-page warning; if the page is left anyway, the reply is **not** sent.
+- After the countdown ends the email is gone and cannot be recalled.
+
+</Warning>
+
+### Answer where the ball goes after a send
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+
+Shown as "Where does the ball go now?" after a send without a "then" choice. Keys `1` to `4` pick options while it is shown; use the mouse.
+
+1. Click one card: **Keep with us**, **Client · waiting for their reply** (shows `follow-up set for {Mon D}`; **change** opens a date input, aria-label "Follow-up date"), **Vendor** (pick in the select, aria-label "Vendor", "Pick vendor…"), or **Done · resolved**.
+2. Click `Confirm · {Keep with us|Waiting on client|Waiting on vendor|Mark done}` (button; disabled with title "Pick the vendor first" until a vendor is picked). Or **Skip for now**.
+
+**Done when:** the case moves (top-centre card or toast) or the prompt closes.
+
+### Reply again on the same case
+**Risk:** `READ` · **Roles:** Principal, Operator
+
+1. After a send, click **Reply again** (button in the action bar). This only reopens the composer; it does not send.
+2. Draft and stop for approval as above.
+
+### Compose a new email
+**Risk:** `READ` (draft only; nothing is saved) · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** To, optional Cc, optional client, Subject, Message
+**Preconditions:** Gmail connected (**New email** is hidden otherwise)
+
+1. Open `/service-desk`.
+2. Click **New email** (button; visual: header, right of **Scan inbox**).
+   - The drawer "New email" opens and the cursor is put in **To**.
+3. Type the address(es) in **To** (input, id "compose-to", placeholder "recipient@example.com, another@example.com"; separate several with commas). **Do not press Enter.**
+4. Optional: click **Cc (optional)** (input, id "compose-cc", placeholder "cc@example.com") and type. **Do not press Enter.**
+5. Optional: choose **Client** (select, id "compose-client"; "No client" or a client).
+6. Click **Subject** (input, id "compose-subject", placeholder "Email subject") and type. **Do not press Enter.**
+7. Click **Message** (editor, aria-label "Message", placeholder "Write your message…") and type. Optional: **Polish** or **Fix grammar** (AI).
+8. **Stop. Report the recipients, subject and message to Clarwiz.**
+
+**Done when:** all fields are filled and nothing has been sent. Closing the drawer (**Discard**, Esc or clicking outside) clears every field; there is no saved draft.
+
+### Send a new email and create a case
+**Risk:** `EXTERNAL` (no undo) · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** explicit approval for these recipients, subject and message
+
+1. Complete [Compose a new email](#compose-a-new-email). **Send & create case** is enabled only when To, Subject and Message all have text.
+2. Re-read **To**, **Cc**, **Subject** and **Message**.
+
+<Warning>**Approval required (EXTERNAL).** Stop here and get approval before clicking **Send & create case**. The email is sent immediately from the user's Gmail. There is no confirmation and no undo.</Warning>
+
+3. Click **Send & create case** (submit button; visual: bottom of the drawer). It reads "Sending…" while working.
+
+**Done when:** the drawer closes and toast "Email sent and tracked as a case" appears with **Open** (opens the new case).
+
+| If you see | Why | Do this |
+|---|---|---|
+| Red alert in the drawer with a server message or "Couldn’t send the email" | Send failed; the drawer stays open | Report the message; do not retry without approval. |
+| **Send & create case** disabled | A required field is empty | Fill To, Subject and Message. |
+
+## Drafts
+- Reply text autosaves in **this browser only** ("Saving…" then "Draft saved"). It is not shared with teammates or other devices.
+- Recipients, attachments and the "then" choice are **not** saved: they reset when the page reloads.
+- The **New email** drawer saves nothing; closing it discards everything.
+- **Draft with Ariya**, **Redraft**, **Draft a nudge**, **Polish** and **Fix grammar** only change the text in the box.
+
+## Controls reference
+| Visible text | Type | Locator | What it does | Risk |
+|---|---|---|---|---|
+| (recipient chip) | button | above the editor | Shows To / Cc / Bcc | `READ` |
+| To / Cc / Bcc | inputs | placeholder "Type 3 letters of a name or address" | Recipients (Enter adds a chip) | `READ` |
+| `+ {email}` | buttons | suggestions | Adds an address | `READ` |
+| `Remove {email}` | icon button | recipient chip | Removes an address | `READ` |
+| Start from: | chips | empty reply box | Inserts a quick reply | `READ` |
+| Reply | editor | aria-label "Reply" | Reply text | `READ` |
+| Formatting | toolbar | aria-label "Formatting" | Text formatting | `READ` |
+| Draft with Ariya / Redraft with Ariya | button | under the box | Opens the draft popover | `AI` |
+| Draft / Redraft | button | popover | Writes the draft | `AI` |
+| Polish ▾ → Casual / Formal | menu | under the box | Rewrites tone | `AI` |
+| Fix grammar | button | under the box | Fixes grammar | `AI` |
+| Attach | button | under the box | Drive picker | `EXTERNAL` (read) |
+| `{n} attachment(s) ▾` | button | under the box | Lists attachments | `READ` |
+| `Remove {title}` | icon button | attachments popover | Removes an attachment | `READ` |
+| Pop out | button | title "Open the reply in a larger window" | Reply dialog | `READ` |
+| Send reply | button | action bar / Reply dialog | **Sends email** | `EXTERNAL` |
+| `Undo send · {n}s` | button | send banner | Cancels the send | `READ` |
+| Keep with us / Client / Vendor | radios | "After sending, the ball is with" | Park after send | `READ` |
+| Reply again | button | action bar after send | Reopens composer | `READ` |
+| `Confirm · {choice}` / Skip for now | buttons | "Where does the ball go now?" | Parks the case | `WRITE` |
+| New email | button | desk header | Opens the drawer | `READ` |
+| To / Cc (optional) / Client / Subject / Message | fields | ids "compose-to", "compose-cc", "compose-client", "compose-subject"; aria-label "Message" | New email fields (Enter in inputs submits) | — |
+| Send & create case / Sending… | submit button | drawer footer | **Sends email, creates case** | `EXTERNAL` |
+| Discard | button | drawer footer | Closes and clears | `READ` |
+
+## Waits and signals
+- "Ariya is drafting…" while AI writes; slow.
+- "Saving…" then "Draft saved" after typing.
+- Send: `Sending reply to {name}` with `Undo send · {n}s` (5 seconds) → `Sending reply to {name}…` → `Reply sent to {name} · {time}`.
+- New email: "Sending…" on the button, then toast "Email sent and tracked as a case".
+
+## Gotchas
+- `Enter` in the New email **To**, **Cc** or **Subject** inputs sends the email when the form is complete.
+- `Enter` on a focused button presses it.
+- Leaving the desk during the 5-second hold sends the reply immediately.
+- **Reply again** is not a send.
+- The Gmail messages in the disabled reasons point to "Operations settings", but `/service-desk/settings` has no Gmail controls. Use the header **Connect Gmail** (human hand-off).
+- To default: the latest inbound sender. Always check the recipient chip before asking for approval.
+
+## Related
+- [Work a case](/operations/case)
+- [Operations inbox](/operations/inbox)
+- [Triage settings and Gmail connection](/operations/settings)
+
+## Source files
+- `packages/web/src/app/(dashboard)/service-desk/page.tsx`
+- `packages/web/src/app/(dashboard)/service-desk/components/composer.tsx`
+- `packages/web/src/app/(dashboard)/service-desk/components/action-bar.tsx`
+- `packages/web/src/app/(dashboard)/service-desk/components/post-send.tsx`
+- `packages/web/src/app/(dashboard)/service-desk/components/reply-pop-out.tsx`
+- `packages/web/src/app/(dashboard)/service-desk/components/compose-dialog.tsx`
+- `packages/web/src/app/(dashboard)/service-desk/components/draft-ai-tools.tsx`
+- `packages/web/src/app/(dashboard)/service-desk/hooks/use-undoable-send.ts`
+- `packages/web/src/app/(dashboard)/service-desk/inbox-page-state.ts`
+- `packages/web/src/app/(dashboard)/service-desk/reply-attachments.ts`
+- `packages/web/src/components/drive-file-picker.tsx`

@@ -1,0 +1,393 @@
+---
+title: "Create a document"
+sidebarTitle: "Create a document"
+description: "Create any HR document from a plain-language request, wait for the AI draft, answer its questions, refine it, download the PDF and attach it to a case."
+keywords: ["create a document", "draft a document", "incident report", "offer letter", "written warning", "write up", "policy", "generate document", "download PDF", "attach to case", "document assistant", "blockers", "packet", "generate now", "use in chat"]
+---
+
+<Info>
+**URL:** `/documents` then `/documents/chat/{sessionId}` · **Reach:** sidebar **Documents** · **Roles:** Principal ✓ Operator ✓ (Admin and Member too; no differences on this flow) · **Ready when:** the heading **What do you need?** and the box with placeholder "For example: an offer letter for Dana at Brightwater Dental, starting 6 October, $46.50 an hour" are visible.
+</Info>
+
+This is the main recipe for producing a document. The AI document chat is the only path that writes real content from a plain-language request such as "create an incident report for Rachel at ABC Dental". Everything else on this page is a variant for special cases.
+
+## Fast path
+
+1. Open `/documents?client={clientSlug}` (or open `/documents` and pick the client in **Select a client…**).
+2. Type the whole request, with every fact, into the request box. Click **Send**. Do not reload.
+3. Wait until the URL is `/documents/chat/{sessionId}`, then check every 5 s until the turn is over: the message box is enabled and the hint next to **Add image** reads "Enter to send, Shift+Enter for a new line". This takes 30 s to several minutes (hard limit 10 min).
+4. If a **Blockers** card appears, answer every question and click **Send answers**. If the last reply asks a question in prose, type the answer and click **Send**. Wait again.
+5. When the **Live preview** shows the document, read it. Type any changes into the message box, **Send**, wait again.
+6. Click **PDF (editable)** in the preview header. Wait for the toast "editable PDF downloaded".
+7. Only if the chat came from an Operations case: click **Attach to case**. Wait for the URL to start with `/service-desk?case=`.
+8. Report back: chat URL, document title, the **Open in editor** URL, the downloaded file name, and any gaps the assistant listed.
+
+## Choose the right path
+
+| Situation | Use |
+|---|---|
+| A plain-language request (the normal case) | [Create a document from a request](#create-a-document-from-a-request) |
+| Clarwiz names an exact template, or the assistant is turned off | [From a template with Generate now](#variant-from-a-template-with-generate-now) |
+| An official PDF form (IRS Form 8655, California DE 48 power of attorney, isolved implementation kit) | [Generate now](#variant-from-a-template-with-generate-now). The assistant refuses PDF forms. |
+| You want a template as a hint but still want AI-written content | [From a template with Use in chat](#variant-from-a-template-with-use-in-chat) |
+| The document is for an Operations case and should be staged on the case reply | [From an Operations case](#variant-from-an-operations-case) |
+| You start on a client profile (**Generate Document** button) | [From a client profile](#variant-from-a-client-profile) |
+| Several standard documents for one client at once | [Packet run](#variant-packet-run) |
+
+For which template fits which request, see [Choosing a template](/documents/choosing-a-template) and the [Template catalog](/documents/template-catalog). For how templates are filled, see [How templates work](/documents/how-templates-work).
+
+## Writing a good request
+
+The assistant only stops to ask about true blockers (for example the employee's name on an offer letter). Everything else it does not know stays blank and is listed as a gap. It never invents names, dates, amounts, addresses or legal citations. So the quality of the document depends almost entirely on what you put in the first message.
+
+- **Put every fact in one message.** Who, which client, dates and times, what happened, witnesses, action taken, pay, who completes or signs it. One complete message is faster than several follow-ups, because each message is a full turn of up to several minutes.
+- **Start with a verb.** Begin with "Draft a …" or "Create a …". A request that reads like a question ("what goes in an offer letter?") gets a prose answer and no document.
+- **Use the full document name** as it appears in Documents → Templates: "HR Incident Report", "Offer Letter", "Written Warning", "non-disclosure agreement". Abbreviations and slang ("NDA", "PIP", "write-up", "QBR", "DE 48") match templates poorly and trigger questions. See [Choosing a template](/documents/choosing-a-template).
+- **Name the client exactly** as it is spelled in Ariya, or better, bind it with **Select a client…** before sending.
+- **Give full names with job titles**, dates with day, month and year, times with am or pm, and money with the unit ("\$46.50 per hour", "\$85,000 per year").
+- **Say who completes or signs it** ("Completed by Jane Smith, HR Manager").
+- **Say what to leave blank** if you know it is missing ("Leave the response deadline blank"). This avoids a blocker question.
+- **Attach source material** (an email, notes, a complaint) with **Attach files** instead of paraphrasing it. Non-image files need a bound client.
+- **Expect a confirmation question** when several templates share a word: warnings (Written Warning vs Corrective Action Warning), incident reports, proposals, service agreements, handbooks. Answer with the exact template name Clarwiz gave you; if Clarwiz did not say, stop and ask.
+
+Example requests (copy the shape, replace the facts):
+
+Incident report:
+
+```text
+Draft an HR Incident Report for ABC Dental. Employee involved: Rachel Kim, dental assistant. Incident date and time: 28 October 2026, about 2:00 pm. Location: staff break room. What happened: Rachel reported a verbal altercation with a coworker, Tom Lee, about shift scheduling; voices were raised, there was no physical contact. Witness: Maria Diaz, front desk. Action taken at the scene: the two were separated and the office manager was notified. Injuries: none. Police or emergency services: not called. Completed by Jane Smith, HR Manager. Reported to Ariya HR on 28 October 2026.
+```
+
+Offer letter:
+
+```text
+Draft an Offer Letter for Brightwater Dental. Candidate: Dana Lopez, dana.lopez@example.com. Position title: Dental Hygienist. Position summary: provides hygiene care and patient education. Department: Clinical. Reports to: Dr. Amy Chen. Start date: 6 October 2026. Schedule: Monday to Thursday, 8:00 am to 5:00 pm. Classification: non-exempt, hourly, $46.50 per hour. Response deadline: 25 September 2026. Signatory: Amy Chen, Practice Owner.
+```
+
+Written warning:
+
+```text
+Draft a Written Warning for ABC Dental, warning level Written Warning. Employer city and state: Sacramento, CA. Employee: Marcus Reed, Front Desk Coordinator, Front Office department, supervisor Jane Smith. Issue type: attendance and punctuality. Issue: arrived 20 to 40 minutes late for his 8:00 am shift on 6, 13 and 20 October 2026 without calling in. Prior warnings: verbal warning on 29 September 2026 for lateness. Required corrective action: arrive by 8:00 am for every scheduled shift and call the office manager before 7:30 am if running late. Improvement deadline: 30 days. Follow-up review: 20 November 2026.
+```
+
+Policy:
+
+```text
+Draft a Remote Work and Expense Reimbursement Policy for ABC Dental. Policy owner: Jane Smith, HR Manager. Effective date: 1 January 2027. Eligible roles: billing and scheduling staff, with manager approval; clinical roles are not eligible. Equipment: the company provides a laptop and headset. Expense reimbursement: internet and phone at $50 per month, claimed monthly with receipts. Timekeeping: non-exempt staff clock in and out in the payroll system and take all meal and rest breaks.
+```
+
+## Recipes
+
+### Create a document from a request
+**Risk:** `WRITE` `AI` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** client name or slug; document type; all facts; optional files; optional case id (see [From an Operations case](#variant-from-an-operations-case)).
+**Preconditions:** signed in; the sidebar shows **Documents**.
+
+1. Open `/documents` (or click sidebar **Documents**, then the top tab **Documents**).
+   - Wait for: heading **What do you need?**, the request box, the **Select a client…** button, **Attach files** and **Send** (Send is disabled while the box is empty). The list below finishes loading when "Loading your documents…" disappears.
+   - If instead you see "The document assistant is turned off for this workspace. You can still open a template below and generate from it." the chat is unavailable. Use [Generate now](#variant-from-a-template-with-generate-now).
+2. Click **Select a client…** (combobox button, `aria-haspopup="listbox"`; visual: under the request box, left side). Skip this step if you opened `/documents?client={clientSlug}` and the button already shows the client name.
+3. Type part of the client name or slug into the search box (aria-label "Search clients", placeholder "Search clients…"; visual: top of the dropdown). It matches anywhere in the name, so "King" finds "Delta King Hotel".
+4. Click the client's name in the list (role `option`). If exactly one match shows, Enter also picks it. "No client matches that." means no match: stop and confirm the client with Clarwiz.
+   - Done when: the picker button shows the client name. There is no clear option; to undo a wrong pick, reload `/documents` and start again.
+5. Click the request box (textarea, label "Your request", id `document-ask`; visual: large box under the heading). Type the whole request (see [Writing a good request](#writing-a-good-request)). Use Shift+Enter for line breaks; plain Enter sends.
+6. Optional: attach files. Click **Attach files** (button with paperclip; visual: under the request box). It opens the OS file picker on a hidden multi-file input; set the files on that input. Staged files show as chips with an "×" (aria-label `Remove {filename}`) and the button changes to **Add more**.
+   - Images (PNG, JPEG, WebP, GIF; up to 4; up to 20MB each) go with the first message. Other files (PDF, .docx, .eml, Excel, CSV, text; up to 10MB) are uploaded as client sources when the chat opens, and need a client from step 4.
+7. Click **Send** (button, text "Send" with a paper-plane icon; visual: right end under the request box).
+   - Wait for: the Send icon spins and the box locks, then the URL changes to `/documents/chat/{sessionId}`. Usually 1 to 3 s.
+   - Do not reload or type a URL during this wait. The request text is handed to the chat page in memory only; a reload loses it (the empty chat still exists, so re-type the request in its message box).
+8. Wait for the turn to finish. See [Wait for the turn to finish](#wait-for-the-turn-to-finish).
+9. Classify the outcome. See [Decide how the turn ended](#decide-how-the-turn-ended).
+
+**Done when:** the URL is `/documents/chat/{sessionId}`, the turn is over and the **Live preview** shows the document.
+
+| If you see | Why | Do this |
+|---|---|---|
+| "That case is not available to you. The request was not sent." (red, under the box) | The `?case=` value is wrong or not yours | Check the case id with Clarwiz; open `/documents?case={caseId}` again |
+| "Could not start a chat. Try again." | Session creation failed | Click **Send** again once; if it repeats, report it |
+| Another red message under the box (for example about the client) | Server refused, often a client slug the workspace does not own | Re-pick the client from the list instead of using `?client=` |
+| `Not attached — {file}: Only PNG, JPEG, WebP or GIF images can be attached` (also "That image is larger than 20MB", "At most 4 images per message") | Image rejected while staging | Remove or replace the file; send other material as a source in the chat |
+| Picker still reads **Select a client…** after `?client={clientSlug}` | Slug not in the client list; the binding is still applied and Send will fail | Pick the client from the list instead |
+
+### Wait for the turn to finish
+**Risk:** `READ` · **Roles:** Principal, Operator
+**Preconditions:** you just sent a message, answered blockers, or opened a chat that is still running.
+
+While the assistant works, you will see:
+- your message as a right-aligned blue bubble;
+- grey italic status lines such as "Thinking...", "Processing...", `Running {n} tools...`, `Working on {Client name}` (the client got bound; the chip at the top of the chat changes from "No client yet" to the client name) and `Attached {file title}`;
+- small grey rows with a wrench icon, one per tool call, such as `resolve_client — …`, `get_client_data — …`, `resolve_template — …`, `generate_draft — …`, `edit_sections — …`, `ask_user — …`;
+- an assistant bubble (bordered, left-aligned) that streams text and keeps rewriting itself;
+- the message box and **Send** disabled, a spinner on **Send**, and the hint next to **Add image** reading "Working...";
+- for a new document, the right pane shows a spinner "Drafting your document…" with "It appears here with your details filled in once the assistant finishes." The draft is hidden on purpose until the turn ends. This is not a failure.
+
+**The turn-finished test.** Check every 5 s. The turn is over only when all three are true:
+1. The message box (placeholder "Ask for a document, or refine the current draft..."; visual: bottom of the left pane) is enabled.
+2. The hint next to **Add image** reads "Enter to send, Shift+Enter for a new line".
+3. The **Send** button shows the paper-plane icon, not a spinner. (Send stays disabled while the box is empty; that is normal.)
+
+Timing: typically 30 s to several minutes. The server stops a turn at 10 minutes. If the connection drops or you reopen the chat mid-turn, a status line reads "Still working on this. The chat updates when the assistant finishes." and the page keeps checking every 3 s for up to 11 minutes; keep waiting. If the turn is still not over after 12 minutes, reload `/documents/chat/{sessionId}` once and apply the test again. If it is still not over, report a failure with the chat URL.
+
+**Done when:** the three conditions hold. Go to [Decide how the turn ended](#decide-how-the-turn-ended).
+
+### Decide how the turn ended
+**Risk:** `READ` · **Roles:** Principal, Operator
+
+Look at the last item in the transcript (left pane), the right pane, and the area above both panes.
+
+| Outcome | What you see | Do this |
+|---|---|---|
+| Finished, draft ready | Right pane shows the rendered document in a frame titled "Document preview". Header shows **Live preview** and a small `v{n}` button (title "Version history"). **PDF (editable)**, **PDF (flat)** and **One page (A4)** are enabled. An **Open in editor** link is visible. The last bubble summarises the draft and may list gaps. | Read the preview and the gap list. Check every fact Clarwiz gave you. Then [Refine the draft](#refine-the-draft) or [Download the PDF](#download-the-pdf). |
+| Blocked, structured questions | The last item is a card headed **Blockers** (shown in capitals, with a question-mark icon), one or more questions with a text box or a row of choice buttons, and a **Send answers** button. The preview often still says "No document yet". | [Answer the assistant's questions](#answer-questions-from-the-assistant). |
+| Blocked, question in prose | The last assistant bubble asks a question. No Blockers card. The preview may or may not show a draft. | Type the answer in the message box and click **Send**. Wait again. |
+| Failed | Red banner at the top of the page, above both panes (texts below). Any draft already made is still shown. | Follow the failure table below. |
+| No document, no question | Preview shows "No document yet" and "The draft appears here as soon as the assistant generates it."; the assistant answered in prose (it treated the text as a question). | Send "Draft the document now." and wait again. |
+
+There is no dedicated refusal screen. A refusal arrives as a prose reply with no draft, as the red banner "The assistant could not finish this request.", or for files as a status line `Not attached: {file}. {reason}`.
+
+| If you see (red banner) | Why | Do this |
+|---|---|---|
+| "The assistant could not finish this request." | The turn failed | Re-send a shorter, simpler request. If a draft exists, ask for the remaining change only. |
+| "Still no result from the assistant. Reload this chat to check on it." | The page stopped waiting after 11 minutes | Reload `/documents/chat/{sessionId}` and apply the turn-finished test |
+| "Your last message was not sent because the assistant was still busy. Send it again." | Two sends overlapped (often a second tab on the same chat) | Close other tabs on this chat, wait for the turn to finish, send the same text again |
+| "The assistant did not reply to your last message. Send it again." | The reply was lost | Send the same text again |
+| "This chat is still working on your previous message." | A turn is still running | Wait, then apply the turn-finished test |
+| "Session not found" | Wrong chat id, or another user's chat (chats are per user) | Start again from `/documents` |
+| "Unable to open that chat" | Load failed | Reload once; if it repeats, start a new chat |
+| `Not attached: {file}. Tell the assistant which client this chat is for before attaching a source` | Source file sent to a chat with no client | Tell the assistant the client, wait, then attach the file again in the chat |
+| `Not attached: {file}. File must be between 1 byte and 10MB` (or "Unsupported evidence file type…", "Could not extract text…") | File rejected | Use a smaller, supported, text-based file |
+
+### Answer questions from the assistant
+**Risk:** `AI` `WRITE` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** the answers. If Clarwiz did not give you an answer, do not guess: stop and return the exact questions to Clarwiz. Only write "Unknown — leave it blank as a gap" when Clarwiz said to proceed with gaps.
+
+Blockers card:
+1. For each question with a row of choice buttons, click the matching choice (button; visual: under the question). The chosen button turns solid.
+2. For each question with a text box, click the box directly under the question (input, id `blocker-{questionId}`) and type the answer.
+3. Click **Send answers** (button; visual: bottom-right of the card). It stays disabled until every question has an answer.
+   - Wait for: the button changes to **Sent**, the inputs lock, an empty blue bubble appears and a new turn starts. Then [Wait for the turn to finish](#wait-for-the-turn-to-finish).
+
+Other cases:
+- **None of the choices fits:** do not use the card. Type the answer as a sentence in the message box and click **Send**. The message box is enabled while a Blockers card waits.
+- **Card gone after a reload:** Blockers cards are not restored when a chat is reopened. Answer in the message box in plain text.
+- **Prose question:** type the answer in the message box (placeholder "Ask for a document, or refine the current draft...") and press Enter or click **Send**.
+- **Which client:** usually a Blockers card with client names as choices. Pick the one Clarwiz named. If the chat is already bound to the wrong client, you cannot change it in this chat: click **Switch client (new chat)** (text button; visual: next to the client chip at the top of the chat), which opens `/documents`, and start again with the right client.
+- **Which template:** answer with the exact template name (for example "Use the Written Warning template"). If Clarwiz did not say, stop and ask.
+
+**Done when:** the new turn ends with a draft (see the outcome table).
+
+### Refine the draft
+**Risk:** `AI` `WRITE` · **Roles:** Principal, Operator
+**Preconditions:** a draft is showing in **Live preview**; the turn is over.
+
+1. Click the message box (placeholder "Ask for a document, or refine the current draft..."; visual: bottom of the left pane).
+2. Type all changes in one message, naming each field and value. Example: "Change the incident time to 2:30 pm and add Maria Diaz, front desk, as a second witness."
+3. Press Enter or click **Send**.
+   - Wait for: the turn to finish (same test). Edits to an existing draft show live in the preview while the turn runs, and the `v{n}` number goes up by one.
+4. Read the preview again and check the changed values.
+
+**Done when:** the turn is over, `v{n}` increased and the preview shows the change.
+
+To edit fields by hand instead, click **Open in editor**; see [Document editor](/documents/document-editor).
+
+### Download the PDF
+**Risk:** `READ` · **Roles:** Principal, Operator
+**Preconditions:** a draft exists (the export buttons are disabled until then); the turn is over.
+
+1. Choose the format in the **Live preview** header (visual: top-right of the right pane):
+   - **PDF (editable)** (button, title "Empty fields stay fillable in the downloaded PDF"). Default choice.
+   - **PDF (flat)** (button, title "Nothing stays editable in the downloaded PDF"). Use for a final copy.
+   - **One page (A4)** (button, title "The whole document scaled onto a single A4 page"). Only for short documents; not available for official PDF forms.
+2. Click it once.
+   - Wait for: all three buttons read "Preparing…" and a toast reads "Preparing editable PDF…", "Preparing flat PDF…" or "Preparing one-page A4 PDF…". Rendering takes about 5 to 10 s.
+3. Confirm the download: a toast reads "editable PDF downloaded", "flat PDF downloaded" or "one-page A4 PDF downloaded", with the file name underneath. The browser saves a file named after the document title.
+
+**Done when:** the success toast shows and the file is in the browser's downloads.
+
+| If you see | Why | Do this |
+|---|---|---|
+| `This document is too long for one page: it would need to be shrunk to about {n}%, below the {m}% readability limit. Use the regular PDF download.` | One-page export would be unreadable | Use **PDF (editable)** or **PDF (flat)** |
+| "One-page export is not available for official PDF forms. Use the regular PDF download." | PDF form document | Use **PDF (editable)** |
+| "PDF export runtime is not installed locally." | Server cannot render PDFs | Report it; nothing to fix in the browser |
+| `{label} download failed ({status})` | Server error | Retry once; then try the editor's **Share** menu |
+
+Alternative: click **Open in editor**, then **Share** → **Download PDF (editable)**, **Download PDF (not editable)** or **Download one page (A4)**. The editor saves pending edits first; toasts read "Preparing PDF…" then "PDF downloaded". See [Document editor](/documents/document-editor#download-or-print).
+
+### Attach the draft to a case
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+**Preconditions:** the chat was started from an Operations case (the chat header shows the pill "Case attached — context loads on your first message"); a draft exists.
+
+1. Click **Attach to case** (button with a link icon; visual: in the **Live preview** header, after the PDF buttons). It only appears when the chat has a case and a draft.
+   - Wait for: the button reads "Attaching…".
+2. Confirm success: toast "Attached to the case — opening it for the reply", and the browser opens `/service-desk?case={caseId}&stage={documentId}` with the draft staged on the case reply.
+
+**Done when:** the URL starts with `/service-desk?case=`. Back in the chat, the button is replaced by the link "Attached to case".
+
+<Warning>**Approval required (EXTERNAL).** Attaching only stages the PDF on the reply. Do not send the case reply from the Operations inbox without explicit human approval.</Warning>
+
+| If you see (red text under the preview header) | Why | Do this |
+|---|---|---|
+| "This document belongs to a different client than the case." | The chat is bound to another client | Start again from `/documents?case={caseId}` with the case's client |
+| "Could not attach the draft to the case. Try again." | Server error | Click **Attach to case** again once |
+
+Alternative from the editor: **Share** → **Attach to case reply** (only listed when the document has an originating case). It is a link to the same `/service-desk?case=…&stage=…` URL.
+
+## Variants
+
+### Variant: a specific client
+**Risk:** `WRITE` `AI` · **Roles:** Principal, Operator
+
+Bind the client in one of three ways, then continue at step 5 of [Create a document from a request](#create-a-document-from-a-request):
+- Open `/documents?client={clientSlug}`. It pre-selects the picker. Use the slug, not the display name.
+- Pick it in **Select a client…** (steps 2 to 4).
+- Name the client in the request and let the assistant bind it. Watch for the status line `Working on {Client name}` and the chip at the top of the chat. A chat with no client cannot take non-image source files, and the assistant cannot draft until a client is bound.
+
+### Variant: from a template with Use in chat
+**Risk:** `WRITE` `AI` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** template name; client; facts.
+
+1. Open `/documents/templates` (or the top tab **Templates** under Documents).
+   - Wait for: heading **Templates** and the card grid ("Loading templates…" disappears).
+2. Type the template name into the search box (input, aria-label and placeholder "Find a template"; visual: right of the category chips).
+3. Click the template card (visual: card with the title, a "Platform" or "Custom" badge and a description). Several templates can share a title; see [Templates](/documents/templates#find-and-preview-a-template).
+   - Wait for: a drawer opens on the right with the template title and a preview.
+4. Optional: in the drawer, click **Select a client…** and pick the client.
+5. Click **Use in chat** (button; visual: drawer footer).
+   - Wait for: the URL becomes `/documents` and the request box is pre-filled with `Draft a {Template title} for {Client name}: ` (the client part only if you picked one); the client picker is set.
+6. Click at the end of the pre-filled text and type all the facts after the colon. Do not reload: the pre-fill only survives in-app navigation.
+7. Click **Send** and continue at step 8 of [Create a document from a request](#create-a-document-from-a-request).
+
+The assistant treats the template as a suggestion. The drawer says: "“Use in chat” describes this template to the assistant, which still picks the template it judges right." If it picks another, answer its question or send `Use the {Template title} template.`
+
+### Variant: from a template with Generate now
+**Risk:** `WRITE` (plus `AI` for official PDF forms) · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** exact template; client; facts.
+
+Use this when the exact template matters, the assistant is turned off, or the document is an official PDF form. For normal templates no AI writing happens: the new document holds the template's example values plus the client's profile values, and you fill the rest.
+
+1. Do steps 1 to 3 of [Use in chat](#variant-from-a-template-with-use-in-chat).
+2. In the drawer, click **Select a client…** and pick the client. Until you do, **Generate now** is disabled with the title "Pick a client to generate straight away".
+3. Click **Generate now** (button; visual: drawer footer, next to **Use in chat**).
+   - Wait for: a spinner on the button, then the URL changes to `/documents/{id}` (the editor). A few seconds; longer for PDF forms.
+4. In the editor, finish the content one of two ways:
+   - By hand: if a blue banner reads **Showing template sample data**, click **Clear samples**, then fill each field with the facts. Wait until the toolbar reads "Saved". See [Document editor](/documents/document-editor#edit-fields-and-save).
+   - With AI: click the chat icon in the toolbar (icon button, aria-label "Edit this document in chat"). It opens a new chat bound to this document. Send the facts in one message and follow [Wait for the turn to finish](#wait-for-the-turn-to-finish).
+5. For an official PDF form (card badge "PDF form · fill-in only"; the drawer says "Fixed PDF form — you can only fill in its fields"): the editor opens the PDF form field editor after one AI extraction pass. Fill or correct fields, then click **Save fields** before downloading. See [Fill an official PDF form](/documents/document-editor#fill-an-official-pdf-form).
+6. Download: toolbar **Share** → **Download PDF (editable)**.
+
+**Done when:** the editor reads "Saved" (or **Save fields** reads "Saved" for PDF forms) and the toast "PDF downloaded" shows.
+
+| If you see | Why | Do this |
+|---|---|---|
+| Red text in the drawer body ("Could not generate that document." or a server message) | Generation failed | Retry once; then try another template or the chat path |
+| **Generate now** disabled | No client picked | Pick a client in the drawer |
+
+### Variant: from an Operations case
+**Risk:** `WRITE` `AI` · **Roles:** Principal, Operator
+
+1. Start from the case: in Operations, open the case, and in its Documents pane click **Generate from case**. With the assistant on, this opens `/documents?case={caseId}`. You can also open that URL directly.
+   - Wait for: the pill "Case attached — context loads on your first message" under the request box.
+2. Follow [Create a document from a request](#create-a-document-from-a-request) from step 2. The case context loads with the first message.
+3. When the draft is ready, [Attach the draft to a case](#attach-the-draft-to-a-case).
+
+If the assistant is turned off, **Generate from case** opens the legacy page instead (`/generate?template={slug}&source=service-case&case_id={caseId}`); see [Generate page](/documents/generate-page).
+
+### Variant: from a client profile
+**Risk:** `WRITE` (plus `AI` if you use Research + fill) · **Roles:** Principal, Operator
+
+The client page's header button **Generate Document**, the client Documents tab's **Generate** or **Generate a document**, the Roadmap tab's **Draft** or **Draft deliverable**, and **Draft with context** all open the legacy page `/generate?client={clientSlug}` (with extra parameters). Short version:
+
+1. Wait for the template name as the middle-column heading and the preview status "Ready".
+2. Pick the template in the left list if it is not already selected.
+3. Check the **Client** select shows the right client (it can auto-pick the first client).
+4. Fill the form; optionally click **Research + fill**, then **Apply**.
+5. Click **Generate** (top-right of the page header). Wait for the toast `Generated "{title}"` and the redirect to `/documents/{id}`.
+6. In the editor: **Share** → **Download PDF (editable)**.
+
+Full recipe and every query parameter: [Generate page](/documents/generate-page).
+
+### Variant: packet run
+**Risk:** `WRITE` · **Roles:** Principal, Operator (both can run; only Principal and Admin can create or edit packets)
+
+1. Open `/documents/packets` (or top tab **Packets** under Documents).
+2. On the packet's row click **Run**.
+3. In the panel that opens, click **Select a client…** and pick the client.
+4. Click `Generate {n} documents`.
+   - Wait for: the spinner to stop; a result line `{created} created` (plus `, {failed} failed`) and one row per template with **Open** or a red error.
+5. Open each result with a middle-click or in a new tab. The result list is not kept: leaving the page loses it. Later, find the documents on `/documents` (newest first; search by client slug).
+6. In each editor: fill the remaining fields, then **Share** → **Download PDF (editable)**.
+
+Packet documents hold template defaults plus client data, with no AI-written prose. Full recipe: [Brand and packets](/documents/brand-and-packets#run-a-packet-for-one-client).
+
+## Controls reference
+
+Landing (`/documents`) and chat (`/documents/chat/{sessionId}`) controls used in this flow. Full lists: [Documents home](/documents/documents-home#controls-reference) and [Chat workspace](/documents/chat-workspace#controls-reference).
+
+| Visible text | Type | Locator | What it does | Risk |
+|---|---|---|---|---|
+| (request box) | textarea | label "Your request", id `document-ask` | First request; Enter sends, Shift+Enter new line | `READ` |
+| **Select a client…** or the client name | combobox button | `aria-haspopup="listbox"`; search aria-label "Search clients" | Binds the chat to a client | `READ` |
+| **Attach files** / **Add more** | button | opens a hidden multi-file input | Stages files for the first message | `READ` |
+| **Send** (landing) | button | disabled while the box is empty | Creates the chat and opens it | `WRITE` `AI` |
+| (message box) | textarea | placeholder "Ask for a document, or refine the current draft..." | Next message; Enter sends | `READ` |
+| **Send** (chat) | button | spinner while busy | Runs a turn | `AI` `WRITE` |
+| **Send answers** / **Sent** | button | in the **Blockers** card | Sends all answers as the next turn | `AI` |
+| `v{n}` | button | title "Version history" | Opens the version list | `READ` |
+| **PDF (editable)** / **PDF (flat)** / **One page (A4)** | buttons | titles as in [Download the PDF](#download-the-pdf) | Downloads the PDF | `READ` |
+| **Attach to case** | button | only with a case and a draft | Links the draft to the case and opens the case reply | `WRITE` |
+| **Open in editor** | link | goes to `/documents/{id}?session={sessionId}` | Opens the editor | `READ` |
+| **Switch client (new chat)** / **Choose client** | text button | top of the chat card | Goes to `/documents`; does not open a picker | `READ` |
+
+## Waits and signals
+
+| Moment | Signal while waiting | Finished when | Typical time |
+|---|---|---|---|
+| Landing loads | "Loading your documents…" | Heading **What do you need?** and the list | 1 to 3 s |
+| Landing **Send** | Send icon spins, box locked | URL is `/documents/chat/{sessionId}` | 1 to 3 s |
+| Chat turn | "Working...", status lines, wrench rows, streaming bubble, "Drafting your document…" | The turn-finished test passes | 30 s to several minutes; 10 min hard limit |
+| Reopened mid-turn | "Still working on this. The chat updates when the assistant finishes." | Same test; the page re-checks every 3 s for up to 11 min | as above |
+| PDF download | "Preparing…" on the buttons, loading toast | Toast `… PDF downloaded` | 5 to 10 s |
+| Attach to case | "Attaching…" | Toast "Attached to the case — opening it for the reply" and new URL | 1 to 3 s |
+| Generate now | Spinner on **Generate now** | URL `/documents/{id}` | a few seconds |
+
+## Gotchas
+
+- Do not reload between landing **Send** and the chat page appearing; the opening request is lost (the empty chat remains).
+- The message box is locked for the whole turn. You cannot queue a second message.
+- Use one browser tab per chat. A second tab sending to the same chat produces "Your last message was not sent because the assistant was still busy. Send it again."
+- A new document stays hidden behind "Drafting your document…" until the turn ends.
+- Blockers cards disappear after a reload; answer in the message box instead.
+- The client cannot be changed inside a chat. Use **Switch client (new chat)** and start over.
+- The landing client picker cannot be cleared; reload `/documents` to reset it.
+- The assistant always needs a client before it can draft, and it cannot create the three official PDF forms. Use [Generate now](#variant-from-a-template-with-generate-now) for those.
+- The assistant may write to the client profile on its own while it works (it approves its own tool calls).
+- The preview is a sandboxed frame. If your tooling cannot read text inside it, use a screenshot, or click **Open in editor**, where every value is a form field.
+- Google Docs export and e-signature are not available anywhere in Documents (the Google Docs buttons are not rendered; **E-signature delivery** is disabled).
+
+## Related
+
+- [Documents home](/documents/documents-home)
+- [Chat workspace](/documents/chat-workspace)
+- [Document editor](/documents/document-editor)
+- [Templates](/documents/templates)
+- [Brand and packets](/documents/brand-and-packets)
+- [Generate page](/documents/generate-page)
+- [How templates work](/documents/how-templates-work)
+- [Choosing a template](/documents/choosing-a-template)
+- [Template catalog](/documents/template-catalog)
+
+## Source files
+
+- `packages/web/src/app/(dashboard)/documents/page.tsx`
+- `packages/web/src/components/documents/_landing/ask-box.tsx`
+- `packages/web/src/app/(dashboard)/documents/chat/[sessionId]/page.tsx`
+- `packages/web/src/components/documents/chat/chat-panel.tsx`
+- `packages/web/src/components/documents/chat/blocker-card.tsx`
+- `packages/web/src/components/documents/chat/preview-pane.tsx`
+- `packages/web/src/components/documents/chat/use-doc-chat.ts`
+- `packages/web/src/components/documents/chat/pending-ask.ts`
+- `packages/web/src/components/documents/_landing/template-preview-drawer.tsx`
+- `packages/web/src/app/(dashboard)/documents/templates/page.tsx`
+- `packages/core/src/documents/agent-prompt.ts`
+- `packages/core/src/documents/agent-tools-read.ts`
+- `packages/core/src/documents/agent-tools-write.ts`

@@ -1,0 +1,574 @@
+---
+title: "Implementation workspace"
+sidebarTitle: "Workspace"
+description: "Work one client's implementation: move milestones, nudge the client, attach evidence, generate the billing memo and Drive folders, build DocuSign envelopes, edit tracker settings and activate go-live."
+keywords: ["implementation workspace", "milestone", "complete milestone", "block milestone", "skip milestone", "nudge client", "billing memo", "Google Drive setup", "client folders", "DocuSign", "signing envelope", "source document", "go-live", "activate go-live", "tracker settings", "first check date", "pause implementation", "cancel implementation", "complete stage", "evidence", "migration artifacts"]
+---
+
+<Info>
+**URL:** `/implementation/{slug}` · **Reach:** sidebar **Implementation** → click the client's row · **Roles:** Principal ✓ Operator ✓ (Admin ✓, Member ✗) · **Ready when:** "Loading implementation…" is gone, the h1 shows the client name and the stage rail (nav "Stages") is visible.
+</Info>
+
+One page per client implementation: stages and milestones in the centre, documents, envelopes, readiness and activity on the right. Principal and Operator see the same controls here.
+
+## Page map
+
+- **Header** (top): breadcrumb "Implementation › `{client}`", h1 = client name, health badge (Green / Yellow / Red), tracker badge when not Active (Awaiting hand-off / Paused / Blocked / Live / Cancelled), owner chip, `First payroll {date} · {relative}` or "First payroll not set", readiness ring (aria-label `Readiness {n}%`). Right side: `Next: {action label} ›`, gear icon "Tracker settings", ⋯ icon "More".
+- **Stage rail** (left column; nav aria-label "Stages"): arc headings "A · Sales & Close", "B · Setup & Compliance", "C · Build & Migration", "D · Go-Live", and one button per stage (id `stage-rail-{n}`) with a badge, the label, a red dot `{n} blocked`, and `{done}/{total}`.
+- **Stage panel** (centre): h2 `{n} · {Label}`, `{done} of {total} done`, a progress bar, buttons **Billing memo** (Stage 2 only), **Complete stage**, paperclip "Attach to stage", the milestone rows, **Add a milestone to this stage**, and on the migration stage (default Stage 6) the **Migration artifacts** panel.
+- **Right rail** (right column; collapsible sections with a header button that has aria-expanded): **Setup & documents** (open by default), **Signing envelopes**, the **Go-live readiness** card, **Activity**.
+- **Milestone sheet** (slides in from the right; opens with `?milestone={id}`).
+- **Tracker settings sheet** (opens with `?panel=settings`).
+- On narrow screens the three columns stack vertically.
+
+## URL parameters
+
+| Parameter | Values | Effect |
+|---|---|---|
+| `stage` | `-1` to `9` | Stage shown in the centre (`-1` = Sales & Close) |
+| `milestone` | milestone id | Opens the milestone sheet |
+| `panel` | `settings`, `setup`, `envelopes`, `activity` | `settings` opens Tracker settings; the others expand that right-rail section |
+| `focus` | `first_check_date`, `state_tax_id_path`, `blocker`, `service_election` | Focuses that Tracker settings field |
+| `docusign` | `review_complete` | Set by DocuSign on return; consumed on load |
+
+## Recipes
+
+### Read the implementation status
+
+**Risk:** `READ` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** client slug or name.
+
+1. Open `/implementation/{slug}`. Alternative: see [Open a client implementation](/implementation/portfolio#open-a-client-implementation).
+   - Wait for: "Loading implementation…" to disappear.
+2. Read the header: health badge, tracker badge, owner chip, first payroll line, readiness ring.
+3. For the readiness breakdown, click the readiness trigger (popover; text like "milestones 75% · services 15% · inputs 10%"). It shows `Readiness {n}%` and "How close this client is to a safe go-live."
+4. Read the stage rail counts and red blocked dots.
+5. Expand **Go-live readiness** and **Activity** in the right rail if needed (click the section header).
+
+**Done when:** you have the values. Empty states:
+
+| If you see | Why | Do this |
+|---|---|---|
+| h3 "Client not found" | Wrong slug | Click **Back to Implementation**; confirm slug with Clarwiz |
+| h3 "No implementation yet" | No tracker | Click **Start implementation** (goes to `/implementation/new?client={slug}`); see [Complete the hand-off](/implementation/portfolio#complete-the-hand-off-and-generate-the-plan) |
+| h3 "This implementation was cancelled" | Cancelled | See [Reactivate](/implementation/portfolio#reactivate-a-cancelled-implementation) |
+| h3 "Couldn’t load this implementation" | Load error | Click **Try again** |
+| Amber strip under the header | Partial data | Read on; report the text |
+| Redirect to `/implementation/{slug}/start` | Tracker awaiting hand-off with no plan | Continue the hand-off flow |
+
+### Go to a stage
+
+**Risk:** `READ` · **Roles:** Principal, Operator
+
+1. Open `/implementation/{slug}?stage={n}`. Alternative: click the stage button in the stage rail (button, id `stage-rail-{n}`; visual: left column). ArrowUp / ArrowDown also move the selection when the rail has focus.
+
+**Done when:** the selected button has aria-current "step" and the centre h2 reads `{n} · {Label}`. No stage is locked.
+
+### Run the next best action
+
+**Risk:** `READ` (navigation only) · **Roles:** Principal, Operator
+
+1. Click `Next: {action label} ›` (primary button, title = the label; visual: header, right). Hidden when everything is complete.
+
+**Done when:** the app scrolls to and highlights a milestone, opens Tracker settings at a field, goes to `/implementation/{slug}/start`, Stage 6 artifacts, or Stage 9. Then do that task with the matching recipe.
+
+### Change the implementation owner
+
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** new owner.
+
+1. Click the owner chip (shows the owner's first name or "Unassigned" with ▾; visual: header title line).
+2. Type the name in the search box (placeholder and aria-label "Search people") and click the person. It applies on click; there is no Save.
+
+**Done when:** toast "Owner updated" and the chip shows the new name.
+
+### Start or complete a milestone
+
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** milestone title (and stage if known).
+
+1. Open `/implementation/{slug}?stage={n}` (or use **Open** from the Milestones view, which opens the sheet; close it with the × aria-label "Close").
+2. Find the milestone row (id `milestone-{id}`; status icon aria-label = status; title; owner; due text).
+3. Click the row's single primary button (visual: right end of the row):
+
+| Milestone status | Primary button | Result toast |
+|---|---|---|
+| Not started | **Start** | "Milestone started" |
+| In progress / Waiting on provider | **Complete** | "Milestone completed" |
+| Blocked (not on the client) | **Unblock** | "Milestone started" |
+| Done / Skipped | **Undo** | "Milestone reopened" |
+| Waiting on client, or blocked on the client | **Nudge client** | Opens the nudge email: see [Nudge the client about a milestone](#nudge-the-client-about-a-milestone) |
+
+**Done when:** the toast shows and the row's status icon changes. Start, Complete and Undo toasts carry **Undo** for 8 seconds.
+
+| If you see | Why | Do this |
+|---|---|---|
+| "That didn’t work — try again." or an error text | Save failed | Retry once; report |
+
+### Change a milestone status
+
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+
+1. On the milestone row, click **Status ▾** (menu button; not shown for Done or Skipped rows).
+2. Click one item. The menu lists only statuses that differ from the current one:
+   - **Mark done** → toast "Milestone completed"
+   - **Waiting on client** → toast "Waiting on client"
+   - **Waiting on provider** → toast "Waiting on provider"
+   - **Block…** or **Skip…** → see [Block or skip a milestone](#block-or-skip-a-milestone)
+   - **Reset to not started** → toast "Reset to not started"
+   - **Reset owner, priority & due to plan** (only when edited by hand) → toast "Reset to the plan"
+
+**Done when:** the toast shows and the status icon changes.
+
+You can also set status in the milestone sheet: radiogroup "Milestone status" with **Not started**, **In progress**, **Waiting on client**, **Blocked**, **Done**, and **More ▾** for **Waiting on provider** and **Skipped**. Picks apply immediately.
+
+### Block or skip a milestone
+
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** the reason text.
+
+1. On the row, click **Status ▾** → **Block…** (or **Skip…**). In the sheet, click **Blocked** (or **More ▾** → **Skipped**).
+2. Type the reason in the reason box (label "Blocked reason" / "Why skip this milestone?" in the row, "Blocked reason" / "Skip reason" in the sheet; placeholder "What is this waiting on?" or "e.g. Not needed for this client").
+3. Click **Block** (or **Skip**). Cmd/Ctrl+Enter also saves; Esc cancels.
+
+**Done when:** toast "Milestone blocked" or "Milestone skipped".
+
+| If you see | Why | Do this |
+|---|---|---|
+| "A reason is required." | Empty reason | Type the reason |
+
+### Nudge the client about a milestone
+
+**Risk:** `EXTERNAL` (emails the client from the user's Gmail and opens an Operations case) · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** milestone; approved recipients and wording.
+
+1. Open the milestone's stage, or its sheet (`/implementation/{slug}?milestone={id}`).
+2. Click **Nudge client** (row primary button, or outline button in the sheet; shown only when the milestone is waiting on the client or blocked on the client). The sheet also shows `Last nudged {date}`.
+   - Wait for: "Preparing the email…" to finish; dialog title `Nudge {client}`.
+3. Review **To**, **Cc**, **Subject**, **Message**. Do not press Cmd/Ctrl+Enter: it sends.
+
+<Warning>**Approval required (EXTERNAL).** Stop here and get approval before clicking **Send nudge**. Report To, Cc, Subject and Message to Clarwiz. The email goes from the user's Gmail and cannot be recalled.</Warning>
+
+4. Click **Send nudge** (dialog footer).
+
+**Done when:** toast "Nudge sent · case created". Full field list and errors: [Nudge clients by email](/implementation/portfolio#nudge-clients-by-email).
+
+### Edit milestone owner, priority or due date
+
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** new owner, priority (Urgent / High / Normal / Low) or due date.
+
+1. Open `/implementation/{slug}?milestone={id}`, or click the milestone title (button) in its row.
+   - Wait for: the sheet with the milestone title as heading.
+2. Owner: click the owner picker, type in "Search people", click the person. Saves on click.
+3. Priority: open the priority select and pick **Urgent**, **High**, **Normal** or **Low**. Saves on pick.
+4. Due: set the date input (aria-label "Due date") in one go with the full date. It saves on every change event, so do not type it digit by digit.
+5. Close the sheet with the × (icon button, aria-label "Close"; visual: top line of the sheet), or Esc when no edit is open.
+
+**Done when:** the property shows the new value and the sheet shows `Set by hand: {fields} — kept when the plan changes.`
+
+To undo hand edits, click **Reset to plan** in that line (toast "Owner, priority and due reset to the plan").
+
+### Edit the milestone reason
+
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+
+1. Open the milestone sheet.
+2. Click the reason box (label "Blocked reason", "Skip reason" or "Waiting on"; placeholder "Add a reason…"). Shown only for blocked, skipped and waiting statuses.
+3. Type the reason and click **Save** (or **Cancel**).
+
+**Done when:** the box shows the new text.
+
+### Attach evidence to a milestone
+
+**Risk:** `WRITE` (reads Drive; writes only to Ariya) · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** note text, Drive file name, or Ariya document name.
+
+1. Open the milestone sheet (`?milestone={id}`).
+2. Under **Evidence**, click **Attach ▾** (menu button).
+3. Pick one:
+   - **Add note**: dialog "Add a note"; type in "Note text"; click **Save note**. Toast "Note added".
+   - **Browse Drive**: dialog "Browse Google Drive"; click **Attach** on the file. Toast `Attached "{name}"`.
+   - **Browse Documents**: dialog "Browse Documents module"; click **Attach** on the document.
+
+**Done when:** a new evidence chip shows under **Evidence**.
+
+| If you see | Why | Do this |
+|---|---|---|
+| "Note text is required" | Empty note | Type the note |
+| "This client's Drive folder hasn't been created yet — run Google Drive setup for this client first." | No Drive folder | See [Run Google Drive setup](#run-google-drive-setup) |
+| "No documents found for this client in the Documents module." | No Ariya documents | Report |
+
+To attach to a whole stage instead, click the paperclip (icon button, aria-label "Attach to stage"; visual: stage panel header, right) and use the same three items.
+
+### Remove evidence or a stage attachment
+
+**Risk:** `DESTRUCTIVE` (removes the link only; the file is kept) · **Roles:** Principal, Operator
+
+<Warning>**Approval required (DESTRUCTIVE).** Stop here and get approval before clicking the ×. The attachment link cannot be restored except by attaching again.</Warning>
+
+1. Milestone evidence: in the sheet, click the × on the chip (aria-label `Remove {label}`). Stage attachment: click the × on the chip in the stage panel (screen-reader text "Revoke").
+2. In the confirm ("Remove this evidence?" or "Remove this attachment?"), click **Remove**.
+
+**Done when:** toast "Evidence removed" or "Attachment removed".
+
+### Comment on a milestone
+
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** comment text.
+
+1. Open the milestone sheet. Press **c** (when not typing) or click the comment box (textarea, aria-label and placeholder "Write a comment…"; visual: **Activity & comments**, bottom of the sheet).
+2. Type the comment.
+3. Click **Comment** (appears once text exists). Cmd/Ctrl+Enter also posts. Esc clears the draft.
+
+**Done when:** the comment appears under **Activity & comments**.
+
+### Add a milestone to a stage
+
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** title, optional due date.
+**Preconditions:** the plan exists.
+
+1. Open `/implementation/{slug}?stage={n}`.
+2. Click **Add a milestone to this stage** (link-button below the milestone list).
+3. Type the title in **Milestone title** (input, aria-label and placeholder "Milestone title").
+4. Optionally set the date input (aria-label "Due date").
+5. Click **Add** (disabled until a title exists). Esc or **Cancel** closes the form.
+
+**Done when:** toast "Milestone added" and the row appears.
+
+| If you see | Why | Do this |
+|---|---|---|
+| "Couldn’t add the milestone" | Save failed | Retry once; report |
+
+### Complete a stage
+
+**Risk:** `WRITE` (marks every open milestone in the stage done) · **Roles:** Principal, Operator
+
+1. Open `/implementation/{slug}?stage={n}`.
+2. Click **Complete stage** (button; visual: stage panel header, right). Disabled with title "Nothing left to complete in this stage" when none are open.
+3. Read the confirm: `Complete {n · Label}?` and `{k} open milestone(s) will be marked done.` Blocked milestones stay open.
+4. Click **Complete stage** in the dialog.
+
+**Done when:** toast `{n} milestone(s) completed` (or `{s} completed · {f} failed`). **Undo all** is available for 10 seconds.
+
+| If you see | Why | Do this |
+|---|---|---|
+| "Couldn’t complete the stage" / "Couldn’t undo" | Save failed | Retry once; report |
+
+### Update migration artifacts
+
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+
+1. Open `/implementation/{slug}?stage=6` (the migration stage; default 6).
+2. Find the **Migration artifacts** panel (id `migration-artifacts`; header shows `{r} of {n} received`).
+3. On the artifact row, click **Mark received** (or **Mark not received**).
+4. Then click **Validate** (or **Unvalidate**). Validate is disabled until received.
+
+**Done when:** the row tag reads Received or Validated.
+
+| If you see | Why | Do this |
+|---|---|---|
+| "Couldn’t update the artifact" | Save failed | Retry once |
+
+### Generate the billing memo
+
+**Risk:** `AI` `WRITE` (writes profile fields to the client record and creates or replaces the memo document) · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** optional source file.
+
+1. Open `/implementation/{slug}?stage=2` and click **Billing memo** (Stage 2 panel header). Alternative: right rail **Setup & documents** → **Generate billing memo** (or **Regenerate**).
+   - Wait for: dialog "Generate billing memo".
+2. Check **Template** (select). If it reads "No Billing Memo template found. Create one in Settings → Templates with a slug starting with billing-memo.", stop and report.
+3. Optionally upload a source file on "Drop a file or click to upload" (PDF, DOCX or image, 10 MB max).
+4. Click **Prepare fields**.
+   - Wait for: "Reading sources…" to finish (AI; can take a minute).
+5. Review the field list (badge "Saves to profile"). Edit only with values from Clarwiz.
+6. If the dialog says "This client already has a billing memo. Generating updates that document in place — its current content is replaced.", report that to Clarwiz before continuing.
+7. Click **Generate billing memo** (or **Update billing memo**).
+
+**Done when:** toast "Billing memo created" or "Billing memo updated" and the URL becomes `/documents/{id}`.
+
+| If you see | Why | Do this |
+|---|---|---|
+| "File must be 10MB or smaller" | File too big | Ask Clarwiz for a smaller file |
+
+To just view an existing memo, click **Open billing memo** in **Setup & documents**.
+
+### Run Google Drive setup
+
+**Risk:** `EXTERNAL` `WRITE` (creates or verifies the client's folder tree in the shared Google Drive) · **Roles:** Principal, Operator
+
+1. Open `/implementation/{slug}?panel=setup` (expands **Setup & documents**).
+2. Find the **Google Drive setup** tile (tag "Generated" or "Not generated").
+
+<Warning>**Approval required (EXTERNAL).** Stop here and get approval before clicking **Generate** or **Regenerate**. It creates real folders in the company's Google Drive.</Warning>
+
+3. Click **Generate** (or **Regenerate**) on that tile.
+
+**Done when:** toast "Google Drive folder setup generated" and the tile tag reads "Generated". **Folder structure** (opens `/documents/{id}` in a new tab) and **Drive folder** (opens the Drive folder in a new tab) become usable.
+
+| If you see | Why | Do this |
+|---|---|---|
+| **Drive folder** disabled with title "Run Google Drive setup first, or connect Google Drive under Settings → Integrations" | No folder yet, or Drive not connected | Run this recipe; if it fails, a Principal must connect Drive at [Integrations](/settings/integrations#connect-or-reconnect-google-drive) |
+
+### Add and apply a source document
+
+**Risk:** `AI` `WRITE` (reads a Drive file, writes the client profile and regenerates target documents) · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** Drive file name, target stage, optional milestone.
+
+1. Open `/implementation/{slug}?panel=setup`.
+2. In the **Source documents** tile, click **Add source document**.
+   - Wait for: dialog "Browse Google Drive".
+3. Click **Attach** on the file.
+4. In "Where does this source document belong?", pick **Stage** (required) and optionally "Milestone (optional)".
+5. Click **Continue**.
+   - Wait for: "Reading…" to finish (AI extraction).
+6. In the review dialog, click **Apply & Generate** (or **Apply & Regenerate Documents**).
+   - Wait for: "Applying…" / "Regenerating…" to finish.
+
+**Done when:** toast "Source document applied" and the tile tag reads "Applied" or `{n} uploaded`.
+
+### Deep-enrich target documents
+
+**Risk:** `AI` `WRITE` (slow) · **Roles:** Principal, Operator
+
+1. In **Setup & documents**, click **Deep enrich**.
+2. Tick the target documents.
+3. Click **Run**. "Each target takes a minute or more."
+
+**Done when:** toast "Deep enrichment complete" (or `{n} target(s) failed to enrich`).
+
+| If you see | Why | Do this |
+|---|---|---|
+| "No target documents configured — add them under Settings → Implementation Catalog." | No targets | A Principal or Admin adds them: [Target documents](/settings/catalogs-and-defaults#add-or-remove-target-documents) |
+
+### Remove a source document
+
+**Risk:** `DESTRUCTIVE` · **Roles:** Principal, Operator
+
+<Warning>**Approval required (DESTRUCTIVE).** Stop here and get approval before clicking **Remove**. Generated documents are kept, but the source is no longer used.</Warning>
+
+1. In **Setup & documents** → **Source documents**, click **Remove** on the source.
+2. In "Remove this source document?", click **Remove**.
+
+**Done when:** toast "Source document removed".
+
+### Generate the signing package
+
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+
+1. Open `/implementation/{slug}?panel=setup`.
+2. In the **Signing package** tile, click **Generate** (or **Regenerate**).
+
+**Done when:** toast "Signing package draft generated". **Open** opens it in a new tab.
+
+### Build a DocuSign envelope
+
+**Risk:** `READ` (preview) then `EXTERNAL` (creates a real DocuSign draft) · **Roles:** Principal, Operator
+
+1. Open `/implementation/{slug}?panel=envelopes` (expands **Signing envelopes**).
+2. Click **Preview Stage 0** or **Preview Stage 4**.
+   - Wait for: "Loading plan…", then the `Stage {n} plan` list.
+3. Read warnings `Nothing attached for: {title}` and the "Also available" checkbox list. Tick extras only if Clarwiz asks.
+
+<Warning>**Approval required (EXTERNAL).** Stop here and get approval before clicking **Review in DocuSign**. It creates a real DocuSign draft envelope and opens DocuSign in a new tab. After clicking, hand off to a human: sending happens inside DocuSign.</Warning>
+
+4. Click `Review in DocuSign ({n} docs)` (disabled when the count is 0).
+5. Stop. Hand off to a human in the new DocuSign tab.
+
+**Done when:** toast "DocuSign draft ready" (or `DocuSign draft ready — {n} expected document(s) not attached`) with "Review and send the envelope inside DocuSign." When DocuSign returns, the workspace URL carries `?panel=envelopes&docusign=review_complete` and shows "Back from DocuSign — envelope statuses refreshed". Do not reload that URL.
+
+### Update an envelope status
+
+**Risk:** `WRITE` (Ariya record only) · **Roles:** Principal, Operator
+
+1. Expand **Signing envelopes** (`?panel=envelopes`).
+2. On the row `Stage {n} · {k} doc(s)`, change the status select to Draft, Sent, Viewed, Completed, Declined, Voided, Expired or Failed. It saves on change.
+
+**Done when:** toast "Envelope status updated". Empty states: "Loading envelopes…" / "No envelopes built yet."
+
+### Check go-live readiness and fill missing inputs
+
+**Risk:** `READ` (then `WRITE` in Tracker settings) · **Roles:** Principal, Operator
+
+1. Open `/implementation/{slug}` and find **Go-live readiness** ("Stage 9 gate"; right rail).
+2. Read the sub-phases (Readiness gate / Process / Verify / Close: "done", "—", or `{d} of {t}`) and the list `{n} item(s) before go-live` (or "Nothing left before go-live"). Click "Show all `{n}`" to see every item; click an item to focus its milestone.
+3. Under "Missing inputs", click a chip such as "+ Add first check date", "+ Add state tax ID path" or "+ Add services". It opens Tracker settings at that field. The line `Services · {c} of {t} confirmed` (or "None selected") opens the Tracker settings **Services** tab.
+4. Fill the field and save (see [Edit tracker settings](#edit-tracker-settings)).
+
+**Done when:** the item list is empty or the missing inputs are gone. "Gate status is unavailable." means the gate could not load.
+
+### Activate go-live
+
+**Risk:** `WRITE` (marks the client live and opens a 3-cycle stabilization window) · **Roles:** Principal, Operator
+
+<Note>Do this only when Clarwiz explicitly asks to activate go-live.</Note>
+
+1. In **Go-live readiness**, click **Activate go-live**. When locked it reads `Activate go-live · {n} item(s) remaining` with "Unlocks when the Stage 9 Close checklist is done (`{k}` open)." or "Unlocks once the Stage 9 Close checklist exists for this plan." Stop and report if locked.
+2. In "Activate go-live?", read the open-item count, then click **Activate**.
+
+**Done when:** toast "Client is live — stabilization window opened" and the card reads "Live" with "This client is live — stabilization cycles are running."
+
+### Edit tracker settings
+
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+**Inputs from Clarwiz:** the fields to change.
+
+1. Open `/implementation/{slug}?panel=settings` (add `&focus=first_check_date`, `state_tax_id_path`, `blocker` or `service_election` to jump to a field). Alternative: click the gear (icon button, aria-label and title "Tracker settings"; visual: header, right).
+   - Wait for: sheet "Tracker settings" with tabs **Details**, **Services**, **States**, **After go-live**.
+2. On **Details**, change only the fields asked for:
+   - Owner, Action owner (owner pickers)
+   - **First check date** (id "settings-firstCheckDate"; re-derives due dates; hand-edited milestones keep theirs)
+   - **Go-live target** (id "settings-goLive")
+   - Client type (select: Existing payroll / New payroll)
+   - **State tax ID path** (id "settings-stateTaxIdPath": Client already has IDs / Ariya registers / Client is handling / Not decided)
+   - Automation (Manual / Draft / Suggested / Approval required / Automatic)
+   - Checkboxes "Prior payroll" (forced on for existing payroll) and "Elevated HR"
+   - Tracker blocker (id "settings-blockerReason", placeholder "Nothing blocking"; blocks the whole implementation and turns health red after 3 days)
+   - SLA profile, SLA override reason, Notes
+3. Do not change **Status** to Cancelled here: it cancels with no confirm. Use [Cancel an implementation](#cancel-an-implementation) instead.
+4. Click **Save settings** (footer; disabled until something changes). **Discard** drops the edits.
+
+**Done when:** toast "Settings saved".
+
+| If you see | Why | Do this |
+|---|---|---|
+| "Couldn’t save settings" | Save failed | Retry once; report |
+
+### Update elected services
+
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+
+1. Open `/implementation/{slug}?panel=settings` and click the **Services** tab.
+2. Per-service progress: change the select under "Status per service" (Not started / In progress / Confirmed / N/A). Saves on change.
+3. To change which services were bought, tick or untick "Elected services", then click **Update services**.
+
+**Done when:** toast "Services updated" (for the election). "No services elected yet." means none are elected.
+
+The **States** tab is read-only ("Set at hand-off and locked once the plan is generated — per-state milestones were created from this list.").
+
+### Track a service after go-live
+
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+
+1. Open `/implementation/{slug}?panel=settings` and click **After go-live**.
+2. Pick "Service" (select), set the date (aria-label "Target date"), and fill "Owner" and "Note" (inputs, by placeholder).
+3. Click **Track service**.
+4. To update one, change its row status select (Identified / Scheduled / In progress / Completed).
+
+**Done when:** toast "Post-onboarding service tracked". "Choose a service" means no service was picked.
+
+### Pause or resume an implementation
+
+**Risk:** `WRITE` · **Roles:** Principal, Operator
+
+1. Click ⋯ (icon button, aria-label "More"; visual: header, far right).
+2. Click **Pause implementation** (or **Resume implementation**).
+
+**Done when:** toast "Implementation paused" (or "Implementation resumed") and the tracker badge updates.
+
+The same menu has **Open client record** (to `/clients/{slug}`), **Open roadmap** (only after graduation) and **Refresh**.
+
+### Cancel an implementation
+
+**Risk:** `DESTRUCTIVE` (reversible later with Reactivate) · **Roles:** Principal, Operator
+
+1. Click ⋯ (aria-label "More") → **Cancel implementation…**.
+
+<Warning>**Approval required (DESTRUCTIVE).** Stop here and get approval before confirming. The implementation leaves the portfolio.</Warning>
+
+2. In "Cancel this implementation?", click **Cancel implementation** (**Keep it** backs out).
+
+**Done when:** toast "Implementation cancelled" and the URL becomes `/implementation`.
+
+### Read the activity log
+
+**Risk:** `READ` · **Roles:** Principal, Operator
+
+1. Open `/implementation/{slug}?panel=activity`.
+2. Read events (summary `{n} events`). Click **Load older** for earlier pages.
+
+**Done when:** you have the events. "No activity yet." means none.
+
+## Controls reference
+
+| Visible text | Type | Locator | What it does | Risk |
+|---|---|---|---|---|
+| Owner chip (`{first name}` / "Unassigned" ▾) | owner picker | header title line | Sets tracker owner | `WRITE` |
+| Readiness trigger | popover | header | Shows readiness breakdown | `READ` |
+| `Next: {label} ›` | button | header right; title = label | Runs the next action | `READ` |
+| (gear) | icon button | aria-label "Tracker settings" | Opens Tracker settings | `READ` |
+| (⋯) | icon button | aria-label "More" | Menu: Open client record, Open roadmap, Refresh, Pause/Resume, Cancel implementation… | mixed |
+| Stage button | button | id `stage-rail-{n}`; aria-current "step" when selected | Sets `?stage=` | `READ` |
+| **Billing memo** | button | Stage 2 panel header | Billing memo dialog | `AI` `WRITE` |
+| **Complete stage** | button | stage panel header | Marks open milestones done | `WRITE` |
+| (paperclip) | icon button | aria-label "Attach to stage" | **Add note** / **Browse Drive** / **Browse Documents** | `WRITE` |
+| **Add a milestone to this stage** | link-button | below milestones | Inline add form | `WRITE` |
+| **Start** / **Complete** / **Unblock** / **Undo** | button | row, right | Primary status action | `WRITE` |
+| **Nudge client** | button | row or sheet | Nudge email dialog | `EXTERNAL` on send |
+| **Status ▾** | menu | row | Status changes | `WRITE` |
+| **Mark received** / **Validate** | buttons | Migration artifacts | Artifact progress | `WRITE` |
+| **Generate** (Google Drive setup) | button | Setup & documents | Creates Drive folders | `EXTERNAL` |
+| **Folder structure** / **Drive folder** / **Open** | link / buttons | Setup & documents | Open in a new tab | `READ` |
+| **Add source document** | button | Setup & documents | Drive picker, then AI extraction | `AI` |
+| **Apply & Generate** / **Apply & Regenerate Documents** | button | review dialog | Writes profile, regenerates docs | `AI` `WRITE` |
+| **Deep enrich** → **Run** | buttons | Setup & documents | Enriches targets | `AI` `WRITE` |
+| **Remove** (source) | button | Setup & documents | Drops the source | `DESTRUCTIVE` |
+| **Preview Stage 0** / **Preview Stage 4** | buttons | Signing envelopes | Shows plan | `READ` |
+| `Review in DocuSign ({n} docs)` | button | Signing envelopes | DocuSign draft, new tab | `EXTERNAL` |
+| Envelope status select | select | envelope row | Saves on change | `WRITE` |
+| **Activate go-live** | button | Go-live readiness | Marks live | `WRITE` |
+| **Load older** | button | Activity | Older events | `READ` |
+| Previous / Next milestone | icon buttons | aria-label "Previous milestone (k)" / "Next milestone (j)" | Moves through milestones | `READ` |
+| × | icon button | aria-label "Close" (sheet) | Closes the milestone sheet | `READ` |
+| **Attach ▾** | menu | sheet Evidence | Note / Drive / Documents | `WRITE` |
+| Evidence × | icon button | aria-label `Remove {label}` | Removes evidence | `DESTRUCTIVE` |
+| **Comment** | button | sheet | Posts comment | `WRITE` |
+| **Save settings** / **Discard** | buttons | Tracker settings footer | Saves Details | `WRITE` |
+| **Update services** | button | Tracker settings Services | Saves election | `WRITE` |
+| **Track service** | button | Tracker settings After go-live | Adds post-go-live service | `WRITE` |
+
+## Waits and signals
+
+- Page load: "Loading implementation…".
+- Right-rail section bodies render only when expanded; click the section header (aria-expanded) first, or use `?panel=`.
+- AI steps: billing memo "Reading sources…", source document "Reading…", "Applying…", "Regenerating…", deep enrich takes a minute or more per target.
+- Undo toasts: 8 seconds on row actions, 10 seconds on **Complete stage**.
+- Envelope plan: "Loading plan…"; envelopes: "Loading envelopes…"; activity: "Loading…".
+
+## Gotchas
+
+- Many writes save instantly with no confirm: owner picks, status segments, priority, due date (on every change), service status selects, envelope status select, migration toggles.
+- Tracker settings **Status** = Cancelled plus **Save settings** cancels without the confirm the ⋯ menu shows.
+- New tabs open from **Folder structure**, **Open** (signing package), **Drive folder**, evidence chips and **Review in DocuSign**. Switch back to the Ariya tab afterwards.
+- The milestone sheet has no default close button in the corner; use the icon button with aria-label "Close", or Esc when no edit is open. Esc during an edit cancels the edit, not the sheet.
+- Sheet keys (ignored while typing): **j** next, **k** previous, **c** focus comment.
+- `?docusign=review_complete` is consumed on load. Do not reload expecting the toast again.
+- In-app help (? panel) says "Click **Generate billing memo**, then **Prepare fields**. Click **Generate**."; the final button is **Generate billing memo** or **Update billing memo**, and on Stage 2 the panel button is **Billing memo**.
+- In-app help says "Click **Review in DocuSign**"; you must first click **Preview Stage 0** or **Preview Stage 4**, and the button reads `Review in DocuSign ({n} docs)` and opens a new tab.
+- In-app help says to use the **More** menu for **Pause**, **Resume**, **Cancel implementation**; the menu is the ⋯ icon (aria-label "More") and the items read "Pause implementation", "Resume implementation", "Cancel implementation…".
+- In-app help says "Open **Setup & documents** and generate the paperwork"; there are separate **Google Drive setup** and **Signing package** tiles, and Drive setup creates real Drive folders.
+
+## Related
+
+- [Implementation portfolio and start flow](/implementation/portfolio)
+- [Integrations](/settings/integrations)
+- [Implementation catalog](/settings/catalogs-and-defaults#implementation-catalog)
+
+## Source files
+
+- `packages/web/src/app/(dashboard)/implementation/components/workspace/workspace-page.tsx`
+- `packages/web/src/app/(dashboard)/implementation/components/workspace/workspace-header.tsx`
+- `packages/web/src/app/(dashboard)/implementation/components/workspace/stage-rail.tsx`
+- `packages/web/src/app/(dashboard)/implementation/components/workspace/stage-panel.tsx`
+- `packages/web/src/app/(dashboard)/implementation/components/workspace/milestone-row.tsx`
+- `packages/web/src/app/(dashboard)/implementation/components/workspace/migration-artifacts-panel.tsx`
+- `packages/web/src/app/(dashboard)/implementation/components/workspace/setup-documents.tsx`
+- `packages/web/src/app/(dashboard)/implementation/components/workspace/signing-envelopes.tsx`
+- `packages/web/src/app/(dashboard)/implementation/components/workspace/readiness-panel.tsx`
+- `packages/web/src/app/(dashboard)/implementation/components/workspace/tracker-settings-sheet.tsx`
+- `packages/web/src/app/(dashboard)/implementation/components/sheet/milestone-sheet.tsx`
+- `packages/web/src/app/(dashboard)/clients/[slug]/components/implementation-attachments.tsx`
+- `packages/web/src/app/(dashboard)/clients/[slug]/components/billing-memo-generate-dialog.tsx`
+- `packages/web/src/components/implementation/owner-picker.tsx`
+- `packages/web/src/lib/implementation/milestone-actions.ts`
